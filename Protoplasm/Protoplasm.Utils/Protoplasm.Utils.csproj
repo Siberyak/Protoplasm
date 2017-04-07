@@ -79,6 +79,12 @@
     <Compile Include="TypeExtender.cs" />
     <Compile Include="TypeNameExtender.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Protoplasm.ComponentModel\Protoplasm.ComponentModel.csproj">
+      <Project>{40e24e3b-7e11-404a-978d-e909a44b118b}</Project>
+      <Name>Protoplasm.ComponentModel</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

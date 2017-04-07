@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using KG.SE2.Utils.Collections;
+using Protoplasm.Utils.Collections;
 
-namespace KG.SE2.Utils.Graph
+namespace Protoplasm.Utils.Graph
 {
 	public interface INodesFactory
 	{

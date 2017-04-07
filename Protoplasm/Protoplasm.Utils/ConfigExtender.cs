@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
-namespace KG.SE2.Utils
+namespace Protoplasm.Utils
 {
     public static class ConfigExtender
     {

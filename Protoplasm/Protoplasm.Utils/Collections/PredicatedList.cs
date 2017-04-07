@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public class PredicatedList<T> : IBindingList<T>
 	{

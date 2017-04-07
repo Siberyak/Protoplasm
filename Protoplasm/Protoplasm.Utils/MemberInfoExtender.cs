@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace KG.SE2.Utils
+namespace Protoplasm.Utils
 {
     /// <summary>
     ///     хелпер для работы с атрибутами членов типа

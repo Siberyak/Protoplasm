@@ -2,7 +2,7 @@
 using System.Text;
 using System.Xml;
 
-namespace KG.SE2.Utils.Graph
+namespace Protoplasm.Utils.Graph
 {
     public interface IGraph
     {

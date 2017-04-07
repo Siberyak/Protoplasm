@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public interface ILinksList<TLink> : IList<TLink>
 	{ }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public abstract class TransformList<TBase, TResult> : BindingListWrapper<TBase, TResult>, IBindingList<TBase>
 	{

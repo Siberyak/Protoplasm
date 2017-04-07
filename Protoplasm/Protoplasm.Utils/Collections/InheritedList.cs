@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public class InheritedList<TParent, TChild> : TransformList<TChild, TParent>
 		where TChild : TParent

@@ -1,6 +1,6 @@
 using System;
 
-namespace KG.SE2.Utils
+namespace Protoplasm.Utils
 {
     /// <summary>
     ///     определяет DisplayName для значения

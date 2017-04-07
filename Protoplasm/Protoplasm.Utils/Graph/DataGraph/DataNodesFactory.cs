@@ -1,4 +1,4 @@
-namespace KG.SE2.Utils.Graph
+namespace Protoplasm.Utils.Graph
 {
     public class DataNodesFactory<TNodeData> : IDataNodesFactory<TNodeData>
     {

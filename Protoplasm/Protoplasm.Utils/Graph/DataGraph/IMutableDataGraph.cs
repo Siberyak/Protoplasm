@@ -1,4 +1,7 @@
-namespace KG.SE2.Utils.Graph
+using System;
+using System.Collections.Generic;
+
+namespace Protoplasm.Utils.Graph
 {
     /// <summary>
     ///     Описание изменяемого графа
@@ -40,5 +43,9 @@ namespace KG.SE2.Utils.Graph
         ///     Удалить связь
         /// </summary>
         void Remove(IEdge edge);
+
+        IEnumerable<T> Datas<T>(Func<T, bool> predicate = null);
+        IEnumerable<IDataNode<T>> DataNodes<T>(Func<IDataNode<T>, bool> predicate = null);
+        IEnumerable<IDataEdge<T>> DataEdges<T>(Func<IDataEdge<T>, bool> predicate = null);
     }
 }

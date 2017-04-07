@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
-namespace KG.SE2.Utils.Graph
+namespace Protoplasm.Utils.Graph
 {
     public interface IEdge
     {

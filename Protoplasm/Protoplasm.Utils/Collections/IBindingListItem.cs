@@ -1,6 +1,6 @@
 using System;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public interface IBindingListItem
 	{

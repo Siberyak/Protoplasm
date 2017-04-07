@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public abstract class LinksListBase<TLink, TOwner, TRelated> : TransformList<TLink, TRelated>, ILinksList<TLink, TOwner, TRelated>
 		where TLink : ILink<TOwner, TRelated>

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
-namespace KG.SE2.Utils
+namespace Protoplasm.Utils
 {
     /// <summary>
     ///     хелпер для работы с атрибутами типов

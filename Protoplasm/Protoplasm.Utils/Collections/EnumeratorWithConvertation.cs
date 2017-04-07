@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	internal class EnumeratorWithConvertation<TBase, TResult> : IEnumerator<TResult>
 	{

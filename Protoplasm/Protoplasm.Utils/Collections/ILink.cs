@@ -1,4 +1,4 @@
-namespace KG.SE2.Utils.Collections
+namespace Protoplasm.Utils.Collections
 {
 	public interface ILink<TOwner, TRelated>
 	{

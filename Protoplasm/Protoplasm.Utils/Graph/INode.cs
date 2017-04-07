@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace KG.SE2.Utils.Graph
+namespace Protoplasm.Utils.Graph
 {
     public interface INode
     {

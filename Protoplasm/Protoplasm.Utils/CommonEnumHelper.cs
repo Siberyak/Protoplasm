@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace KG.SE2.Utils
+namespace Protoplasm.Utils
 {
     /// <summary>
     /// </summary>
