@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,15 +33,6 @@ namespace ConsoleApplication1.TestData
 
             Competence result = required.CompareValues(variant) ?? variant.CompareValues(required, true);
             return result;
-        }
-    }
-
-    public class CompetenceMatch
-    {
-
-        public CompetenceMatch(Competence competence, Competence firstOrDefault, int? compareTo)
-        {
-            
         }
     }
 
@@ -91,98 +81,6 @@ namespace ConsoleApplication1.TestData
         }
     }
 
-    public class Competences : IReadOnlyCollection<Competence>
-    {
-        private readonly List<Competence> _competences = new List<Competence> ();
-
-        private Competences(IEnumerable<Competence> competences)
-        {
-            _competences.AddRange(competences);
-        }
-
-        internal Competences()
-        {
-        }
-
-        public Competences AddKeyValue<TKey, TValue>(TKey key, TValue value)
-            where TKey : IEquatable<TKey>
-            where TValue : IComparable<TValue>, IComparable
-        {
-            return Add(new Competence<TKey, TValue>(key, value));
-        }
-
-        public Competences AddKey<TKey>(TKey key)
-    where TKey : IEquatable<TKey>
-    
-        {
-            return AddKeyValue(key, new AnyValueComparable());
-        }
-
-        internal class AnyValueComparable : IComparable, IComparable<AnyValueComparable>
-        {
-            public int CompareTo(object obj)
-            {
-                return obj != null ? 0 : 1;
-            }
-
-            public int CompareTo(AnyValueComparable other)
-            {
-                return CompareTo((object)other);
-            }
-        }
-
-
-        public Competences Add(Competence competence)
-        {
-            if (competence == null)
-                return this;
-            _competences.Add(competence);
-            return this;
-        }
-
-
-        public IEnumerator<Competence> GetEnumerator()
-        {
-            return _competences.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public int Count => _competences.Count;
-
-
-
-        public bool Acceptable(IEnumerable<Competence> competences, out IEnumerable<CompetenceMatchingResult> result)
-        {
-            result = this
-                .Select
-                (
-                    required => new CompetenceMatchingResult
-                    (required, 
-                        competences
-                            .Select(variant => Competence.Acceptable(required, variant))
-                            .FirstOrDefault(y => y != null))
-                            )
-                .ToArray();
-
-            return result.All(x => x != null);
-        }
-
-        public Competences AnyOf(IReadOnlyCollection<Competence> competences)
-        {
-            Add(new AnyOfCompetence(competences as Competences ?? new Competences(competences) ));
-            return this;
-        }
-
-        public static Competences New()
-        {
-            return new Competences();
-        }
-    }
-
     public class CompetenceMatchingResult
     {
         public Competence Required { get; }
@@ -225,43 +123,6 @@ namespace ConsoleApplication1.TestData
         }
     }
 
-    public static class MemberOfCompetenceExtender
-    {
-        public static Competences MemberOf(this Competences competences, params MembershipItem[] memberOf)
-        {
-            foreach (var membership in memberOf)
-            {
-                competences = competences.Add(new MemberOfCompetence(membership));
-            }
-
-            return competences;
-        }
-    }
-
-    public class MemberOfCompetence : Competence
-    {
-        public MemberOfCompetence(MembershipItem membershipItem)
-        {
-            MembershipItem = membershipItem;
-        }
-
-        public MembershipItem MembershipItem { get; }
-        protected override object CompetenceKey => GetType();
-        protected override Competence CompareValues(Competence other, bool backward = false)
-        {
-            if (backward)
-                return null;
-
-            var competence = other as MemberOfCompetence;
-            return competence?.MembershipItem.MemberOfOrEqual(MembershipItem) == true ? competence : null;
-        }
-
-        public override string ToString()
-        {
-            return $"Member of [{MembershipItem}]";
-        }
-    }
-
     public abstract class MembershipItem : Entity
     {
         public string Caption { get; }
@@ -288,30 +149,6 @@ namespace ConsoleApplication1.TestData
     {
         public MembershipItemsContainer(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption, memberOf)
         {
-        }
-    }
-
-    public class Role : MembershipItemsContainer
-    {
-        public Role(string caption = null) : base(caption, new Role[0])
-        {
-        }
-
-        public override bool MemberOfOrEqual(MembershipItem item)
-        {
-            return Equals(this, item);
-        }
-    }
-
-    public class Department : MembershipItemsContainer
-    {
-        public Department(string caption, params Department[] memberOf) : base(caption, memberOf)
-        {
-        }
-
-        public override bool MemberOfOrEqual(MembershipItem item)
-        {
-            return base.MemberOfOrEqual(item);
         }
     }
 }

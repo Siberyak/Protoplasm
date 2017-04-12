@@ -55,29 +55,36 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseRequirement.cs" />
-    <Compile Include="TestData\BoundaryRequirement.cs" />
-    <Compile Include="TestData\Calendar.cs" />
-    <Compile Include="TestData\CalendarAbility.cs" />
-    <Compile Include="TestData\Competence.cs" />
-    <Compile Include="TestData\CompetencesAbility.cs" />
-    <Compile Include="TestData\CompetencesRequirement.cs" />
-    <Compile Include="TestData\Employee.cs" />
-    <Compile Include="TestData\Interval.cs" />
+    <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
+    <Compile Include="TestData\Data\Calendar.cs" />
+    <Compile Include="TestData\Abilities\CalendarAbility.cs" />
+    <Compile Include="TestData\Competences\Competence.cs" />
+    <Compile Include="TestData\Competences\Competences.cs" />
+    <Compile Include="TestData\Abilities\CompetencesAbility.cs" />
+    <Compile Include="TestData\Competences\CompetencesExtender.cs" />
+    <Compile Include="TestData\Requirements\CompetencesRequirement.cs" />
+    <Compile Include="TestData\Data\Department.cs" />
+    <Compile Include="TestData\Data\Employee.cs" />
+    <Compile Include="TestData\Data\Interval.cs" />
     <Compile Include="TestData\MappingType.cs" />
+    <Compile Include="TestData\Competences\MemberOfCompetence.cs" />
     <Compile Include="TestData\PlanningEnvironment.cs" />
-    <Compile Include="TestData\ResourcesManager.cs" />
+    <Compile Include="TestData\Requirements\Requirement.cs" />
+    <Compile Include="TestData\Agents\ResourcesManager.cs" />
     <Compile Include="Scene.cs" />
-    <Compile Include="TestData\Entity.cs" />
-    <Compile Include="TestData\WorkItemAgent.cs" />
-    <Compile Include="TestData\WorkItemsManager.cs" />
-    <Compile Include="TestData\Ability.cs" />
-    <Compile Include="TestData\WorkItem.cs" />
+    <Compile Include="TestData\Data\Entity.cs" />
+    <Compile Include="TestData\Data\Role.cs" />
+    <Compile Include="TestData\Agents\WorkItemAgent.cs" />
+    <Compile Include="TestData\Agents\WorkItemsManager.cs" />
+    <Compile Include="TestData\Abilities\Ability.cs" />
+    <Compile Include="TestData\Data\WorkItem.cs" />
     <Compile Include="TestData\_TestDataLoad.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
