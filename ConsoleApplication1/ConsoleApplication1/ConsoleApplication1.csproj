@@ -55,6 +55,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseRequirement.cs" />
+    <Compile Include="Intervals\Point.cs" />
+    <Compile Include="Intervals\PointDirection.cs" />
+    <Compile Include="Intervals\PointedInterval.cs" />
+    <Compile Include="Intervals\PointedIntervalsContainer.cs" />
+    <Compile Include="Intervals\PointedIntervalsContainerExtender.cs" />
+    <Compile Include="Intervals\PointsComparerBase.cs" />
     <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
     <Compile Include="TestData\Data\Calendar.cs" />
     <Compile Include="TestData\Abilities\CalendarAbility.cs" />

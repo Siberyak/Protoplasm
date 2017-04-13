@@ -4,21 +4,22 @@ using System.Collections.Generic;
 namespace ConsoleApplication1.TestData
 {
     public struct Interval<T> : IEquatable<Interval<T>>
+        //where T : struct
     {
         public static readonly Interval<T> Empty = new Interval<T>(default(T), default(T));
 
-        private Interval(T begin, T end)
+        private Interval(T left, T right)
         {
-            Begin = begin;
-            End = end;
+            Left = left;
+            Right = right;
         }
 
-        public T Begin { get; }
-        public T End { get; }
+        public T Left { get; }
+        public T Right { get; }
 
         public bool Equals(Interval<T> other)
         {
-            return EqualityComparer<T>.Default.Equals(Begin, other.Begin) && EqualityComparer<T>.Default.Equals(End, other.End);
+            return EqualityComparer<T>.Default.Equals(Left, other.Left) && EqualityComparer<T>.Default.Equals(Right, other.Right);
         }
 
         public override bool Equals(object obj)
@@ -31,7 +32,7 @@ namespace ConsoleApplication1.TestData
         {
             unchecked
             {
-                return (EqualityComparer<T>.Default.GetHashCode(Begin)*397) ^ EqualityComparer<T>.Default.GetHashCode(End);
+                return (EqualityComparer<T>.Default.GetHashCode(Left)*397) ^ EqualityComparer<T>.Default.GetHashCode(Right);
             }
         }
 
@@ -53,5 +54,9 @@ namespace ConsoleApplication1.TestData
         {
             return new Interval<T>(begin, end);
         }
+
+
     }
+
+
 }

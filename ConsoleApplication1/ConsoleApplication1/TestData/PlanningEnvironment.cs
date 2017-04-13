@@ -7,6 +7,15 @@ namespace ConsoleApplication1.TestData
         where TDuration : struct, IComparable<TDuration>
     {
 
+        public static TTime Min(TTime a, TTime b)
+        {
+            return a.CompareTo(b) <= 0 ? a : b;
+        }
+        public static TTime Max(TTime a, TTime b)
+        {
+            return a.CompareTo(b) >= 0 ? a : b;
+        }
+
         public ResourcesManager Resources { get; }
         public WorkItemsManager WorkItems { get; }
     }
