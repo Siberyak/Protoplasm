@@ -14,302 +14,128 @@ namespace ConsoleApplication1.TestData
 
     public class _TestDataLoad
     {
-
-        private static PlanningEnvironment<DateTime, TimeSpan>.CalendarItem GetCalendarItemDelegated(PlanningEnvironment<DateTime, TimeSpan>.CalendarItem baseItem, DateTime date,
-            params PlanningEnvironment<DateTime, TimeSpan>.Calendar.GenerateCalendarItem[] funcs)
-        {
-            foreach (var func in funcs)
-            {
-                baseItem = func(baseItem, date);
-            }
-
-            return baseItem;
-        }
-
-        //private static PlanningEnvironment<DateTime, TimeSpan>.CalendarItem GetTimedCalendarItem(PlanningEnvironment<DateTime, TimeSpan>.CalendarItem baseItem, DateTime date)
-        //{
-        //    if (baseItem == null || Equals(baseItem.Data, false))
-        //    {
-        //        return baseItem;
-        //    }
-
-        //    DateTime begin = date.Date.AddHours(9);
-        //    DateTime end = date.Date.AddHours(18);
-
-        //    var isWorkTime = date >= begin && date <= end;
-
-
-        //    if (isWorkTime)
-        //    {
-        //        begin = PlanningEnvironment<DateTime, TimeSpan>.Max(begin, baseItem.Begin);
-        //        end = PlanningEnvironment<DateTime, TimeSpan>.Min(end, baseItem.End);
-        //    }
-        //    else
-        //    {
-        //        if (date < begin)
-        //        {
-        //            end = begin;
-        //            begin = baseItem.Begin;
-        //        }
-        //        else
-        //        {
-        //            begin = end;
-        //            end = baseItem.End;
-        //        }
-        //    }
-
-        //    return new PlanningEnvironment<DateTime, TimeSpan>.CalendarItem {Begin = begin, End = end, Data = isWorkTime};
-        //}
-
-        private static PlanningEnvironment<DateTime, TimeSpan>.CalendarItem GetCalendarItem(DateTime date)
-        {
-            DayOfWeek dayOfWeek = date.DayOfWeek;
-            var begin = date.Date;
-            var end = begin;
-            var available = CalendarItemType.Available;
-
-            switch (dayOfWeek)
-            {
-                case DayOfWeek.Saturday:
-                    end = date.AddDays(1);
-                    available = CalendarItemType.Unavalable;
-                    break;
-                case DayOfWeek.Sunday:
-                    available = CalendarItemType.Unavalable;
-                    break;
-                default:
-                    end = date.AddDays(5 - (int)dayOfWeek);
-                    break;
-                    
-            }
-
-            return new PlanningEnvironment<DateTime, TimeSpan>.CalendarItem() {Begin = begin, End = end, Data = available};
-        }
-
-
         public static void Do()
         {
-            TestIntervals();
+
+            TestCalendars();
 
             TestCalendarItems();
 
-
             TestCompetencesMatching();
-
 
             TestManagersAdd();
         }
 
-        private static void TestIntervals()
+        private static void TestCalendars()
         {
-            var container = new PointedIntervalsContainer<int, int>((a, b) => a + b, (a, b) => a - b);
+            var calendar1 = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => CalendarItemType.Unknown);
+            var tmp1 = calendar1.Get(DateTime.Today, DateTime.Today.AddDays(10));
+            var tmp2 = calendar1.Get(DateTime.Today.AddDays(20), DateTime.Today.AddDays(30));
+            var tmp3 = calendar1.Get(DateTime.Today.AddDays(15), DateTime.Today.AddDays(35));
 
-            try
-            {
-                container.Include(1, 1, 8, true, false);
-            }
-            catch (Exception e)
-            {
+            var calendar2 = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>(calendar1, ByWorkingTime, (a, b) => b, (a, b) => CalendarItemType.Unavalable);
+            var tmp4 = calendar2.Get(DateTime.Today.AddDays(5), DateTime.Today.AddDays(15));
 
-            }
-            try
-            {
-                container.Include(1, 1, 8, false, true);
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            container.Include(0, 100, 8);
-
-
-            container.Include(200, 300, 8);
-            container.Include(190, 200, 8);
-            container.Include(300, 310, 8);
-
-
-            container.Include(20, 60, 2);
-            container.Include(40, 80, 2);
-
-            container.Exclude(50, 60, 2);
-            container.Exclude(70, 80, 1);
-            container.Exclude(80, 90, 1);
-            try
-            {
-                container.Exclude(45, 45, 12, false, false);
-            }
-            catch (Exception e)
-            {
-                
-            }
-            container.Exclude(47, 47, 12);
-
-            var tmp = container.ToArray();
         }
+
+        #region TestCalendarItems
 
         private static void TestCalendarItems()
         {
-            var container = new PointedIntervalsContainer<DateTime, CalendarItemType>((a, b) => b, (a, b) => CalendarItemType.Unknown);
+            var container = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems((a, b) => b, (a, b) => CalendarItemType.Unknown);
             container.Include(DateTime.Today, DateTime.Today.AddDays(1), CalendarItemType.Available);
             container.Include(DateTime.Now, DateTime.Now.AddHours(1), CalendarItemType.Available);
 
             var environment = new PlanningEnvironment<DateTime, TimeSpan>();
 
 
-            var request = new PlanningEnvironment<DateTime, TimeSpan>.CalendarItem() {Begin = DateTime.Now.AddDays(-10), End = DateTime.Now.AddDays(12)};
+            //var request = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>(TODO, TODO, TODO).CalendarItem() {Begin = DateTime.Now.AddDays(-10), End = DateTime.Now.AddDays(12)};
 
-            var items0 = new[] {request};
+            //var items0 = new[] {request};
 
-            var items1 = ByDayOfWeek(items0);
-            var items2 = ByWorkingTime(items1);
+            //var items1 = ByDayOfWeek(items0);
+            //var items2 = ByWorkingTime(items1);
         }
 
 
-        private static IEnumerable<PlanningEnvironment<DateTime, TimeSpan>.CalendarItem> ByDayOfWeek(IEnumerable<PlanningEnvironment<DateTime, TimeSpan>.CalendarItem> baseitems)
+        private static void ByDayOfWeek(PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem toDefine)
         {
-            var items = baseitems.ToArray();
+            var begin = toDefine.Left.PointValue.Value;
+            var end = toDefine.Right.PointValue.Value;
 
-            var container = new PointedIntervalsContainer<DateTime, CalendarItemType>((a, b) => b, (a, b) => CalendarItemType.Unknown);
-
-            // ====================
-            // test points includings
-            // ====================
-            // normal
-            //var days = 5;
-            //container.Include(DateTime.Today.AddDays(days), DateTime.Today.AddDays(days+1), CalendarItemType.Available, false, false);
-            //container.Include(DateTime.Today.AddDays(days + 1), DateTime.Today.AddDays(days + 2), CalendarItemType.Available, false, false);
-
-            // exception
-            //days = 10;
-            //container.Include(DateTime.Today.AddDays(days), DateTime.Today.AddDays(days + 1), CalendarItemType.Available);
-            //container.Include(DateTime.Today.AddDays(days + 1), DateTime.Today.AddDays(days + 2), CalendarItemType.Available, false);
-            
-            // error in splitting: don't need split
-            //container.Include(DateTime.Today, DateTime.Today.AddDays(1), CalendarItemType.Available);
-            //container.Include(DateTime.Now, DateTime.Now, CalendarItemType.Available);
-            // ====================
-
-            foreach (var item in items)
+            while (begin < end)
             {
-                var begin = item.Begin;
-                var end = item.End;
+                var available = CalendarItemType.Available;
+                var date = begin.Date.AddDays(1);
+                var dayOfWeek = begin.DayOfWeek;
 
-                while (begin < end)
+                switch (dayOfWeek)
                 {
-                    var available = CalendarItemType.Available;
-                    var date = begin.Date.AddDays(1);
-                    var dayOfWeek = begin.DayOfWeek;
-
-                    switch (dayOfWeek)
-                    {
-                        case DayOfWeek.Saturday:
-                            date = date.AddDays(1);
-                            available = CalendarItemType.Unavalable;
-                            break;
-                        case DayOfWeek.Sunday:
-                            available = CalendarItemType.Unavalable;
-                            break;
-                        default:
-                            date = date.AddDays(5 - (int)dayOfWeek);
-                            break;
-
-                    }
-
-                    container.Include
-                        (
-                            begin,
-                            begin = PlanningEnvironment<DateTime, TimeSpan>.Min(date, end),
-                            available,
-                            rightIncluded: false
-                        );
+                    case DayOfWeek.Saturday:
+                        date = date.AddDays(1);
+                        available = CalendarItemType.Unavalable;
+                        break;
+                    case DayOfWeek.Sunday:
+                        available = CalendarItemType.Unavalable;
+                        break;
+                    default:
+                        date = date.AddDays(5 - (int) dayOfWeek);
+                        break;
                 }
 
+                container.Include
+                    (
+                        begin,
+                        begin = PlanningEnvironment<DateTime, TimeSpan>.Min(date, end),
+                        available,
+                        rightIncluded: false
+                    );
             }
-
-
-            var tmp = container.ToArray();
-
-            items = tmp.Select
-                (
-                    x =>
-                        new PlanningEnvironment<DateTime, TimeSpan>.CalendarItem
-                        {
-                            Begin = x.Left.PointValue.Value,
-                            End = x.Right.PointValue.Value,
-                            Data = x.Data
-                        })
-                .ToArray();
-
-            return items;
         }
 
-
-        private static IEnumerable<PlanningEnvironment<DateTime, TimeSpan>.CalendarItem> ByWorkingTime(IEnumerable<PlanningEnvironment<DateTime, TimeSpan>.CalendarItem> baseitems)
+        private static void ByWorkingTime(PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem toDefine)
         {
-            var items = baseitems.ToArray();
+            var begin = toDefine.Left.PointValue.Value;
+            var end = toDefine.Right.PointValue.Value;
 
-            var container = new PointedIntervalsContainer<DateTime, CalendarItemType>((a, b) => b, (a, b) => CalendarItemType.Unavalable);
+            container.Include(begin, end, toDefine.Data, rightIncluded: false);
+            if (toDefine.Data == CalendarItemType.Unavalable)
+                return;
 
-            foreach (var item in items)
+            while (begin < end)
             {
-                var begin = item.Begin;
-                var end = item.End;
+                var interval = ExcludeIfNeed(begin, end, 0, 9, container);
+                interval = ExcludeIfNeed(begin, end, 13, 14, container) ?? interval;
+                interval = ExcludeIfNeed(begin, end, 18, 24, container) ?? interval;
 
-                container.Include(begin, end, item.Data, rightIncluded: false);
-                if(item.Data == CalendarItemType.Unavalable)
-                    continue;
 
-                while (begin < end)
-                {
-                    PointedInterval<DateTime, CalendarItemType> interval;
-                    if (NeedExclude(begin, end, 0, 9, out interval))
-                        container.Exclude(interval);
-
-                    if (NeedExclude(begin, end, 13, 14, out interval))
-                        container.Exclude(interval);
-
-                    if (NeedExclude(begin, end, 18, 24, out interval))
-                        container.Exclude(interval);
-
-                    begin = interval?.Right.PointValue.Value ?? begin.Date.AddDays(1);
-                }
+                begin = interval?.Right.PointValue ?? begin.Date.AddDays(1);
             }
-
-            var tmp = container.ToArray();
-            items = tmp.Select
-                (
-                    x =>
-                        new PlanningEnvironment<DateTime, TimeSpan>.CalendarItem
-                        {
-                            Begin = x.Left.PointValue.Value,
-                            End = x.Right.PointValue.Value,
-                            Data = x.Data
-                        })
-                .ToArray();
-
-            return items;
         }
 
-        static bool NeedExclude(DateTime begin, DateTime end, int beginHour, int endHour, out PointedInterval<DateTime, CalendarItemType> interval)
+        static PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container)
         {
 
             var wantedBegin = begin.Date.AddHours(beginHour);
             var wantedEnd = begin.Date.AddHours(endHour);
 
-            interval = null;
 
             if (wantedBegin > end)
-                return false;
+                return null;
             if (wantedEnd < begin)
-                return false;
+                return null;
 
             wantedBegin = PlanningEnvironment<DateTime, TimeSpan>.Max(begin, wantedBegin);
             wantedEnd = PlanningEnvironment<DateTime, TimeSpan>.Min(end, wantedEnd);
 
-            interval = new PointedInterval<DateTime, CalendarItemType>(wantedBegin, true, wantedEnd, false, CalendarItemType.Unavalable);
-            return true;
+            PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem interval;
+            //= container.NewInterval(Point<DateTime>.Right(wantedBegin), Point<DateTime>.Right(wantedEnd, false), CalendarItemType.Unavalable);
+            container.Exclude(out interval, wantedBegin, wantedEnd, CalendarItemType.Unavalable, true, false);
+            return interval;
         }
+
+        #endregion
+
 
         private static void TestCompetencesMatching()
         {

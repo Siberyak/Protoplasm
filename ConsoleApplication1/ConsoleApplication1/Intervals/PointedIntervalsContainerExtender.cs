@@ -29,6 +29,18 @@ namespace ConsoleApplication1.Intervals
             TestIC();
         }
 
+        class IntIntInterval : PointedInterval<int, int>
+        {
+            public IntIntInterval(Point<int> left = null, Point<int> right = null, int data = 0) : base(left, right, data)
+            {
+            }
+        }
+        class IntIntIntervals : PointedIntervalsContainer<IntIntInterval, int, int>
+        {
+            public IntIntIntervals() : base((left, right, data) => new IntIntInterval(left, right, data), (a,b) => a+b, (a, b) => a - b)
+            {
+            }
+        }
 
         /// <summary>
         /// 
@@ -38,7 +50,7 @@ namespace ConsoleApplication1.Intervals
 
             var value = 1;
 
-            var container = new PointedIntervalsContainer<int, int>((a, b) => a + b, (a, b) => a - b);
+            PointedIntervalsContainerBase<int, int> container = new IntIntIntervals();
 
             // ========================================================================================
             // "точка" = интервал у которого правый и левый кра€ равны и включены в интервал - [x,x] 
@@ -96,7 +108,7 @@ namespace ConsoleApplication1.Intervals
             // ========================================================================================
             // если соседние интервал€ имеют одно и то же значение данных, то они объедин€ютс€
             // ========================================================================================
-            new PointedIntervalsContainer<int, int>((a, b) => a + b, (a, b) => a - b)
+            new IntIntIntervals()
                 .Execute
                 (
                     x => x.Include(0, 5, value, true, false).Include(5, 10, value, true, false), // [0, 5)(1) + [5,10)(1) = 
@@ -104,7 +116,7 @@ namespace ConsoleApplication1.Intervals
                 );
 
 
-            new PointedIntervalsContainer<int, int>((a, b) => a + b, (a, b) => a - b)
+            new IntIntIntervals()
                 .Execute
                 (
                     x => x.Include(0, 5, value, false, true).Include(5, 10, value, false, true), // (0, 5](1) + (5,10](1) = 
@@ -115,13 +127,13 @@ namespace ConsoleApplication1.Intervals
 
 
 
-            var ic = new PointedIntervalsContainer<decimal, IDictionary<string, decimal>>((a, b) => ProcessDict(a, b, (arg1, arg2) => arg1 + arg2), (a, b) => ProcessDict(a, b, (arg1, arg2) => arg1 - arg2), DictToStr);
+            //var ic = new PointedIntervalsContainer<decimal, IDictionary<string, decimal>>((a, b) => ProcessDict(a, b, (arg1, arg2) => arg1 + arg2), (a, b) => ProcessDict(a, b, (arg1, arg2) => arg1 - arg2), DictToStr);
 
-            ic
-                .Include(0, 100, new Dictionary<string, decimal> { { "a", 10 } })
-                .Include(20, 30, new Dictionary<string, decimal> { { "a", 5 } })
-                .Exclude(-10, 50, new Dictionary<string, decimal> { { "a", 15 } })
-                ;
+            //ic
+            //    .Include(0, 100, new Dictionary<string, decimal> { { "a", 10 } })
+            //    .Include(20, 30, new Dictionary<string, decimal> { { "a", 5 } })
+            //    .Exclude(-10, 50, new Dictionary<string, decimal> { { "a", 15 } })
+            //    ;
         }
 
         static bool Check(this PointedInterval<int, int> x, int data, int? left, bool leftIncluded, int? right, bool rightIncluded)
@@ -129,7 +141,7 @@ namespace ConsoleApplication1.Intervals
             return x.Data == data && x.Left.Included == leftIncluded && x.Left == left && x.Right.Included == rightIncluded && x.Right == right;
         }
 
-        static void Execute<TB, TD>(this PointedIntervalsContainer<TB, TD> container, Action<PointedIntervalsContainer<TB, TD>> action, Func<PointedInterval<TB, TD>[], bool> check = null)
+        static void Execute<TB, TD>(this PointedIntervalsContainerBase<TB, TD> container, Action<PointedIntervalsContainerBase<TB, TD>> action, Func<PointedInterval<TB, TD>[], bool> check = null)
             where TB : struct, IComparable<TB>
         {
             try
@@ -147,7 +159,7 @@ namespace ConsoleApplication1.Intervals
                 throw new Exception("!!! самотестирование провалено !!!", ex);
             }
         }
-        static void ExecuteWithException<TB, TD, TException>(this PointedIntervalsContainer<TB, TD> container, Action<PointedIntervalsContainer<TB, TD>> action, Func<TException, bool> checkException = null)
+        static void ExecuteWithException<TB, TD, TException>(this PointedIntervalsContainerBase<TB, TD> container, Action<PointedIntervalsContainerBase<TB, TD>> action, Func<TException, bool> checkException = null)
             where TException : Exception
             where TB : struct, IComparable<TB>
         {

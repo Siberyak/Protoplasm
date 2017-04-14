@@ -9,7 +9,7 @@ namespace ConsoleApplication1.TestData
             
             }
 
-            public void Add(string caption, Competences competences, Calendar calendar, params MembershipItemsContainer[] memberOf)
+            public void Add(string caption, Competences competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
             {
                 Employee employee = new Employee(caption, competences, calendar);
             }

@@ -9,7 +9,7 @@ namespace ConsoleApplication1.Intervals
     /// </summary>
     /// <typeparam name="TBound"></typeparam>
     /// <typeparam name="TData"></typeparam>
-    public class PointedInterval<TBound, TData> where TBound : struct, IComparable<TBound>
+    public abstract class PointedInterval<TBound, TData> where TBound : struct, IComparable<TBound>
     {
         /// <summary>
         /// Возвращает строку, представляющую текущий объект.
@@ -35,7 +35,7 @@ namespace ConsoleApplication1.Intervals
         /// <summary>
         /// 
         /// </summary>
-        protected internal PointedIntervalsContainer<TBound, TData>.DataToString DataToString;
+        protected internal PointedIntervalsContainerBase<TBound, TData>.DataToString DataToString;
 
         /// <summary>
         /// 
@@ -75,13 +75,14 @@ namespace ConsoleApplication1.Intervals
             return Left <= point && point <= Right;
         }
 
-        public IEnumerable<PointedInterval<TBound, TData>> Split(Point<TBound> point)
+        public bool TrySplit(Point<TBound> point, out Point<TBound>[] points)
         {
+            points = null;
+
             // [[, ]], ((, )) 
             if (Left.Equals(point) || Right.Equals(point))
-                return new[] {this};
+                return false;
 
-            Point<TBound>[] points;
 
             var equalsToLeft = Equals(Left.PointValue, point.PointValue);
             var equalsToRight = Equals(Right.PointValue, point.PointValue);
@@ -106,81 +107,10 @@ namespace ConsoleApplication1.Intervals
                 points = new[] { Left, Point<TBound>.Right(point, false), Point<TBound>.Left(point), Point<TBound>.Right(point) } ;
             }
 
-            return new[]
-            {
-                new PointedInterval<TBound, TData>(points[0], points[1], Data) {DataToString = DataToString},
-                new PointedInterval<TBound, TData>(points[2], points[3], Data) {DataToString = DataToString},
-            };
+            return true;
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="isLeft"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public IEnumerable<PointedInterval<TBound, TData>> Split1(Point<TBound> point, bool isLeft)
-        {
-            if (point == Left)
-            {
-                if (point.Direction == PointDirection.Left)
-                {
-                    if(point.Included)
-                    {
-                        return new[]
-                        {
-                            new PointedInterval<TBound, TData>(Point<TBound>.Left(point.PointValue), Point<TBound>.Right(point.PointValue), Data) {DataToString = DataToString},
-                            new PointedInterval<TBound, TData>(Point<TBound>.Left(Left.PointValue, false), Right, Data) {DataToString = DataToString},
-
-                        };
-                    }
-
-                    return new[]
-                    {
-                        new PointedInterval<TBound, TData>(Point<TBound>.Left(point), Point<TBound>.Right(point), Data) {DataToString = DataToString},
-                        new PointedInterval<TBound, TData>(Point<TBound>.Left(Left, false), Right, Data) {DataToString = DataToString},
-
-                    };
-                }
-                return new[] { this };
-            }
-
-            if (point == Right)
-            {
-                if (point.Direction == PointDirection.Right)
-                {
-                    if (point.Included)
-                    {
-                        return new[]
-                        {
-                            new PointedInterval<TBound, TData>(Left, Point<TBound>.Right(Right, false), Data) {DataToString = DataToString},
-                            new PointedInterval<TBound, TData>(Point<TBound>.Left(point.PointValue), Point<TBound>.Right(point.PointValue), Data) {DataToString = DataToString},
-                        };
-                    }
-
-                    return new[]
-                        {
-                            new PointedInterval<TBound, TData>(Left, Point<TBound>.Right(Right, false), Data) {DataToString = DataToString},
-                            new PointedInterval<TBound, TData>(Point<TBound>.Left(point), Point<TBound>.Right(point), Data) {DataToString = DataToString},
-                        };
-
-                }
-                return new[] { this };
-
-            }
-
-            var included = point.Included;
-
-            var rightIncluded = (isLeft && !included) || (!isLeft && included);
-
-            return new[]
-                       {
-                           new PointedInterval<TBound, TData>(Left, Point<TBound>.Right(point.PointValue, rightIncluded), Data) {DataToString = DataToString},
-                           new PointedInterval<TBound, TData>(Point<TBound>.Left(point.PointValue, !rightIncluded), Right , Data){DataToString = DataToString},
-                       };
-        }
-
+        
     }
 }

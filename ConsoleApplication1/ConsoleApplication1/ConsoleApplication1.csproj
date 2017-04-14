@@ -52,6 +52,7 @@
     <Compile Include="BaseWorker.cs" />
     <Compile Include="BaseEntity.cs" />
     <Compile Include="EntityAgent.cs" />
+    <Compile Include="Intervals\SimpleLinkedList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseRequirement.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="TestData\Agents\WorkItemsManager.cs" />
     <Compile Include="TestData\Abilities\Ability.cs" />
     <Compile Include="TestData\Data\WorkItem.cs" />
+    <Compile Include="TestData\TypeNameExtender.cs" />
     <Compile Include="TestData\_TestDataLoad.cs" />
   </ItemGroup>
   <ItemGroup>

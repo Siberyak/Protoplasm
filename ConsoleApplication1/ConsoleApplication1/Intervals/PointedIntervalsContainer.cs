@@ -1,45 +1,13 @@
-#define CHECK1
-
-
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ConsoleApplication1.Intervals
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TBound"></typeparam>
-    /// <typeparam name="TData"></typeparam>
-    public class PointedIntervalsContainer<TBound, TData>
+    public abstract class PointedIntervalsContainerBase<TBound, TData>
         where TBound : struct, IComparable<TBound>
     {
-
-        static PointedIntervalsContainer()
-        {
-            PointedIntervalsContainerExtender.Test();
-        }
-
-        private readonly IncludeData _includeData;
-
-        private readonly ExcludeData _excludeData;
-
-        private readonly DataToString _dataToString;
-
-        private LinkedList<PointedInterval<TBound, TData>> _is;
-
-        /// <summary>
-        /// »нициализирует новый экземпл€р класса <see cref="T:System.Object"/>.
-        /// </summary>
-        public PointedIntervalsContainer(IncludeData includeData, ExcludeData excludeData, DataToString dataToString = null)
-        {
-            _includeData = includeData;
-            _excludeData = excludeData;
-            _dataToString = dataToString;
-            _is = new LinkedList<PointedInterval<TBound, TData>>(new[] { new PointedInterval<TBound, TData>() { DataToString = _dataToString } });
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -60,7 +28,72 @@ namespace ConsoleApplication1.Intervals
         /// <param name="data"></param>
         public delegate string DataToString(TData data);
 
-        private PointedIntervalsContainer<TBound, TData> Process(PointedInterval<TBound, TData> interval, Func<TData, TData, TData> func)
+
+        public abstract PointedIntervalsContainerBase<TBound, TData> Exclude(PointedInterval<TBound, TData> interval);
+        public abstract PointedIntervalsContainerBase<TBound, TData> Exclude(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true);
+        public abstract PointedIntervalsContainerBase<TBound, TData> Include(PointedInterval<TBound, TData> interval);
+        public abstract PointedIntervalsContainerBase<TBound, TData> Include(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true);
+
+        public abstract PointedInterval<TBound, TData>[] ToArray(bool onlyWithData = true);
+
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TInterval"></typeparam>
+    /// <typeparam name="TBound"></typeparam>
+    /// <typeparam name="TData"></typeparam>
+    public class PointedIntervalsContainer<TInterval, TBound, TData> : PointedIntervalsContainerBase<TBound, TData>, IEnumerable<TInterval>
+        where TBound : struct, IComparable<TBound>
+        where TInterval : PointedInterval<TBound, TData>
+
+    {
+
+        static PointedIntervalsContainer()
+        {
+            PointedIntervalsContainerExtender.Test();
+        }
+
+        private readonly CreateInterval _createInterval;
+        private readonly IncludeData _includeData;
+
+        private readonly ExcludeData _excludeData;
+
+        private readonly DataToString _dataToString;
+
+        //private LinkedList<TInterval> _is;
+        private readonly SimpleLinkedList<TInterval> _is;
+
+        public SimpleLinkedList<TInterval>.Node FirstNode => _is.First;
+        public SimpleLinkedList<TInterval>.Node LastNode => _is.Last;
+
+        /// <summary>
+        /// »нициализирует новый экземпл€р класса <see cref="T:System.Object"/>.
+        /// </summary>
+        public PointedIntervalsContainer(CreateInterval createInterval, IncludeData includeData, ExcludeData excludeData, DataToString dataToString = null)
+        {
+            _createInterval = createInterval;
+            _includeData = includeData;
+            _excludeData = excludeData;
+            _dataToString = dataToString;
+
+            //_is = new LinkedList<TInterval>(new[] { NewInterval() });
+            _is = new SimpleLinkedList<TInterval>(new[] { NewInterval() });
+        }
+
+        public TInterval NewInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default (TData), DataToString dataToString = null)
+        {
+            var interval = _createInterval(left, right, data);
+            interval.DataToString = dataToString  ?? _dataToString;
+            return interval;
+        }
+
+        
+        public delegate TInterval CreateInterval(Point<TBound> left, Point<TBound> right, TData data);
+
+        private PointedIntervalsContainer<TInterval, TBound, TData> Process(PointedInterval<TBound, TData> interval, Func<TData, TData, TData> func)
         {
             if (interval == null || Equals(interval.Data, default(TData)))
             {
@@ -88,7 +121,7 @@ namespace ConsoleApplication1.Intervals
                     var prev = node.Previous.Previous;
                     _is.Remove(node.Previous);
                     _is.Remove(node);
-                    var nodeData = new PointedInterval<TBound, TData>(previous.Left, current.Right, current.Data) {DataToString = current.DataToString};
+                    var nodeData = NewInterval(previous.Left, current.Right, current.Data, current.DataToString);
 
                     node = prev == null
                         ? _is.AddFirst(nodeData)
@@ -96,182 +129,36 @@ namespace ConsoleApplication1.Intervals
                 }
 
                 node = node.Next;
-
-                //if (current.Left > interval.Right)
-                //    break;
             }
 
             return this;
         }
 
-        private LinkedListNode<PointedInterval<TBound, TData>> UnionWithPrevious(LinkedListNode<PointedInterval<TBound, TData>> node)
+        public TInterval Left => _is.Count == 0 ? null : _is.First.Next?.Value;
+        public TInterval Right => _is.Count == 0 ? null : _is.Last.Previous?.Value;
+
+        private SimpleLinkedList<TInterval>.Node[] Add(Point<TBound> point)
         {
-            var nextNode = node?.Next;
-            if (nextNode == null)
-                return null;
 
-            var data = node.Value.Data;
-
-            if (!Equals(data, nextNode.Value.Data))
-                return nextNode;
-
-            var a = node.Value;
-            var b = nextNode.Value;
-
-            var previous = node.Previous;
-
-            _is.Remove(node);
-            _is.Remove(nextNode);
-
-            var interval = new PointedInterval<TBound, TData>(a.Left, b.Right, data);
-
-            return previous == null
-                ? _is.AddFirst(interval)
-                : _is.AddAfter(previous, interval);
-        }
-
-        private LinkedListNode<PointedInterval<TBound, TData>> UnionWithNext(LinkedListNode<PointedInterval<TBound, TData>> node)
-        {
-            var nextNode = node?.Next;
-            if (nextNode == null)
-                return null;
-
-            var data = node.Value.Data;
-
-            if (!Equals(data, nextNode.Value.Data))
-                return nextNode;
-
-            var a = node.Value;
-            var b = nextNode.Value;
-
-            var previous = node.Previous;
-
-            _is.Remove(node);
-            _is.Remove(nextNode);
-
-            var interval = new PointedInterval<TBound, TData>(a.Left, b.Right, data);
-
-            return previous == null
-                ? _is.AddFirst(interval)
-                : _is.AddAfter(previous, interval);
-        }
-
-        public PointedInterval<TBound, TData> Left => _is.Count == 0 ? null : _is.First.Next?.Value;
-        public PointedInterval<TBound, TData> Right => _is.Count == 0 ? null : _is.Last.Previous?.Value;
-
-        private IEnumerable<LinkedListNode<PointedInterval<TBound, TData>>> GetNodes(Point<TBound> left, Point<TBound> right)
-        {
-            var intervals = _is.ToArray();
-            var index = BinaryFind(intervals, left, 0, intervals.Length);
-            var item = intervals[index];
-
-            if (item.Left != left)
-            {
-                if (index > 0 && intervals[index - 1].Left == left)
-                {
-                    item = intervals[index - 1];
-                    index--;
-                }
-                else if(index < intervals.Length - 1 && intervals[index + 1].Left == left)
-                {
-                    item = intervals[index + 1];
-                    index++;
-                }
-                else
-                    throw new Exception();
-            }
-
-#if CHECK
-            var item2 = intervals.SkipWhile(x => x.Left != left).First();
-            if(item != item2)
-                throw new Exception();
-#endif
-
-            
-
-            LinkedListNode<PointedInterval<TBound, TData>> node = GetNodeByIndex(index);
-#if CHECK
-            var node1 = _is.Find(item);
-            if(node != node1)
-                throw new Exception();
-#endif
-
-            while (node != null)
-            {
-                item = node.Value;
-                yield return node;
-
-                if (item.Right == right)
-                    yield break;
-
-                node = node.Next;
-            }
-        }
-
-        private LinkedListNode<PointedInterval<TBound, TData>> GetNodeByIndex(int index)
-        {
-            if (_is.Count / 2 >= index)
-            {
-                var node = _is.First;
-                for (int i = 0; i < index; i++)
-                {
-                    node = node.Next;
-                }
-
-                return node;
-            }
-            else
-            {
-                var node = _is.Last;
-                for (int i = _is.Count - 1; i > index; i--)
-                {
-                    node = node.Previous;
-                }
-
-                return node;
-            }
-        }
-
-        private LinkedListNode<PointedInterval<TBound, TData>>[] Add(Point<TBound> point)
-        {
-            //Point<TBound> point = isLeft ? Point<TBound>.Left(value, included) : Point<TBound>.Right(value, included);
-
-            var intervals = _is.ToArray();
-            int index = BinaryFind(intervals, point, 0, intervals.Length);
-            var interval = intervals[index];
-
-
-#if CHECK
-            var n1 = _is.Skip(index).First(x => x.Contains(point));
-            if (n1 != interval)
-                throw new Exception();
-#endif
-
-
-
-#if CHECK
-            var i0 = Find2(point);
-
-            if(i0 != interval)
-                throw new Exception();
-
-#endif
-
-            var node = GetNodeByIndex(index);
-
-#if CHECK
-            var node1 = _is.Find(interval);
-            if (node != node1)
-                throw new Exception();
-#endif
-
+            var node = _is.Find(x => x.Contains(point));
 
             var prev = node.Previous;
 
 
-            var items = interval.Split(point).ToArray();
+            Point<TBound>[] points;
+            var interval = node.Value;
 
-            var nodes = new LinkedListNode<PointedInterval<TBound, TData>>[] {prev, null};
+            var items =
+                interval.TrySplit(point, out points)
+                    ? new[]
+                    {
+                        NewInterval(points[0], points[1], interval.Data),
+                        NewInterval(points[2], points[3], interval.Data),
+                    }
+                    : new[] {interval};
+
+
+            var nodes = new[] {prev, null};
 
             //if (items.Length > 1)
             {
@@ -291,76 +178,36 @@ namespace ConsoleApplication1.Intervals
             return nodes;
         }
 
-        private PointedInterval<TBound, TData> Find2(Point<TBound> point)
+
+        public SimpleLinkedList<TInterval>.Node FindNode(Func<TInterval, bool> predicate)
         {
-            return _is.First(x => x.Contains(point));
-        }
+            return _is.Find(predicate);
 
-        //        private PointedInterval<TBound, TData> FindIntervalByPoint(Point<TBound> point)
-        //        {
-        //            int count = _is.Count;
-        //            if(count < 2)
-        //                return _is.First(x => x.Contains(point));
+            //_is.FirstOrDefault(x => )
+            TInterval interval = null;
+//            var node = _is.Find(interval);
 
-        //            var intervals = _is.ToArray();
-        //            int index = BinaryFind(intervals, point, 0, count);
-        //            var n2 = intervals[index];
-        //#if CHECK
-        //            var n1 = _is.Skip(index).First(x => x.Contains(point));
-        //            if (n1 != n2)
-        //                throw new Exception();
-        //#endif
-
-        //            return n2;
-        //        }
-
-        private
-#if !CHECK
-static 
-#endif
-            int BinaryFind(IReadOnlyList<PointedInterval<TBound, TData>> intervals, Point<TBound> point, int startIndex, int length)
-        {
-            int lengthHalf = length / 2;
-            int middleIndex = startIndex + lengthHalf;
-            var middle = intervals[middleIndex];
-#if CHECK
-            var middle2 = _is.Skip(middleIndex).First();
-            if(middle2 != middle)
-                throw new Exception();
-#endif
-
-
-            if (middle.Right < point)
-            {
-                return BinaryFind(intervals, point, middleIndex, length - lengthHalf);
-            }
-
-            else if (middle.Left > point)
-            {
-                return BinaryFind(intervals, point, startIndex, lengthHalf);
-            }
-
-            return middleIndex;
+            throw new NotImplementedException(); 
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="i"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        public PointedIntervalsContainer<TBound, TData> Include(PointedInterval<TBound, TData> i)
+        public override PointedIntervalsContainerBase<TBound, TData> Include(PointedInterval<TBound, TData> interval)
         {
-            return Process(i, (x, y) => _includeData(x, y));
+            return Process(interval, (x, y) => _includeData(x, y));
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="i"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        public PointedIntervalsContainer<TBound, TData> Exclude(PointedInterval<TBound, TData> i)
+        public override PointedIntervalsContainerBase<TBound, TData> Exclude(PointedInterval<TBound, TData> interval)
         {
-            return Process(i, (x, y) => _excludeData(x, y));
+            return Process(interval, (x, y) => _excludeData(x, y));
         }
 
         /// <summary>
@@ -372,40 +219,63 @@ static
         /// <param name="rightIncluded"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public PointedIntervalsContainer<TBound, TData> Include(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
+        public override PointedIntervalsContainerBase<TBound, TData> Include(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
         {
-            return Include(new PointedInterval<TBound, TData>(left, leftIncluded, right, rightIncluded, data));
+            TInterval interval;
+            return Include(out interval, left, right, data, leftIncluded, rightIncluded);
+        }
+
+        public PointedIntervalsContainerBase<TBound, TData> Include(out TInterval interval, TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
+        {
+            interval = NewInterval(Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
+            return Include(interval);
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="interval"></param>
         /// <param name="left"></param>
         /// <param name="leftIncluded"></param>
         /// <param name="right"></param>
         /// <param name="rightIncluded"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public PointedIntervalsContainer<TBound, TData> Exclude(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
+        public PointedIntervalsContainerBase<TBound, TData> Exclude(out TInterval interval, TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
         {
-            return Exclude(new PointedInterval<TBound, TData>(left, leftIncluded, right, rightIncluded, data));
+            interval = NewInterval(Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
+            return Exclude(interval);
+        }
+
+        public override PointedIntervalsContainerBase<TBound, TData> Exclude(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
+        {
+            TInterval interval;
+            return Exclude(out interval, left, right, data, leftIncluded, rightIncluded);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public PointedInterval<TBound, TData>[] ToArray(bool onlyWithData = true)
+        public TInterval[] ToArray()
         {
-            PointedInterval<TBound, TData>[] array = _is.ToArray();
-            if (onlyWithData)
-                array = array.Where(x => !Equals(x.Data, default(TData))).ToArray();
-
-                //array = array.Length > 1 
-                //    ? array.Skip(1).Take(array.Length-2).ToArray()
-                //    : new PointedInterval<TBound, TData>[0];
-
+            TInterval[] array = _is.Where(x => !Equals(x.Data, default(TData))).ToArray();
             return array;
+        }
+
+        public override PointedInterval<TBound, TData>[] ToArray(bool onlyWithData = true)
+        {
+            return ToArray();
+        }
+
+        public IEnumerator<TInterval> GetEnumerator()
+        {
+            return _is.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
