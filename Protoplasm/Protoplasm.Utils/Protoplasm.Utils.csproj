@@ -76,6 +76,7 @@
     <Compile Include="Graph\SimpleGraph.cs" />
     <Compile Include="MemberInfoExtender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Obfuscation\SequencedAttribute.cs" />
     <Compile Include="TypeExtender.cs" />
     <Compile Include="TypeNameExtender.cs" />
   </ItemGroup>

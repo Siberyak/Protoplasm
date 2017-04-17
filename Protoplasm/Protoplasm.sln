@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessResearch", "ProcessR
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Research", "Research", "{CD17EC18-123A-4020-9BE5-705534C47D2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{97B06EC9-9926-4080-A665-241BC83CB9AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{5C57C8C6-9AF4-41D8-9868-FCBFC715B3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C57C8C6-9AF4-41D8-9868-FCBFC715B3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C57C8C6-9AF4-41D8-9868-FCBFC715B3EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97B06EC9-9926-4080-A665-241BC83CB9AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97B06EC9-9926-4080-A665-241BC83CB9AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97B06EC9-9926-4080-A665-241BC83CB9AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97B06EC9-9926-4080-A665-241BC83CB9AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

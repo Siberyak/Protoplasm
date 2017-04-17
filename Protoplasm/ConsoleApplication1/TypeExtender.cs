@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
-namespace Protoplasm.Utils
+namespace ConsoleApplication1
 {
     /// <summary>
     ///     хелпер для работы с атрибутами типов
@@ -112,8 +111,8 @@ namespace Protoplasm.Utils
                 {
                     var attr = type.Attribute<DisplayNameAttribute>();
                     var displayName = attr == null
-                                          ? type.TypeName()
-                                          : attr.DisplayName;
+                        ? type.TypeName()
+                        : attr.DisplayName;
 
                     DisplayNames.Add(type, displayName);
                 }
