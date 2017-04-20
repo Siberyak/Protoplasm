@@ -20,7 +20,7 @@ namespace ConsoleApplication1
             _data = data;
         }
 
-        public Scene(Scene parent) : this(parent._data)
+        private Scene(Scene parent) : this(parent._data)
         {
             Parent = parent;
         }
@@ -52,6 +52,11 @@ namespace ConsoleApplication1
         public bool Exists(Guid id)
         {
             return _data.TryGetKey(id, out id);
+        }
+
+        public Scene Child()
+        {
+            return new Scene(this);
         }
     }
 }

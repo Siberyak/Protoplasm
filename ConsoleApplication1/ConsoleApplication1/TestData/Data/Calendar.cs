@@ -16,15 +16,32 @@ namespace ConsoleApplication1.TestData
             private readonly Calendar<TData> _prev;
             private readonly DefineData _defineData;
             private readonly CalendarItems _calendarItems;
+            private readonly List<Calendar<TData>> _nexts = new List<Calendar<TData>>();
 
             public Calendar(DefineData defineData, CalendarItems.IncludeData includeData, CalendarItems.ExcludeData excludeData, CalendarItems.DataToString dataToString = null)
                 : this(null, defineData, includeData, excludeData, dataToString)
             { }
             public Calendar(Calendar<TData> prev, DefineData defineData, CalendarItems.IncludeData includeData, CalendarItems.ExcludeData excludeData, CalendarItems.DataToString dataToString = null)
             {
+                // проверить на закольцовывание... на вс€кий случай....
+                if (prev?.FullChain().Contains(this) == true)
+                    throw new ArgumentException("try to loop detected", nameof(prev));
+
                 _prev = prev;
+                _prev?._nexts.Add(this);
+
                 _defineData = defineData;
                 _calendarItems = new CalendarItems(includeData, excludeData, dataToString);
+            }
+
+            public Calendar<TData>[] FullChain()
+            {
+                var chain = new[] {this};
+
+                if (_prev != null)
+                    chain = _prev.FullChain().Union(chain).ToArray();
+
+                return chain;
             }
 
             public IEnumerable<CalendarItem> Get(TTime from, TTime to)

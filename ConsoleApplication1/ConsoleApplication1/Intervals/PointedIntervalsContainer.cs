@@ -5,6 +5,26 @@ using System.Linq;
 
 namespace ConsoleApplication1.Intervals
 {
+    public interface IIntervalData<T>
+    {
+        /// <summary>
+        /// Возвращает новый инстанс (!!!) значения <typeparamref name="T"/>>, который является результатом выполенения "операции" [Include] для текущего значения и <paramref name="b"/>.
+        /// Например, если значением <typeparamref name="T"/> является <see cref="int"/>, то это сложение: a.Include(b) эквивалентно a + b
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        T Include(T b);
+
+        /// <summary>
+        /// Возвращает [новый инстанс] (!!!) значения <typeparamref name="T"/>, который является результатом выполенения "операции" [Exclude] для текущего значения и <paramref name="b"/>.
+        /// Например, если значением <typeparamref name="T"/> является <see cref="int"/>, то это вычитание: a.Exclude(b) эквивалентно a - b
+        ///  </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        T Exclude(T b);
+    }
+
+
     public abstract class PointedIntervalsContainerBase<TBound, TData>
         where TBound : struct, IComparable<TBound>
     {
@@ -39,6 +59,7 @@ namespace ConsoleApplication1.Intervals
 
     }
 
+
     /// <summary>
     /// 
     /// </summary>
@@ -64,10 +85,10 @@ namespace ConsoleApplication1.Intervals
         private readonly DataToString _dataToString;
 
         //private LinkedList<TInterval> _is;
-        private readonly SimpleLinkedList<TInterval> _is;
+        private readonly SimpleLinkedList<TInterval> _intervals;
 
-        public SimpleLinkedList<TInterval>.Node FirstNode => _is.First;
-        public SimpleLinkedList<TInterval>.Node LastNode => _is.Last;
+        public SimpleLinkedList<TInterval>.Node FirstNode => _intervals.First;
+        public SimpleLinkedList<TInterval>.Node LastNode => _intervals.Last;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="T:System.Object"/>.
@@ -80,17 +101,17 @@ namespace ConsoleApplication1.Intervals
             _dataToString = dataToString;
 
             //_is = new LinkedList<TInterval>(new[] { NewInterval() });
-            _is = new SimpleLinkedList<TInterval>(new[] { NewInterval() });
+            _intervals = new SimpleLinkedList<TInterval>(new[] { NewInterval() });
         }
 
-        public TInterval NewInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default (TData), DataToString dataToString = null)
+        public TInterval NewInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData), DataToString dataToString = null)
         {
             var interval = _createInterval(left, right, data);
-            interval.DataToString = dataToString  ?? _dataToString;
+            interval.DataToString = dataToString ?? _dataToString;
             return interval;
         }
 
-        
+
         public delegate TInterval CreateInterval(Point<TBound> left, Point<TBound> right, TData data);
 
         private PointedIntervalsContainer<TInterval, TBound, TData> Process(PointedInterval<TBound, TData> interval, Func<TData, TData, TData> func)
@@ -106,10 +127,10 @@ namespace ConsoleApplication1.Intervals
             var right = Add(interval.Right);
 
 
-            while (node !=  null && node.Previous != right[1])
+            while (node != null && node.Previous != right[1])
             {
                 var current = node.Value;
-                if(interval.Left <= current.Right && current.Left <= interval.Right)
+                if (interval.Left <= current.Right && current.Left <= interval.Right)
                 {
                     var data = func(current.Data, interval.Data);
                     current.Data = data;
@@ -119,13 +140,13 @@ namespace ConsoleApplication1.Intervals
                 if (previous != null && Equals(previous.Data, current.Data))
                 {
                     var prev = node.Previous.Previous;
-                    _is.Remove(node.Previous);
-                    _is.Remove(node);
+                    _intervals.Remove(node.Previous);
+                    _intervals.Remove(node);
                     var nodeData = NewInterval(previous.Left, current.Right, current.Data, current.DataToString);
 
                     node = prev == null
-                        ? _is.AddFirst(nodeData)
-                        : _is.AddAfter(prev, nodeData);
+                        ? _intervals.AddFirst(nodeData)
+                        : _intervals.AddAfter(prev, nodeData);
                 }
 
                 node = node.Next;
@@ -134,13 +155,13 @@ namespace ConsoleApplication1.Intervals
             return this;
         }
 
-        public TInterval Left => _is.Count == 0 ? null : _is.First.Next?.Value;
-        public TInterval Right => _is.Count == 0 ? null : _is.Last.Previous?.Value;
+        public TInterval Left => _intervals.Count == 0 ? null : _intervals.First.Next?.Value;
+        public TInterval Right => _intervals.Count == 0 ? null : _intervals.Last.Previous?.Value;
 
         private SimpleLinkedList<TInterval>.Node[] Add(Point<TBound> point)
         {
 
-            var node = _is.Find(x => x.Contains(point));
+            var node = _intervals.Find(x => x.Contains(point));
 
             var prev = node.Previous;
 
@@ -155,20 +176,20 @@ namespace ConsoleApplication1.Intervals
                         NewInterval(points[0], points[1], interval.Data),
                         NewInterval(points[2], points[3], interval.Data),
                     }
-                    : new[] {interval};
+                    : new[] { interval };
 
 
-            var nodes = new[] {prev, null};
+            var nodes = new[] { prev, null };
 
             //if (items.Length > 1)
             {
-                _is.Remove(node);
+                _intervals.Remove(node);
 
                 foreach (var item in items)
                 {
-                    prev = prev == null 
-                        ? _is.AddFirst(item) 
-                        : _is.AddAfter(prev, item);
+                    prev = prev == null
+                        ? _intervals.AddFirst(item)
+                        : _intervals.AddAfter(prev, item);
 
                     nodes[0] = nodes[0] ?? prev;
                     nodes[1] = prev;
@@ -181,13 +202,13 @@ namespace ConsoleApplication1.Intervals
 
         public SimpleLinkedList<TInterval>.Node FindNode(Func<TInterval, bool> predicate)
         {
-            return _is.Find(predicate);
+            return _intervals.Find(predicate);
 
             //_is.FirstOrDefault(x => )
             TInterval interval = null;
-//            var node = _is.Find(interval);
+            //            var node = _is.Find(interval);
 
-            throw new NotImplementedException(); 
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -259,7 +280,7 @@ namespace ConsoleApplication1.Intervals
         /// <returns></returns>
         public TInterval[] ToArray()
         {
-            TInterval[] array = _is.Where(x => !Equals(x.Data, default(TData))).ToArray();
+            TInterval[] array = _intervals.Where(x => !Equals(x.Data, default(TData))).ToArray();
             return array;
         }
 
@@ -270,12 +291,23 @@ namespace ConsoleApplication1.Intervals
 
         public IEnumerator<TInterval> GetEnumerator()
         {
-            return _is.GetEnumerator();
+            return _intervals.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+    }
+
+    public class IntervalsOfIntervalDataContainer<TInterval, TBound, TData> : PointedIntervalsContainer<TInterval, TBound, TData>
+    where TBound : struct, IComparable<TBound>
+    where TInterval : PointedInterval<TBound, TData>
+    where TData : IIntervalData<TData>
+    {
+        public IntervalsOfIntervalDataContainer(CreateInterval createInterval, DataToString dataToString = null)
+            : base(createInterval, (a, b) => a.Include(b), (a, b) => a.Exclude(b), dataToString)
+        {
         }
     }
 }

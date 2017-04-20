@@ -6,7 +6,7 @@ using ConsoleApplication1.TestData;
 
 namespace ConsoleApplication1.Intervals
 {
-    public class SimpleLinkedList<T> : IEnumerable<T>
+    internal class SimpleLinkedList<T> : IEnumerable<T>
     {
         public override string ToString()
         {
