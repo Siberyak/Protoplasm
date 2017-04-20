@@ -87,8 +87,8 @@ namespace ConsoleApplication1.Intervals
         //private LinkedList<TInterval> _is;
         private readonly SimpleLinkedList<TInterval> _intervals;
 
-        public SimpleLinkedList<TInterval>.Node FirstNode => _intervals.First;
-        public SimpleLinkedList<TInterval>.Node LastNode => _intervals.Last;
+        internal SimpleLinkedList<TInterval>.Node FirstNode => _intervals.First;
+        internal SimpleLinkedList<TInterval>.Node LastNode => _intervals.Last;
 
         /// <summary>
         /// »нициализирует новый экземпл€р класса <see cref="T:System.Object"/>.
@@ -200,7 +200,7 @@ namespace ConsoleApplication1.Intervals
         }
 
 
-        public SimpleLinkedList<TInterval>.Node FindNode(Func<TInterval, bool> predicate)
+        internal SimpleLinkedList<TInterval>.Node FindNode(Func<TInterval, bool> predicate)
         {
             return _intervals.Find(predicate);
 
