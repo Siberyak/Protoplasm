@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
@@ -9,9 +11,17 @@ namespace ConsoleApplication1.TestData
             
             }
 
-            public void Add(string caption, Competences competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
+            public Department CreateDepartment(string caption, params Department[] memberOf)
             {
-                Employee employee = new Employee(caption, competences, calendar);
+                return new Department(caption, memberOf);
+            }
+
+            public EmployeeAgent CreateEmployeeAgent(string caption, Competences competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
+            {
+                var employee = new Employee(caption, competences, calendar, memberOf);
+                var agent = new EmployeeAgent(employee);
+                agent.Initialize();
+                return agent;
             }
         } 
     }

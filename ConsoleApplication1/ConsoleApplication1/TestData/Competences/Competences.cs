@@ -106,9 +106,9 @@ namespace ConsoleApplication1.TestData
             return this;
         }
 
-        public static Competences New()
+        public static Competences New(IReadOnlyCollection<Competence> competences = null)
         {
-            return new Competences();
+            return competences == null ? new Competences() : new Competences(competences);
         }
     }
 }

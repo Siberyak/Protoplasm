@@ -62,6 +62,8 @@
     <Compile Include="Intervals\PointedIntervalsContainer.cs" />
     <Compile Include="Intervals\PointedIntervalsContainerExtender.cs" />
     <Compile Include="Intervals\PointsComparerBase.cs" />
+    <Compile Include="TestData\Agents\DepartmentAgent.cs" />
+    <Compile Include="TestData\Agents\EmployeeAgent.cs" />
     <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
     <Compile Include="TestData\Data\Calendar.cs" />
     <Compile Include="TestData\Abilities\CalendarAbility.cs" />

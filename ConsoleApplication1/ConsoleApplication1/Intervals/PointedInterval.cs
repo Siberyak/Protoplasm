@@ -20,7 +20,7 @@ namespace ConsoleApplication1.Intervals
         public override string ToString()
         {
             var data = DataToString == null ? (object)Data : DataToString(Data);
-            return $"{Left},{Right} {data}";
+            return $"{Left}, {Right}, Data = [{data}]";
         }
 
         /// <summary>

@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication1.TestData
 {
-    public class Ability : BaseAbility
+    public abstract class Ability : BaseAbility
     {
-        public Ability(MappingType mappingType)
+        protected Ability(MappingType mappingType)
         {
             MappingType = mappingType;
         }
 
         public MappingType MappingType { get; private set; }
 
-        protected override ConformResult Conformable(BaseRequirement requirement)
+        public override ConformType Conformable(BaseRequirement requirement)
         {
-            return ConformResult.Empty;
+            return ConformType.Imposible;
         }
     }
 }

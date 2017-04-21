@@ -136,23 +136,35 @@ namespace ConsoleApplication1.Intervals
                     current.Data = data;
                 }
 
-                var previous = node.Previous?.Value;
-                if (previous != null && Equals(previous.Data, current.Data))
-                {
-                    var prev = node.Previous.Previous;
-                    _intervals.Remove(node.Previous);
-                    _intervals.Remove(node);
-                    var nodeData = NewInterval(previous.Left, current.Right, current.Data, current.DataToString);
-
-                    node = prev == null
-                        ? _intervals.AddFirst(nodeData)
-                        : _intervals.AddAfter(prev, nodeData);
-                }
+                node = TryMerge(node);
 
                 node = node.Next;
             }
 
+            TryMerge(node);
+
             return this;
+        }
+
+        private SimpleLinkedList<TInterval>.Node TryMerge(SimpleLinkedList<TInterval>.Node node)
+        {
+            if (node == null)
+                return null;
+
+            var current = node.Value;
+            var previous = node.Previous?.Value;
+            if (previous != null && Equals(previous.Data, current.Data))
+            {
+                var prev = node.Previous.Previous;
+                _intervals.Remove(node.Previous);
+                _intervals.Remove(node);
+                var nodeData = NewInterval(previous.Left, current.Right, current.Data, current.DataToString);
+
+                node = prev == null
+                    ? _intervals.AddFirst(nodeData)
+                    : _intervals.AddAfter(prev, nodeData);
+            }
+            return node;
         }
 
         public TInterval Left => _intervals.Count == 0 ? null : _intervals.First.Next?.Value;

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
@@ -13,6 +15,21 @@ namespace ConsoleApplication1.TestData
                 Start = start;
                 Finish = finish;
                 Duration = duration;
+            }
+
+            public override ConformType Conformable(BaseAbility ability)
+            {
+                var calendarAbility = ability as CalendarAbility;
+                return calendarAbility?.Conformable(this) ?? ConformType.Imposible;
+            }
+
+            public override string ToString()
+            {
+                var start = Start == Interval<TTime?>.Empty ? null : $"S: {Start}";
+                var finish = Finish == Interval<TTime?>.Empty ? null : $"F: {Finish}";
+                var duration = Duration == Interval<TDuration?>.Empty ? null : $"D: {Duration}";
+                var parts = new []{start, finish, duration};
+                return string.Join(", ", parts.Where(x => x != null));
             }
         }
 

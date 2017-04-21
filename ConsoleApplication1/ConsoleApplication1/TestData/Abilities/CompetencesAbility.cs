@@ -4,20 +4,19 @@ namespace ConsoleApplication1.TestData
 {
     public class CompetencesAbility : Ability
     {
-        public IReadOnlyCollection<Competence> Competences { get; }
+        public override bool IsMutable => false;
+
+        public Competences Competences { get; }
 
         public CompetencesAbility(IReadOnlyCollection<Competence> competences) : base(MappingType.Competences)
         {
-            Competences = competences;
+            Competences = Competences.New(competences);
         }
 
-        protected override ConformResult Conformable(BaseRequirement requirement)
+        public override ConformType Conformable(BaseRequirement requirement)
         {
             var competencesRequirement = requirement as CompetencesRequirement;
-            if (competencesRequirement == null)
-                return ConformResult.Empty;
-
-            return base.Conformable(requirement);
+            return competencesRequirement?.Conformable(this) ?? ConformType.Imposible;
         }
     }
 

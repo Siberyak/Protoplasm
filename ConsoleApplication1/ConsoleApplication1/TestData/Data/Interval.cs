@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace ConsoleApplication1.TestData
 {
     public struct Interval<T> : IEquatable<Interval<T>>
-        //where T : struct
     {
         public static readonly Interval<T> Empty = new Interval<T>(default(T), default(T));
 
@@ -34,6 +33,11 @@ namespace ConsoleApplication1.TestData
             {
                 return (EqualityComparer<T>.Default.GetHashCode(Left)*397) ^ EqualityComparer<T>.Default.GetHashCode(Right);
             }
+        }
+
+        public override string ToString()
+        {
+            return Equals(Left, Right) ? $"{Left}" : $"{Left} - {Right}";
         }
 
         public static bool operator ==(Interval<T> left, Interval<T> right)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleApplication1.TestData
 {
@@ -17,7 +18,7 @@ namespace ConsoleApplication1.TestData
             public Employee(string caption, IReadOnlyCollection<Competence> competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf) 
                 : base(caption, memberOf)
             {
-                _competencesAbility = new CompetencesAbility(competences);
+                _competencesAbility = new CompetencesAbility(competences.Union(MembershipCompetences).ToArray());
                 _calendarAbility = new CalendarAbility(calendar);
             }
 

@@ -4,9 +4,9 @@ namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class WorkItemAgent : EntityAgent<WorkItem>
+        public class DepartmentAgent : EntityAgent<Department>
         {
-            public WorkItemAgent(WorkItem entity) : base(entity)
+            public DepartmentAgent(Department entity) : base(entity)
             {
             }
 

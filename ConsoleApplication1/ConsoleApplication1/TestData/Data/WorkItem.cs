@@ -17,9 +17,9 @@ namespace ConsoleApplication1.TestData
 
             public IReadOnlyCollection<Competence> Competences => _competencesRequirement.Competences;
 
-
-            //Laboriousness
-
+            // Parent-Group
+            // Predecessors-Followers
+            // Laboriousness
 
             public WorkItem(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
             {

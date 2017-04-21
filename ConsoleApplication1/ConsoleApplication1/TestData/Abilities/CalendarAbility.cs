@@ -10,6 +10,11 @@ namespace ConsoleApplication1.TestData
             {
                 Calendar = calendar;
             }
+
+            public override ConformType Conformable(BaseRequirement requirement)
+            {
+                return ConformType.Posible;
+            }
         } 
     }
 }

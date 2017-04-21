@@ -12,11 +12,12 @@ namespace ConsoleApplication1.TestData
 
             }
 
-            public void Add(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
+            public WorkItemAgent CreateWorkItemAgent(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
             {
                 var workItem = new WorkItem(start, finish, duration, competences);
                 var agent = new WorkItemAgent(workItem);
                 agent.Initialize();
+                return agent;
             }
         }
     }

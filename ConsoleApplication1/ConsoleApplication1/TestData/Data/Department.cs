@@ -1,14 +1,22 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace ConsoleApplication1.TestData
 {
-    public class Department : MembershipItemsContainer
+    public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public Department(string caption, params Department[] memberOf) : base(caption, memberOf)
+        public class Department : MembershipItemsContainer
         {
-        }
+            public Department(string caption, params Department[] memberOf) : base(caption, memberOf)
+            {
+            }
 
-        public override bool MemberOfOrEqual(MembershipItem item)
-        {
-            return base.MemberOfOrEqual(item);
+
+            protected override IReadOnlyCollection<Ability> GenerateAbilities()
+            {
+                var data = Members.Select(x => new {Member = x, Calendar = x.Abilities.OfType<CalendarAbility>().FirstOrDefault() } );
+                return new Ability[] {};
+            }
         }
     }
 }

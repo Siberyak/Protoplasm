@@ -16,6 +16,7 @@ namespace ConsoleApplication1.TestData
     {
         public static void Do()
         {
+            PlanningEnvironment<DateTime, TimeSpan>.GetOffset = (from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?);
 
             TestCalendars();
 
@@ -36,13 +37,28 @@ namespace ConsoleApplication1.TestData
             var calendar2 = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>(calendar1, ByWorkingTime, (a, b) => b, (a, b) => CalendarItemType.Unavalable);
             var tmp4 = calendar2.Get(DateTime.Today.AddDays(5), DateTime.Today.AddDays(15));
 
+            var calendar3 = new PlanningEnvironment<DateTime, TimeSpan>.Calendars<int?>.PrevBasedCalendar<CalendarItemType>
+                (
+                calendar2,
+                DoDefineData,
+                (a, b) => b, (a, b) => null
+                );
+            var tmp5 = calendar3.Get(DateTime.Today.AddYears(1), DateTime.Today.AddYears(1).AddDays(15));
+        }
+
+        private static void DoDefineData(PlanningEnvironment<DateTime, TimeSpan>.Calendars<int?>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem todefine)
+        {
+            if (todefine.Data == CalendarItemType.Unknown)
+                container.Exclude(todefine.Left, todefine.Right, null);
+            else
+                container.Include(todefine.Left, todefine.Right, todefine.Data == CalendarItemType.Available? 1 : 0);
         }
 
         #region TestCalendarItems
 
         private static void TestCalendarItems()
         {
-            var container = new PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems((a, b) => b, (a, b) => CalendarItemType.Unknown);
+            var container = new PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems((a, b) => b, (a, b) => CalendarItemType.Unknown);
             container.Include(DateTime.Today, DateTime.Today.AddDays(1), CalendarItemType.Available);
             container.Include(DateTime.Now, DateTime.Now.AddHours(1), CalendarItemType.Available);
 
@@ -58,7 +74,7 @@ namespace ConsoleApplication1.TestData
         }
 
 
-        private static void ByDayOfWeek(PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem toDefine)
+        private static void ByDayOfWeek(PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem toDefine)
         {
             var begin = toDefine.Left.PointValue.Value;
             var end = toDefine.Right.PointValue.Value;
@@ -93,7 +109,7 @@ namespace ConsoleApplication1.TestData
             }
         }
 
-        private static void ByWorkingTime(PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem toDefine)
+        private static void ByWorkingTime(PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem toDefine)
         {
             var begin = toDefine.Left.PointValue.Value;
             var end = toDefine.Right.PointValue.Value;
@@ -113,7 +129,7 @@ namespace ConsoleApplication1.TestData
             }
         }
 
-        static PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItems container)
+        static PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container)
         {
 
             var wantedBegin = begin.Date.AddHours(beginHour);
@@ -128,7 +144,7 @@ namespace ConsoleApplication1.TestData
             wantedBegin = PlanningEnvironment<DateTime, TimeSpan>.Max(begin, wantedBegin);
             wantedEnd = PlanningEnvironment<DateTime, TimeSpan>.Min(end, wantedEnd);
 
-            PlanningEnvironment<DateTime, TimeSpan>.Calendar<CalendarItemType>.CalendarItem interval;
+            PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem interval;
             //= container.NewInterval(Point<DateTime>.Right(wantedBegin), Point<DateTime>.Right(wantedEnd, false), CalendarItemType.Unavalable);
             container.Exclude(out interval, wantedBegin, wantedEnd, CalendarItemType.Unavalable, true, false);
             return interval;
@@ -202,34 +218,65 @@ namespace ConsoleApplication1.TestData
             Debug.Assert(except.Length == 0);
         }
 
-        private static void TestManagersAdd()
+        private static PlanningEnvironment<DateTime, TimeSpan> TestManagersAdd()
         {
-            //environment.Resources.Add
-            //    (
-            //        "res 1",
-            //        Competence.Set("", 1), 
-            //        new PlanningEnvironment<DateTime, TimeSpan>.Calendar(), 
-            //        c3, po
-            //    );
+            var environment = new PlanningEnvironment<DateTime, TimeSpan>();
 
-            //environment.Resources.Add
-            //    (
-            //        "res 2",
-            //        Competence.Set("", 1),
-            //        new PlanningEnvironment<DateTime, TimeSpan>.Calendar(),
-            //        r2, d2
-            //    );
+            var baseCalendar = environment.CreateCalendar<CalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => CalendarItemType.Unknown);
+
+            var r1 = environment.Resources.CreateEmployeeAgent
+                (
+                    "R1",
+                    Competences.New().AddKeyValue("курящий", true).AddKeyValue("C1", 10).AddKeyValue("C2", 5),
+                    baseCalendar
+                );
+
+            var r2 = environment.Resources.CreateEmployeeAgent
+                (
+                    "R2",
+                    Competences.New().AddKeyValue("курящий", false).AddKeyValue("C1", 5).AddKeyValue("C2", 10),
+                    baseCalendar
+                );
 
             ////===================================================
 
-            //environment.WorkItems.Add
-            //    (
-            //        Interval<DateTime?>.Empty,
-            //        Interval<DateTime?>.Empty,
-            //        Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
-            //        Competences.New().AnyOf(Competence.Set("", 2).MemberOf(d2, c3))
-            //    );
-            return;
+            var wi1 = environment.WorkItems.CreateWorkItemAgent
+                (
+                    Interval<DateTime?>.Empty,
+                    Interval<DateTime?>.Empty,
+                    Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
+                    Competences.New().AnyOf(Competences.New().AddKeyValue("C1",  7).AddKeyValue("C2", 7))
+                );
+
+            var wi2 = environment.WorkItems.CreateWorkItemAgent
+                (
+                    Interval<DateTime?>.Empty,
+                    Interval<DateTime?>.Empty,
+                    Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
+                    Competences.New().AddKeyValue("C1", 7)
+                );
+
+            var wi3 = environment.WorkItems.CreateWorkItemAgent
+                (
+                    Interval<DateTime?>.Empty,
+                    Interval<DateTime?>.Empty,
+                    Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
+                    Competences.New().AddKeyValue("C2", 7)
+                );
+
+
+            var c1 = $"r1 -> wi1 : {r1.ConformableFor(wi1).ToConformType()}";
+            var c2 = $"r2 -> wi1 : {r2.ConformableFor(wi1).ToConformType()}";
+
+            var c3 = $"r1 -> wi2 : {r1.ConformableFor(wi2).ToConformType()}";
+            var c4 = $"r2 -> wi2 : {r2.ConformableFor(wi2).ToConformType()}";
+
+            var c5 = $"r1 -> wi3 : {r1.ConformableFor(wi3).ToConformType()}";
+            var c6 = $"r2 -> wi3 : {r2.ConformableFor(wi3).ToConformType()}";
+
+
+            return environment;
+
         }
     }
 }

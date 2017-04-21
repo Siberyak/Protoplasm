@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+
 namespace ConsoleApplication1
 {
     public abstract class BaseRequirement
     {
-        protected abstract ConformResult Conformable(BaseAbility ability);
+        public static IReadOnlyCollection<BaseRequirement> Empty = new BaseRequirement[0];
+        public virtual bool IsMutable => true;
+        public abstract ConformType Conformable(BaseAbility ability);
     }
 }

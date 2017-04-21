@@ -125,12 +125,25 @@ namespace ConsoleApplication1.TestData
 
     public abstract class MembershipItem : Entity
     {
+        protected readonly Competences MembershipCompetences;
         public string Caption { get; }
         protected MembershipItem(string caption, IEnumerable<MembershipItemsContainer> memberOf)
         {
             Caption = caption;
-            MemberOf = memberOf;
+            var membership = memberOf.ToArray();
+            MemberOf = membership;
+
+            var competences = Competences.New();
+            foreach (var item in membership)
+            {
+                competences = competences.MemberOf(item);
+                item.AddMember(this);
+            }
+
+            MembershipCompetences = competences;
         }
+
+  
 
         protected IEnumerable<MembershipItem> MemberOf { get; }
 
@@ -147,8 +160,15 @@ namespace ConsoleApplication1.TestData
 
     public abstract class MembershipItemsContainer : MembershipItem
     {
-        public MembershipItemsContainer(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption, memberOf)
+        protected readonly List<MembershipItem> Members = new List<MembershipItem>();
+
+        protected MembershipItemsContainer(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption, memberOf)
         {
+        }
+
+        public void AddMember(MembershipItem member)
+        {
+            Members.Add(member);
         }
     }
 }
