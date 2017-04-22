@@ -126,10 +126,8 @@ namespace ConsoleApplication1.TestData
     public abstract class MembershipItem : Entity
     {
         protected readonly Competences MembershipCompetences;
-        public string Caption { get; }
-        protected MembershipItem(string caption, IEnumerable<MembershipItemsContainer> memberOf)
+        protected MembershipItem(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption)
         {
-            Caption = caption;
             var membership = memberOf.ToArray();
             MemberOf = membership;
 

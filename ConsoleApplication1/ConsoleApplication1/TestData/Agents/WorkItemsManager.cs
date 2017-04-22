@@ -2,8 +2,17 @@ using System.Collections.Generic;
 
 namespace ConsoleApplication1.TestData
 {
-    public partial class PlanningEnvironment<TTime, TDuration>
+    public class AgentsManager<TAgent> : BaseAgent
+    {
+        protected override void RegisterBehaviors()
+        {
+            
+        }
+    }
 
+    
+
+    public partial class PlanningEnvironment<TTime, TDuration>
     {
         public class WorkItemsManager : BaseAgent
         {
@@ -19,9 +28,9 @@ namespace ConsoleApplication1.TestData
 
             }
 
-            public WorkItemAgent CreateWorkItemAgent(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
+            public WorkItemAgent CreateWorkItemAgent(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
             {
-                var workItem = new WorkItem(start, finish, duration, competences);
+                var workItem = new WorkItem(caption, start, finish, duration, competences);
                 var agent = new WorkItemAgent(workItem);
                 agent.Initialize();
                 return agent;

@@ -4,8 +4,6 @@ namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-
-
         public class WorkItem : Entity
         {
             private readonly BoundaryRequirement _boundaryRequirement;
@@ -21,7 +19,8 @@ namespace ConsoleApplication1.TestData
             // Predecessors-Followers
             // Laboriousness
 
-            public WorkItem(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
+            public WorkItem(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
+                : base(caption)
             {
                 _boundaryRequirement = new BoundaryRequirement(start, finish, duration);
                 _competencesRequirement = new CompetencesRequirement(competences);

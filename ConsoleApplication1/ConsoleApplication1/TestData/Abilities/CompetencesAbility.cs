@@ -13,10 +13,10 @@ namespace ConsoleApplication1.TestData
             Competences = Competences.New(competences);
         }
 
-        public override ConformType Conformable(BaseRequirement requirement)
+        public override CompatibilityType Compatible(BaseRequirement requirement)
         {
             var competencesRequirement = requirement as CompetencesRequirement;
-            return competencesRequirement?.Conformable(this) ?? ConformType.Imposible;
+            return competencesRequirement?.Compatible(this) ?? CompatibilityType.Never;
         }
     }
 

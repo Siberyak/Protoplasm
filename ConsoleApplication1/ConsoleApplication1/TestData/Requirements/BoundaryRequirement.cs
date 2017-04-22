@@ -17,10 +17,10 @@ namespace ConsoleApplication1.TestData
                 Duration = duration;
             }
 
-            public override ConformType Conformable(BaseAbility ability)
+            public override CompatibilityType Compatible(BaseAbility ability)
             {
                 var calendarAbility = ability as CalendarAbility;
-                return calendarAbility?.Conformable(this) ?? ConformType.Imposible;
+                return calendarAbility?.Compatible(this) ?? CompatibilityType.Never;
             }
 
             public override string ToString()

@@ -13,17 +13,17 @@ namespace ConsoleApplication1.TestData
             Competences = Competences.New(competences);
         }
 
-        public override ConformType Conformable(BaseAbility ability)
+        public override CompatibilityType Compatible(BaseAbility ability)
         {
             var competencesAbility = ability as CompetencesAbility;
             if(competencesAbility == null)
-                return ConformType.Imposible;
+                return CompatibilityType.Never;
 
             IEnumerable<CompetenceMatchingResult> result;
             if(!Competences.Acceptable(competencesAbility.Competences, out result))
-                return ConformType.Imposible;
+                return CompatibilityType.Never;
 
-            return IsMutable || competencesAbility.IsMutable ? ConformType.Posible : ConformType.Conform;
+            return IsMutable || competencesAbility.IsMutable ? CompatibilityType.DependsOnScene : CompatibilityType.Always;
         }
     }
 }

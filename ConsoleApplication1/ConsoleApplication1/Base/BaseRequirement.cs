@@ -6,6 +6,6 @@ namespace ConsoleApplication1
     {
         public static IReadOnlyCollection<BaseRequirement> Empty = new BaseRequirement[0];
         public virtual bool IsMutable => true;
-        public abstract ConformType Conformable(BaseAbility ability);
+        public abstract CompatibilityType Compatible(BaseAbility ability);
     }
 }

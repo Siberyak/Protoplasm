@@ -131,6 +131,7 @@ namespace ConsoleApplication1.TestData
 
             var wi1 = environment.WorkItems.CreateWorkItemAgent
                 (
+                    "wi1",
                     Interval<DateTime?>.Empty,
                     Interval<DateTime?>.Empty,
                     Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
@@ -139,6 +140,7 @@ namespace ConsoleApplication1.TestData
 
             var wi2 = environment.WorkItems.CreateWorkItemAgent
                 (
+                    "wi2",
                     Interval<DateTime?>.Empty,
                     Interval<DateTime?>.Empty,
                     Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
@@ -147,6 +149,7 @@ namespace ConsoleApplication1.TestData
 
             var wi3 = environment.WorkItems.CreateWorkItemAgent
                 (
+                    "wi3",
                     Interval<DateTime?>.Empty,
                     Interval<DateTime?>.Empty,
                     Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
@@ -154,14 +157,14 @@ namespace ConsoleApplication1.TestData
                 );
 
 
-            var c1 = $"r1 -> wi1 : {r1.ConformableFor(wi1).ToConformType()}";
-            var c2 = $"r2 -> wi1 : {r2.ConformableFor(wi1).ToConformType()}";
+            var c1 = r1.Compatible(wi1);
+            var c2 = r2.Compatible(wi1);
 
-            var c3 = $"r1 -> wi2 : {r1.ConformableFor(wi2).ToConformType()}";
-            var c4 = $"r2 -> wi2 : {r2.ConformableFor(wi2).ToConformType()}";
+            var c3 = r1.Compatible(wi2);
+            var c4 = r2.Compatible(wi2);
 
-            var c5 = $"r1 -> wi3 : {r1.ConformableFor(wi3).ToConformType()}";
-            var c6 = $"r2 -> wi3 : {r2.ConformableFor(wi3).ToConformType()}";
+            var c5 = r1.Compatible(wi3);
+            var c6 = r2.Compatible(wi3);
 
 
             return environment;

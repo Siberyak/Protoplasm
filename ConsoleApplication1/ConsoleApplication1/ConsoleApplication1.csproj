@@ -47,15 +47,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseAbility.cs" />
-    <Compile Include="BaseAgent.cs" />
-    <Compile Include="BaseWorker.cs" />
-    <Compile Include="BaseEntity.cs" />
-    <Compile Include="EntityAgent.cs" />
+    <Compile Include="Base\Compatibility\CompatibilityType.cs" />
+    <Compile Include="Base\Compatibility\AgentsCompatibilityInfo.cs" />
+    <Compile Include="Base\BaseAbility.cs" />
+    <Compile Include="Base\BaseAgent.cs" />
+    <Compile Include="Base\BaseWorker.cs" />
+    <Compile Include="Base\BaseEntity.cs" />
+    <Compile Include="Base\Compatibility\CompatibilityHelper.cs" />
+    <Compile Include="Base\Compatibility\CompatibilityInfo.cs" />
+    <Compile Include="Base\EntityAgent.cs" />
     <Compile Include="Intervals\SimpleLinkedList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaseRequirement.cs" />
+    <Compile Include="Base\BaseRequirement.cs" />
     <Compile Include="Intervals\Point.cs" />
     <Compile Include="Intervals\PointDirection.cs" />
     <Compile Include="Intervals\PointedInterval.cs" />

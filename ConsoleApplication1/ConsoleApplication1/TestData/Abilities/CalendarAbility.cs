@@ -11,9 +11,9 @@ namespace ConsoleApplication1.TestData
                 Calendar = calendar;
             }
 
-            public override ConformType Conformable(BaseRequirement requirement)
+            public override CompatibilityType Compatible(BaseRequirement requirement)
             {
-                return ConformType.Posible;
+                return CompatibilityType.DependsOnScene;
             }
         } 
     }

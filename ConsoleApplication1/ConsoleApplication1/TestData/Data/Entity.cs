@@ -6,9 +6,12 @@ namespace ConsoleApplication1.TestData
 {
     public abstract class Entity : BaseEntity
     {
-        protected Entity( )
+        public string Caption { get; }
+
+        protected Entity(string caption)
             : base(Guid.NewGuid())
         {
+            Caption = caption;
         }
 
 #pragma warning disable 649
@@ -38,6 +41,11 @@ namespace ConsoleApplication1.TestData
         protected virtual IReadOnlyCollection<Ability> GenerateAbilities()
         {
             return new Ability[0];
+        }
+
+        public override string ToString()
+        {
+            return Caption;
         }
     }
 }

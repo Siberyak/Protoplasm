@@ -15,9 +15,9 @@ namespace ConsoleApplication1.TestData
 
         public MappingType MappingType { get; private set; }
 
-        public override ConformType Conformable(BaseRequirement requirement)
+        public override CompatibilityType Compatible(BaseRequirement requirement)
         {
-            return ConformType.Imposible;
+            return CompatibilityType.Never;
         }
     }
 }
