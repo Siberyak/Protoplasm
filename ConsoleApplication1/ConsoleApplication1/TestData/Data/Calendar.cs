@@ -15,6 +15,10 @@ namespace ConsoleApplication1.TestData
     {
         public static class Calendars<TData>
         {
+
+            public abstract class HelperBase : PrevBasedCalendar<TData>.HelperBase
+            { }
+
             public interface ICalendar : IAbstractCalendar
             {
                 IEnumerable<CalendarItem> Get(TTime from, TTime to);
@@ -55,6 +59,26 @@ namespace ConsoleApplication1.TestData
 
             public class PrevBasedCalendar<TPrevData> : ICalendar
             {
+                public abstract class HelperBase
+                {
+                    public void Define(CalendarItems container, Calendars<TPrevData>.CalendarItem todefine)
+                    {
+                        var begin = todefine.Left.PointValue.Value;
+                        var end = todefine.Right.PointValue.Value;
+
+                        var left = begin;
+
+                        while (left.CompareTo(end) < 0)
+                        {
+                            left = ProcessInterval(container, left, end, todefine.Data);
+                        }
+                    }
+
+                    protected abstract TTime ProcessInterval(CalendarItems container, TTime left, TTime end, TPrevData data);
+                    public abstract TData Include(TData a, TData b);
+                    public abstract TData Exclude(TData a, TData b);
+                }
+
                 public delegate void DefineData(CalendarItems container, Calendars<TPrevData>.CalendarItem toDefine);
 
                 private readonly Calendars<TPrevData>.ICalendar _prev;
@@ -65,6 +89,7 @@ namespace ConsoleApplication1.TestData
                 public PrevBasedCalendar(DefineData defineData, CalendarItems.IncludeData includeData, CalendarItems.ExcludeData excludeData, CalendarItems.DataToString dataToString = null)
                     : this(null, defineData, includeData, excludeData, dataToString)
                 { }
+
                 public PrevBasedCalendar(Calendars<TPrevData>.ICalendar prev, DefineData defineData, CalendarItems.IncludeData includeData, CalendarItems.ExcludeData excludeData, CalendarItems.DataToString dataToString = null)
                 {
                     // проверить на закольцовывание... на вс€кий случай....
@@ -76,6 +101,16 @@ namespace ConsoleApplication1.TestData
 
                     _defineData = defineData;
                     _calendarItems = new CalendarItems(includeData, excludeData, dataToString);
+                }
+
+                public PrevBasedCalendar(HelperBase helper, CalendarItems.DataToString dataToString = null)
+                : this(helper.Define, helper.Include, helper.Exclude, dataToString)
+                {
+                }
+
+                public PrevBasedCalendar(Calendar<TPrevData> prev, HelperBase helper, CalendarItems.DataToString dataToString = null)
+                : this(prev, helper.Define, helper.Include, helper.Exclude, dataToString)
+                {
                 }
 
                 public IAbstractCalendar[] FullChain()
@@ -130,7 +165,7 @@ namespace ConsoleApplication1.TestData
                         _prev?.Get(undefinedInterval.Left.PointValue.Value, undefinedInterval.Right.PointValue.Value)
                         ?? new[] { new Calendars<TPrevData>.CalendarItem(undefinedInterval.Left, undefinedInterval.Right) };
 
-                    
+
 
                     foreach (var interval in intervals)
                     {
@@ -159,23 +194,27 @@ namespace ConsoleApplication1.TestData
 
         public class Calendar<TData> : Calendars<TData>.PrevBasedCalendar<TData>
         {
-            public Calendar(DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null) 
+            public Calendar(DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null)
                 : base(defineData, includeData, excludeData, dataToString)
             {
             }
 
-            public Calendar(Calendar<TData> prev, DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null) 
+            public Calendar(Calendar<TData> prev, DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null)
                 : base(prev, defineData, includeData, excludeData, dataToString)
+            {
+            }
+
+            public Calendar(Calendars<TData>.HelperBase helper, Calendars<TData>.CalendarItems.DataToString dataToString = null)
+                : this(helper.Define, helper.Include, helper.Exclude, dataToString)
+            {
+            }
+
+            public Calendar(Calendar<TData> prev, Calendars<TData>.HelperBase helper, Calendars<TData>.CalendarItems.DataToString dataToString = null)
+                : this(prev, helper.Define, helper.Include, helper.Exclude, dataToString)
             {
             }
         }
 
     }
 
-    public enum CalendarItemType
-    {
-        Unknown = 0,
-        Available,
-        Unavalable
-    }
 }

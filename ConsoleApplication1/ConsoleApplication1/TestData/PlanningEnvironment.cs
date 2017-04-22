@@ -18,7 +18,13 @@ namespace ConsoleApplication1.TestData
             return a.CompareTo(b) >= 0 ? a : b;
         }
 
-        public ResourcesManager Resources { get; } = new ResourcesManager();
-        public WorkItemsManager WorkItems { get; } = new WorkItemsManager();
+        public PlanningEnvironment()
+        {
+            Resources = new ResourcesManager(this);
+            WorkItems = new WorkItemsManager(this);
+        }
+
+        public ResourcesManager Resources { get; }
+        public WorkItemsManager WorkItems { get; } 
     }
 }

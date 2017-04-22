@@ -64,6 +64,8 @@
     <Compile Include="Intervals\PointsComparerBase.cs" />
     <Compile Include="TestData\Agents\DepartmentAgent.cs" />
     <Compile Include="TestData\Agents\EmployeeAgent.cs" />
+    <Compile Include="Tests\CalendarTests.cs" />
+    <Compile Include="Tests\CompetencesTests.cs" />
     <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
     <Compile Include="TestData\Data\Calendar.cs" />
     <Compile Include="TestData\Abilities\CalendarAbility.cs" />
@@ -88,7 +90,7 @@
     <Compile Include="TestData\Abilities\Ability.cs" />
     <Compile Include="TestData\Data\WorkItem.cs" />
     <Compile Include="TestData\TypeNameExtender.cs" />
-    <Compile Include="TestData\_TestDataLoad.cs" />
+    <Compile Include="Tests\Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

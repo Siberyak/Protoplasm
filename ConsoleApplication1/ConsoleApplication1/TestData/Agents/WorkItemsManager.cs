@@ -7,6 +7,13 @@ namespace ConsoleApplication1.TestData
     {
         public class WorkItemsManager : BaseAgent
         {
+            private PlanningEnvironment<TTime, TDuration> _environment;
+
+            public WorkItemsManager(PlanningEnvironment<TTime, TDuration> environment)
+            {
+                _environment = environment;
+            }
+
             protected override void RegisterBehaviors()
             {
 

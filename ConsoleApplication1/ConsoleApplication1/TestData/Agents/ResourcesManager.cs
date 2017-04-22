@@ -6,6 +6,13 @@ namespace ConsoleApplication1.TestData
     {
         public class ResourcesManager : BaseAgent
         {
+            private readonly PlanningEnvironment<TTime, TDuration> _environment;
+
+            public ResourcesManager(PlanningEnvironment<TTime, TDuration> environment)
+            {
+                _environment = environment;
+            }
+
             protected override void RegisterBehaviors()
             {
             
