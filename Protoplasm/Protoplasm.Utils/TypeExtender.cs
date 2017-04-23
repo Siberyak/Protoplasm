@@ -123,4 +123,17 @@ namespace Protoplasm.Utils
 
         #endregion
     }
+
+    public static class EqualityExtender
+    {
+        public static bool AreEquals<T1, T2>(this T1 first, T2 second, Func<T1, T1, bool> isEquals)
+        {
+            if (!(second is T1))
+                return ReferenceEquals(first, second);
+
+            var other = (T1)(object)second;
+
+            return isEquals(first, other);
+        }
+    }
 }

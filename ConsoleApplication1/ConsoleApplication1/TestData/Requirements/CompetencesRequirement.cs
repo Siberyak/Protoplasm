@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
@@ -14,7 +17,7 @@ namespace ConsoleApplication1.TestData
             Competences = Competences.New(competences);
         }
 
-        public override CompatibilityType Compatible(BaseAbility ability)
+        public override CompatibilityType Compatible(IAbility ability)
         {
             var competencesAbility = ability as CompetencesAbility;
             if(competencesAbility == null)

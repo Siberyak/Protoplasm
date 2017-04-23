@@ -1,19 +1,25 @@
 using System.Collections.Generic;
 using MAS.Core;
+using MAS.Core.Compatibility.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class WorkItemAgent : EntityAgent<WorkItem>
+        public class WorkItemAgent : ManagedEntityAgent<WorkItem>, IRequirementsHolder
         {
-            public WorkItemAgent(WorkItem entity) : base(entity)
+            public WorkItemAgent(WorkItemsManager manager, WorkItem entity) : base(manager, entity)
             {
             }
 
             protected override void RegisterBehaviors()
             {
 
+            }
+
+            public bool Equals(IRequirementsHolder other)
+            {
+                throw new System.NotImplementedException();
             }
         }
     }

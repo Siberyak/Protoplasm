@@ -1,5 +1,8 @@
 using System.Linq;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
@@ -18,7 +21,7 @@ namespace ConsoleApplication1.TestData
                 Duration = duration;
             }
 
-            public override CompatibilityType Compatible(BaseAbility ability)
+            public override CompatibilityType Compatible(IAbility ability)
             {
                 var calendarAbility = ability as CalendarAbility;
                 return calendarAbility?.Compatible(this) ?? CompatibilityType.Never;

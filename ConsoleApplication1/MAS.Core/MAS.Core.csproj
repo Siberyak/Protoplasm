@@ -44,17 +44,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgentExtender.cs" />
     <Compile Include="BaseAbility.cs" />
     <Compile Include="BaseAgent.cs" />
+    <Compile Include="Compatibility\Contracts\IAbilitiesCompatibilityInfo.cs" />
+    <Compile Include="Compatibility\Contracts\IAbilitiesHolder.cs" />
+    <Compile Include="Compatibility\Contracts\IRequirementsHolder.cs" />
+    <Compile Include="Compatibility\Contracts\IRequirementsCompatibilityInfo.cs" />
+    <Compile Include="Compatibility\Contracts\IAbility.cs" />
+    <Compile Include="Compatibility\Contracts\ICompatibilitiesAgent.cs" />
+    <Compile Include="Contracts\IAgent.cs" />
     <Compile Include="BaseEntity.cs" />
     <Compile Include="BaseRequirement.cs" />
     <Compile Include="BaseWorker.cs" />
     <Compile Include="Compatibility\AgentsCompatibilityInfo.cs" />
-    <Compile Include="Compatibility\ComaptibilitiesAgent.cs" />
-    <Compile Include="Compatibility\CompatibilityHelper.cs" />
+    <Compile Include="Compatibility\CompatibilitiesStorageAgent.cs" />
+    <Compile Include="Compatibility\CompatibilityExtender.cs" />
     <Compile Include="Compatibility\CompatibilityInfo.cs" />
     <Compile Include="Compatibility\CompatibilityType.cs" />
+    <Compile Include="Contracts\IEntityAgent.cs" />
     <Compile Include="EntityAgent.cs" />
+    <Compile Include="Contracts\IAgentsManager.cs" />
+    <Compile Include="Contracts\IIdentifiedAgent.cs" />
+    <Compile Include="Contracts\IManagedAgent.cs" />
+    <Compile Include="Compatibility\Contracts\IRequirement.cs" />
+    <Compile Include="Contracts\IScene.cs" />
+    <Compile Include="IdentifiedAgent.cs" />
+    <Compile Include="ManagedEntityAgent.cs" />
+    <Compile Include="Messaging\Messaging.cs" />
+    <Compile Include="Messaging\Contracts\IMessage.cs" />
+    <Compile Include="Messaging\Contracts\IRequest%28TRequestData%29.cs" />
+    <Compile Include="Messaging\Contracts\IResponse%28TRequestData, TResponseData%29.cs" />
+    <Compile Include="Messaging\Message%28TMessageData%29.cs" />
+    <Compile Include="Messaging\Message.cs" />
+    <Compile Include="Messaging\Request%28TRequestData%29.cs" />
+    <Compile Include="Messaging\Response%28TRequestData, TResponseData%29.cs" />
+    <Compile Include="Messaging\Response%28TResponseData%29.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene.cs" />
   </ItemGroup>
@@ -71,6 +96,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

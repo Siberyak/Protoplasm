@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
-namespace MAS.Core
+namespace MAS.Core.Compatibility
 {
-    public static class CompatibilityHelper
+    public static class CompatibilityExtender
     {
         public static CompatibilityType ToCompatibilityType(this IEnumerable<CompatibilityInfo> compatibilityInfo)
         {
@@ -22,17 +24,7 @@ namespace MAS.Core
             throw new NotImplementedException();
         }
 
-
-        public static void Find(this BaseAgent requirements, IEnumerable<BaseAgent> abilities)
-        {
-            foreach (var agent in abilities)
-            {
-                //var result = agent.Compatible(requirements);
-                //result.Details.All(x => x.Variants.Any());
-            }
-        }
-
-        public static CompatibilityInfo[] Compatibility(this IEnumerable<BaseRequirement> requirements, IEnumerable<BaseAbility> abilities)
+        public static CompatibilityInfo[] Compatibility(this IEnumerable<IRequirement> requirements, IEnumerable<IAbility> abilities)
         {
             var array = abilities.ToArray();
             var result = requirements

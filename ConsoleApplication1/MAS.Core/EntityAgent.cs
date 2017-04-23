@@ -1,12 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MAS.Core.Contracts;
 
 namespace MAS.Core
 {
-    public abstract class EntityAgent<T> : BaseAgent
+    public abstract class EntityAgent<T> : BaseAgent, IEntityAgent<T>
         where T : BaseEntity
     {
+        public Guid ID => Entity.ID;
+        T IEntityAgent<T>.Entity => Entity;
+
+        protected override bool IsEquals(IAgent other)
+        {
+            return (other as IIdentifiedAgent)?.ID == ID;
+        }
+
         protected EntityAgent(T entity)
         {
             Entity = entity;

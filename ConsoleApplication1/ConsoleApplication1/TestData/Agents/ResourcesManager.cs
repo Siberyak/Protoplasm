@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class ResourcesManager : BaseAgent
+        public class ResourcesManager : IdentifiedAgent, IAgentsManager
         {
             private readonly PlanningEnvironment<TTime, TDuration> _environment;
 
@@ -14,22 +18,32 @@ namespace ConsoleApplication1.TestData
                 _environment = environment;
             }
 
+            protected override ICompatibilitiesAgent CompatibilitiesAgent { get; } = new CompatibilitiesStorageAgent();
+
             protected override void RegisterBehaviors()
             {
             
             }
 
-            public Department CreateDepartment(string caption, params Department[] memberOf)
+            TAgent Initialize<TAgent>(TAgent agent)
+                where TAgent : IManagedAgent
             {
-                return new Department(caption, memberOf);
+                agent.Initialize();
+                return agent;
+            } 
+
+            public DepartmentAgent CreateDepartment(string caption, params Department[] memberOf)
+            {
+                var department = new Department(caption, memberOf);
+                var agent = new DepartmentAgent(this, department);
+                return Initialize(agent);
             }
 
             public EmployeeAgent CreateEmployeeAgent(string caption, Competences competences, Calendar<TestCalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
             {
                 var employee = new Employee(caption, competences, calendar, memberOf);
-                var agent = new EmployeeAgent(employee);
-                agent.Initialize();
-                return agent;
+                var agent = new EmployeeAgent(this, employee);
+                return Initialize(agent);
             }
         } 
     }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
@@ -14,7 +16,7 @@ namespace ConsoleApplication1.TestData
             Competences = Competences.New(competences);
         }
 
-        public override CompatibilityType Compatible(BaseRequirement requirement)
+        public override CompatibilityType Compatible(IRequirement requirement)
         {
             var competencesRequirement = requirement as CompetencesRequirement;
             return competencesRequirement?.Compatible(this) ?? CompatibilityType.Never;

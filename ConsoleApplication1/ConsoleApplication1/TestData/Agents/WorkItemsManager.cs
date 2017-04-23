@@ -1,28 +1,23 @@
+using System;
 using System.Collections.Generic;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
+using Protoplasm.Utils;
 
 namespace ConsoleApplication1.TestData
 {
-    public class AgentsManager<TAgent> : BaseAgent
-    {
-        protected override void RegisterBehaviors()
-        {
-            
-        }
-    }
-
-    
-
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class WorkItemsManager : BaseAgent
+        public class WorkItemsManager : IdentifiedAgent, IAgentsManager
         {
             private PlanningEnvironment<TTime, TDuration> _environment;
-
             public WorkItemsManager(PlanningEnvironment<TTime, TDuration> environment)
             {
                 _environment = environment;
             }
+            protected override ICompatibilitiesAgent CompatibilitiesAgent { get; } = new CompatibilitiesStorageAgent();
 
             protected override void RegisterBehaviors()
             {
@@ -32,7 +27,7 @@ namespace ConsoleApplication1.TestData
             public WorkItemAgent CreateWorkItemAgent(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
             {
                 var workItem = new WorkItem(caption, start, finish, duration, competences);
-                var agent = new WorkItemAgent(workItem);
+                var agent = new WorkItemAgent(this, workItem);
                 agent.Initialize();
                 return agent;
             }

@@ -5,9 +5,9 @@ namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class DepartmentAgent : EntityAgent<Department>
+        public class DepartmentAgent : ManagedEntityAgent<Department>
         {
-            public DepartmentAgent(Department entity) : base(entity)
+            public DepartmentAgent(ResourcesManager manager, Department entity) : base(manager, entity)
             {
             }
 

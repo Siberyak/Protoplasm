@@ -1,51 +1,41 @@
 using System;
 using System.Collections.Generic;
+using MAS.Core.Compatibility.Contracts;
 
-namespace MAS.Core
+namespace MAS.Core.Compatibility
 {
-    public interface IRequiremetsCompatibilityInfo
+    internal class AgentsCompatibilityInfo : IRequirementsCompatibilityInfo, IAbilitiesCompatibilityInfo
     {
-        BaseAgent Agent { get; }
-    }
-
-    public interface IAbilitiesCompatibilityInfo
-    {
-        BaseAgent Agent { get; }
-    }
-
-    public class AgentsCompatibilityInfo : IRequiremetsCompatibilityInfo, IAbilitiesCompatibilityInfo
-    {
-        public readonly BaseAgent RequiremenetsAgent;
-        public readonly BaseAgent AbilitiesAgent;
+        public readonly IRequirementsHolder RequiremenetsHolder;
+        public readonly IAbilitiesHolder AbilitiesHolder;
         public readonly CompatibilityType Compatibility;
 
         public readonly IReadOnlyCollection<CompatibilityInfo> Details;
 
-        public AgentsCompatibilityInfo(BaseAgent requiremenetsAgent, BaseAgent abilitiesAgent, IReadOnlyCollection<CompatibilityInfo> details)
+        public AgentsCompatibilityInfo(IRequirementsHolder requiremenetsHolder, IAbilitiesHolder abilitiesHolder, IReadOnlyCollection<CompatibilityInfo> details)
         {
-            if(requiremenetsAgent == null)
-                throw new ArgumentNullException(nameof(requiremenetsAgent));
-            if (abilitiesAgent == null)
-                throw new ArgumentNullException(nameof(abilitiesAgent));
+            if(requiremenetsHolder == null)
+                throw new ArgumentNullException(nameof(requiremenetsHolder));
+            if (abilitiesHolder == null)
+                throw new ArgumentNullException(nameof(abilitiesHolder));
             if (details == null)
                 throw new ArgumentNullException(nameof(details));
 
-            RequiremenetsAgent = requiremenetsAgent;
-            AbilitiesAgent = abilitiesAgent;
+            RequiremenetsHolder = requiremenetsHolder;
+            AbilitiesHolder = abilitiesHolder;
             Compatibility = details.ToCompatibilityType();
             Details = details;
 
-            requiremenetsAgent.AddCompatibilityInfo((IAbilitiesCompatibilityInfo)this);
-            abilitiesAgent.AddCompatibilityInfo((IRequiremetsCompatibilityInfo)this);
+            //requiremenetsHolder.CompatibilitiesAgent.Add((IAbilitiesCompatibilityInfo)this);
+            //abilitiesHolder.CompatibilitiesAgent.Add((IRequirementsCompatibilityInfo)this);
         }
 
-        BaseAgent IRequiremetsCompatibilityInfo.Agent => RequiremenetsAgent;
-
-        BaseAgent IAbilitiesCompatibilityInfo.Agent => AbilitiesAgent;
+        IRequirementsHolder IRequirementsCompatibilityInfo.Holder => RequiremenetsHolder;
+        IAbilitiesHolder IAbilitiesCompatibilityInfo.Holder => AbilitiesHolder;
 
         public override string ToString()
         {
-            return $"R: [{RequiremenetsAgent} <-> A: [{AbilitiesAgent}] => [{Compatibility}]";
+            return $"R: [{RequiremenetsHolder} <-> A: [{AbilitiesHolder}] => [{Compatibility}]";
         }
     }
 

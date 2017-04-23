@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Immutable;
+using MAS.Core.Contracts;
 
 namespace MAS.Core
 {
-    public class Scene
+    public class Scene : IScene
     {
         public Guid ID { get; } = Guid.NewGuid();
 

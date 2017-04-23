@@ -1,4 +1,6 @@
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
@@ -13,7 +15,7 @@ namespace ConsoleApplication1.TestData
                 Calendar = calendar;
             }
 
-            public override CompatibilityType Compatible(BaseRequirement requirement)
+            public override CompatibilityType Compatible(IRequirement requirement)
             {
                 return CompatibilityType.DependsOnScene;
             }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
@@ -16,7 +18,7 @@ namespace ConsoleApplication1.TestData
 
         public MappingType MappingType { get; private set; }
 
-        public override CompatibilityType Compatible(BaseRequirement requirement)
+        public override CompatibilityType Compatible(IRequirement requirement)
         {
             return CompatibilityType.Never;
         }

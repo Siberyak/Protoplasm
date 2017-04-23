@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ConsoleApplication1.TestData;
+using ConsoleApplication1.TestData.Messaging;
 
 namespace ConsoleApplication1
 {
@@ -11,6 +12,8 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
+            MessagingTests.Test1();
+
             Tests.Do();
         }
     }

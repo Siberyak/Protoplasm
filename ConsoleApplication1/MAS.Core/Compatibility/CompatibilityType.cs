@@ -1,4 +1,4 @@
-namespace MAS.Core
+namespace MAS.Core.Compatibility
 {
     /// <summary>
     /// Типы совместимости
