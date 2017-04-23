@@ -1,4 +1,4 @@
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
     /// <summary>
     /// 

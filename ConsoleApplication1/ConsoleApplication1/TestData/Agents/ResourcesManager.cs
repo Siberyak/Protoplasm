@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MAS.Core;
 
 namespace ConsoleApplication1.TestData
 {

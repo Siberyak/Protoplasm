@@ -1,4 +1,5 @@
 using System.Linq;
+using MAS.Core;
 
 namespace ConsoleApplication1.TestData
 {

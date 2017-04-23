@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
     abstract class PointsComparerBase
     {

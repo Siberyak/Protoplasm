@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{97B06EC9-9926-4080-A665-241BC83CB9AD}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{A00EEBAD-4F1B-470C-AFDE-0AAA6EA851D5}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>ConsoleApplication1</AssemblyName>
+    <RootNamespace>Protoplasm.PointedIntervals</RootNamespace>
+    <AssemblyName>Protoplasm.PointedIntervals</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,28 +40,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MemberInfoExtender.cs" />
-    <Compile Include="ObfuscateAttribute.cs" />
-    <Compile Include="ObfuscateDecimalAttribute.cs" />
-    <Compile Include="ObfuscateStringAttribute.cs" />
-    <Compile Include="ObfuscationSequenceAttribute.cs" />
-    <Compile Include="Obfuscator.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PointDirection.cs" />
+    <Compile Include="PointedInterval.cs" />
+    <Compile Include="PointedIntervalsContainer.cs" />
+    <Compile Include="PointedIntervalsContainerExtender.cs" />
+    <Compile Include="PointsComparerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeExtender.cs" />
-    <Compile Include="TypeNameExtender.cs" />
+    <Compile Include="SimpleLinkedList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\ConsoleApplication1\MAS.Core\MAS.Core.csproj">
-      <Project>{0cfb6a8e-af1c-483f-99de-44d6b867ec71}</Project>
-      <Name>MAS.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Protoplasm.PointedIntervals\Protoplasm.PointedIntervals.csproj">
-      <Project>{a00eebad-4f1b-470c-afde-0aaa6ea851d5}</Project>
-      <Name>Protoplasm.PointedIntervals</Name>
+    <ProjectReference Include="..\..\Protoplasm\Protoplasm.Utils\Protoplasm.Utils.csproj">
+      <Project>{19baf319-a0ba-4c50-b580-32647171c73b}</Project>
+      <Name>Protoplasm.Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

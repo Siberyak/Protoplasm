@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1
+namespace MAS.Core
 {
     public abstract class EntityAgent<T> : BaseAgent
         where T : BaseEntity
@@ -16,12 +16,12 @@ namespace ConsoleApplication1
 
         public override IReadOnlyCollection<BaseRequirement> Requirements => Entity.Requirements;
 
-        public override AgentsCompatibilityInfo Compatible(BaseAgent requirementsAgent)
-        {
-            var result = requirementsAgent.Requirements.Compatibility(Entity.Abilities);
+        //public override AgentsCompatibilityInfo Compatible(BaseAgent requirementsAgent)
+        //{
+        //    var result = requirementsAgent.Requirements.Compatibility(Entity.Abilities);
 
-            return new AgentsCompatibilityInfo(requirementsAgent, this, result);
-        }
+        //    return new AgentsCompatibilityInfo(requirementsAgent, this, result);
+        //}
 
         protected void LifeCircle()
         {

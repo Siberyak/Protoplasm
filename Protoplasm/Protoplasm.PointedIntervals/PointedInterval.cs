@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
     /// <summary>
     /// 
@@ -50,11 +50,11 @@ namespace ConsoleApplication1.Intervals
         /// <param name="right"></param>
         /// <param name="rightIncluded"></param>
         /// <param name="data"></param>
-        public PointedInterval(TBound? left, bool leftIncluded, TBound? right, bool rightIncluded, TData data)
+        protected PointedInterval(TBound? left, bool leftIncluded, TBound? right, bool rightIncluded, TData data)
             : this(left.HasValue ? Point<TBound>.Left(left.Value, leftIncluded) : Point<TBound>.Left(), right.HasValue ? Point<TBound>.Right(right.Value, rightIncluded) : Point<TBound>.Right(), data)
         { }
 
-        internal PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
+        protected PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
         {
             Left = left ?? Point<TBound>.Left();
             Right = right ?? Point<TBound>.Right();

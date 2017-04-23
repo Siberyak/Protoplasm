@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1
+namespace MAS.Core
 {
     public static class CompatibilityHelper
     {
@@ -27,8 +27,8 @@ namespace ConsoleApplication1
         {
             foreach (var agent in abilities)
             {
-                var result = agent.Compatible(requirements);
-                result.Details.All(x => x.Variants.Any());
+                //var result = agent.Compatible(requirements);
+                //result.Details.All(x => x.Variants.Any());
             }
         }
 

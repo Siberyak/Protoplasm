@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
     /// <summary>
     /// 

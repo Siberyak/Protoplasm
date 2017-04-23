@@ -1,7 +1,7 @@
 using System;
-using ConsoleApplication1.TestData;
 
-namespace ConsoleApplication1
+
+namespace MAS.Core
 {
     public abstract class BaseAbility
     {

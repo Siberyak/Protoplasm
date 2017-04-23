@@ -1,3 +1,5 @@
+using MAS.Core;
+
 namespace ConsoleApplication1.TestData
 {
     public abstract class Requirement : BaseRequirement

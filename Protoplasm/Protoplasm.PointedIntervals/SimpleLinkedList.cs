@@ -2,10 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ConsoleApplication1.TestData;
+using Protoplasm.Utils;
 
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
+    public interface INode<T>
+    {
+        T Value { get; }
+
+        INode<T> Previous { get;  }
+
+        INode<T> Next { get; }
+    }
+
     internal class SimpleLinkedList<T> : IEnumerable<T>
     {
         public override string ToString()
@@ -28,10 +37,10 @@ namespace ConsoleApplication1.Intervals
 
         public int Count { get; private set; }
 
-        public Node First { get; private set; }
-        public Node Last { get; private set; }
+        public INode<T> First { get; private set; }
+        public INode<T> Last { get; private set; }
 
-        public Node Find(Func<T, bool> predicate)
+        public INode<T> Find(Func<T, bool> predicate)
         {
             if (predicate == null)
                 return null;
@@ -62,7 +71,7 @@ namespace ConsoleApplication1.Intervals
             return result;
         }
 
-        public class Node
+        public class Node : INode<T>
         {
             internal Node(SimpleLinkedList<T> list, Node previous, Node next, T value)
             {
@@ -80,16 +89,16 @@ namespace ConsoleApplication1.Intervals
 
             public SimpleLinkedList<T> List { get; private set; }
 
-            public Node Previous { get; private set; }
+            public INode<T> Previous { get; private set; }
 
-            public Node Next { get; private set; }
+            public INode<T> Next { get; private set; }
 
-            public readonly T Value;
+            public T Value { get; }
 
             internal void Remove()
             {
-                var previous = Previous;
-                var next = Next;
+                var previous = (Node)Previous;
+                var next = (Node)Next;
 
                 if(previous != null)
                     previous.Next = next;
@@ -106,12 +115,12 @@ namespace ConsoleApplication1.Intervals
             }
         }
 
-        public void Remove(Node node)
+        public void Remove(INode<T> node)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (node.List != this)
+            if (((Node)node).List != this)
                 throw new ArgumentException("node.List != this", nameof(node));
 
             if (node == First)
@@ -119,11 +128,11 @@ namespace ConsoleApplication1.Intervals
             if (node == Last)
                 Last = node.Previous;
 
-            node.Remove();
+            ((Node)node).Remove();
             Count--;
         }
 
-        public Node AddFirst(T value)
+        public INode<T> AddFirst(T value)
         {
             Count++;
             return First == null 
@@ -131,15 +140,15 @@ namespace ConsoleApplication1.Intervals
                 : AddBefore(First, value);
         }
 
-        public Node AddAfter(Node node, T value)
+        public INode<T> AddAfter(INode<T> node, T value)
         {
             if(node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (node.List != this)
+            if (((Node)node).List != this)
                 throw new ArgumentException("node.List != this", nameof(node));
 
-            var result = new Node(this, node, node.Next, value);
+            var result = new Node(this, (Node)node, (Node)node.Next, value);
 
             if (result.Next == null)
                 Last = result;
@@ -149,15 +158,15 @@ namespace ConsoleApplication1.Intervals
             return result;
         }
 
-        public Node AddBefore(Node node, T value)
+        public INode<T> AddBefore(INode<T> node, T value)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (node.List != this)
+            if (((Node)node).List != this)
                 throw new ArgumentException("node.List != this", nameof(node));
 
-            var result = new Node(this, node.Previous, node, value);
+            var result = new Node(this, (Node)node.Previous, (Node)node, value);
 
             if (result.Previous == null)
                 First = result;
@@ -169,10 +178,10 @@ namespace ConsoleApplication1.Intervals
 
         private class Enumerator : IEnumerator<T>
         {
-            private readonly Node _startNode;
-            private Node _current;
+            private readonly INode<T> _startNode;
+            private INode<T> _current;
 
-            public Enumerator(Node current)
+            public Enumerator(INode<T> current)
             {
                 if (current == null)
                     throw new ArgumentNullException(nameof(current));

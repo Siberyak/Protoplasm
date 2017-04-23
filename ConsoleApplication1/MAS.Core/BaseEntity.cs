@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ConsoleApplication1
+namespace MAS.Core
 {
     public abstract class BaseEntity
     {

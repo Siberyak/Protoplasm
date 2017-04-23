@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1.Intervals
+namespace Protoplasm.PointedIntervals
 {
     public interface IIntervalData<T>
     {
@@ -87,8 +87,8 @@ namespace ConsoleApplication1.Intervals
         //private LinkedList<TInterval> _is;
         private readonly SimpleLinkedList<TInterval> _intervals;
 
-        internal SimpleLinkedList<TInterval>.Node FirstNode => _intervals.First;
-        internal SimpleLinkedList<TInterval>.Node LastNode => _intervals.Last;
+        public INode<TInterval> FirstNode => _intervals.First;
+        public INode<TInterval> LastNode => _intervals.Last;
 
         /// <summary>
         /// »нициализирует новый экземпл€р класса <see cref="T:System.Object"/>.
@@ -146,7 +146,7 @@ namespace ConsoleApplication1.Intervals
             return this;
         }
 
-        private SimpleLinkedList<TInterval>.Node TryMerge(SimpleLinkedList<TInterval>.Node node)
+        private INode<TInterval> TryMerge(INode<TInterval> node)
         {
             if (node == null)
                 return null;
@@ -170,7 +170,7 @@ namespace ConsoleApplication1.Intervals
         public TInterval Left => _intervals.Count == 0 ? null : _intervals.First.Next?.Value;
         public TInterval Right => _intervals.Count == 0 ? null : _intervals.Last.Previous?.Value;
 
-        private SimpleLinkedList<TInterval>.Node[] Add(Point<TBound> point)
+        private INode<TInterval>[] Add(Point<TBound> point)
         {
 
             var node = _intervals.Find(x => x.Contains(point));
@@ -212,7 +212,7 @@ namespace ConsoleApplication1.Intervals
         }
 
 
-        internal SimpleLinkedList<TInterval>.Node FindNode(Func<TInterval, bool> predicate)
+        public INode<TInterval> FindNode(Func<TInterval, bool> predicate)
         {
             return _intervals.Find(predicate);
 

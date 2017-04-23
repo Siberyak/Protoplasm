@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace ConsoleApplication1
+namespace MAS.Core
 {
     public class Scene
     {

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ConsoleApplication1.Intervals;
+using Protoplasm.PointedIntervals;
+using Protoplasm.Utils;
 
 namespace ConsoleApplication1.TestData
 {
@@ -178,19 +179,12 @@ namespace ConsoleApplication1.TestData
                     return $"{GetType().TypeName()}";
                 }
             }
-
-
         }
 
         public Calendar<TData> CreateCalendar<TData>(Calendars<TData>.PrevBasedCalendar<TData>.DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null)
         {
             return new Calendar<TData>(defineData, includeData, excludeData, dataToString);
         }
-
-        //public Calendar<TData> CreateCalendar<TData>(Calendars<TData>.PrevBasedCalendar<TData>.DefineData defineData, Calendars<TData>.CalendarItems.IncludeData includeData, Calendars<TData>.CalendarItems.ExcludeData excludeData, Calendars<TData>.CalendarItems.DataToString dataToString = null)
-        //{
-        //    return new Calendar<TData>(defineData, includeData, excludeData, dataToString);
-        //}
 
         public class Calendar<TData> : Calendars<TData>.PrevBasedCalendar<TData>
         {

@@ -1,4 +1,4 @@
-namespace ConsoleApplication1
+namespace MAS.Core
 {
     /// <summary>
     /// Типы совместимости

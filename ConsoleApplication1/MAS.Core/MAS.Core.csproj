@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{19ABBF76-4B4F-43AC-9527-70DB1B442452}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{0CFB6A8E-AF1C-483F-99DE-44D6B867EC71}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>ConsoleApplication1</AssemblyName>
+    <RootNamespace>MAS.Core</RootNamespace>
+    <AssemblyName>MAS.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -47,41 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="BaseAbility.cs" />
+    <Compile Include="BaseAgent.cs" />
+    <Compile Include="BaseEntity.cs" />
+    <Compile Include="BaseRequirement.cs" />
+    <Compile Include="BaseWorker.cs" />
+    <Compile Include="Compatibility\AgentsCompatibilityInfo.cs" />
+    <Compile Include="Compatibility\ComaptibilitiesAgent.cs" />
+    <Compile Include="Compatibility\CompatibilityHelper.cs" />
+    <Compile Include="Compatibility\CompatibilityInfo.cs" />
+    <Compile Include="Compatibility\CompatibilityType.cs" />
+    <Compile Include="EntityAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestData\Agents\DepartmentAgent.cs" />
-    <Compile Include="TestData\Agents\EmployeeAgent.cs" />
-    <Compile Include="Tests\CalendarTests.cs" />
-    <Compile Include="Tests\CompetencesTests.cs" />
-    <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
-    <Compile Include="TestData\Data\Calendar.cs" />
-    <Compile Include="TestData\Abilities\CalendarAbility.cs" />
-    <Compile Include="TestData\Competences\Competence.cs" />
-    <Compile Include="TestData\Competences\Competences.cs" />
-    <Compile Include="TestData\Abilities\CompetencesAbility.cs" />
-    <Compile Include="TestData\Competences\CompetencesExtender.cs" />
-    <Compile Include="TestData\Requirements\CompetencesRequirement.cs" />
-    <Compile Include="TestData\Data\Department.cs" />
-    <Compile Include="TestData\Data\Employee.cs" />
-    <Compile Include="TestData\Data\Interval.cs" />
-    <Compile Include="TestData\MappingType.cs" />
-    <Compile Include="TestData\Competences\MemberOfCompetence.cs" />
-    <Compile Include="TestData\PlanningEnvironment.cs" />
-    <Compile Include="TestData\Requirements\Requirement.cs" />
-    <Compile Include="TestData\Agents\ResourcesManager.cs" />
-    <Compile Include="TestData\Data\Entity.cs" />
-    <Compile Include="TestData\Data\Role.cs" />
-    <Compile Include="TestData\Agents\WorkItemAgent.cs" />
-    <Compile Include="TestData\Agents\WorkItemsManager.cs" />
-    <Compile Include="TestData\Abilities\Ability.cs" />
-    <Compile Include="TestData\Data\WorkItem.cs" />
-    <Compile Include="Tests\Tests.cs" />
+    <Compile Include="Scene.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Protoplasm\Protoplasm.PointedIntervals\Protoplasm.PointedIntervals.csproj">
       <Project>{a00eebad-4f1b-470c-afde-0aaa6ea851d5}</Project>
@@ -91,10 +67,9 @@
       <Project>{19baf319-a0ba-4c50-b580-32647171c73b}</Project>
       <Name>Protoplasm.Utils</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MAS.Core\MAS.Core.csproj">
-      <Project>{0cfb6a8e-af1c-483f-99de-44d6b867ec71}</Project>
-      <Name>MAS.Core</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
