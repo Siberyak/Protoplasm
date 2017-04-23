@@ -75,7 +75,7 @@ namespace Protoplasm.PointedIntervals
             return Left <= point && point <= Right;
         }
 
-        public bool TrySplit(Point<TBound> point, out Point<TBound>[] points)
+        internal bool TrySplit(Point<TBound> point, out Point<TBound>[] points)
         {
             points = null;
 

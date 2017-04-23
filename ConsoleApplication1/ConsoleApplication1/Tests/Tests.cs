@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using Protoplasm.Calendars;
+using Protoplasm.Calendars.Tests;
 
 
 namespace ConsoleApplication1.TestData
@@ -13,16 +15,23 @@ namespace ConsoleApplication1.TestData
     {
         public static void Do()
         {
-            PlanningEnvironment<DateTime, TimeSpan>.InitGetOffset((from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?));
+            var original = Calendars<DateTime, TimeSpan>.GetOffset;
+            try
+            {
+                Calendars<DateTime, TimeSpan>.GetOffset = (from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?);
 
-            CalendarTests.Calendars();
+                CalendarTests.Calendars();
 
-            WorkCalendarTests.WorkCalendars();
+                WorkCalendarTests.WorkCalendars();
 
+                CompetencesTests.TestCompetencesMatching();
 
-            CompetencesTests.TestCompetencesMatching();
-
-            TestManagersAdd();
+                TestManagersAdd();
+            }
+            finally
+            {
+                Calendars<DateTime, TimeSpan>.GetOffset = original;
+            }
         }
 
        #region TestCalendarItems

@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protoplasm.PointedIntervals
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{19ABBF76-4B4F-43AC-9527-70DB1B442452}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protoplasm.Calendars", "..\Protoplasm\Protoplasm.Calendars\Protoplasm.Calendars.csproj", "{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Protoplasm", "Protoplasm", "{6D8D77A3-B788-4B55-85DB-BEE3D684C323}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MAS", "MAS", "{3BDDFE4F-8098-493D-883B-6092F3634818}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +39,18 @@ Global
 		{19ABBF76-4B4F-43AC-9527-70DB1B442452}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19ABBF76-4B4F-43AC-9527-70DB1B442452}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19ABBF76-4B4F-43AC-9527-70DB1B442452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0CFB6A8E-AF1C-483F-99DE-44D6B867EC71} = {3BDDFE4F-8098-493D-883B-6092F3634818}
+		{19BAF319-A0BA-4C50-B580-32647171C73B} = {6D8D77A3-B788-4B55-85DB-BEE3D684C323}
+		{A00EEBAD-4F1B-470C-AFDE-0AAA6EA851D5} = {6D8D77A3-B788-4B55-85DB-BEE3D684C323}
+		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8} = {6D8D77A3-B788-4B55-85DB-BEE3D684C323}
 	EndGlobalSection
 EndGlobal
