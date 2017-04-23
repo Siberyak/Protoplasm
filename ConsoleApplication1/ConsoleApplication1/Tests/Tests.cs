@@ -13,13 +13,11 @@ namespace ConsoleApplication1.TestData
     {
         public static void Do()
         {
-            PlanningEnvironment<DateTime, TimeSpan>.GetOffset = (from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?);
-
-            CalendarTests.TestCalendarItems();
+            PlanningEnvironment<DateTime, TimeSpan>.InitGetOffset((from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?));
 
             CalendarTests.Calendars();
 
-            CalendarTests.WorkCalendars();
+            WorkCalendarTests.WorkCalendars();
 
 
             CompetencesTests.TestCompetencesMatching();
@@ -29,14 +27,14 @@ namespace ConsoleApplication1.TestData
 
        #region TestCalendarItems
 
-        private static void ByDayOfWeek(PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem toDefine)
+        private static void ByDayOfWeek(Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container, Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem toDefine)
         {
             var begin = toDefine.Left.PointValue.Value;
             var end = toDefine.Right.PointValue.Value;
 
             while (begin < end)
             {
-                var available = CalendarItemType.Available;
+                var available = TestCalendarItemType.Available;
                 var date = begin.Date.AddDays(1);
                 var dayOfWeek = begin.DayOfWeek;
 
@@ -44,10 +42,10 @@ namespace ConsoleApplication1.TestData
                 {
                     case DayOfWeek.Saturday:
                         date = date.AddDays(1);
-                        available = CalendarItemType.Unavalable;
+                        available = TestCalendarItemType.Unavalable;
                         break;
                     case DayOfWeek.Sunday:
-                        available = CalendarItemType.Unavalable;
+                        available = TestCalendarItemType.Unavalable;
                         break;
                     default:
                         date = date.AddDays(5 - (int) dayOfWeek);
@@ -64,27 +62,26 @@ namespace ConsoleApplication1.TestData
             }
         }
 
-        private static void ByWorkingTime(PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem toDefine)
+        private static void ByWorkingTime(Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container, Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem toDefine)
         {
             var begin = toDefine.Left.PointValue.Value;
             var end = toDefine.Right.PointValue.Value;
 
             container.Include(begin, end, toDefine.Data, rightIncluded: false);
-            if (toDefine.Data == CalendarItemType.Unavalable)
+            if (toDefine.Data == TestCalendarItemType.Unavalable)
                 return;
 
             while (begin < end)
             {
-                var interval = ExcludeIfNeed(begin, end, 0, 9, container);
-                interval = ExcludeIfNeed(begin, end, 13, 14, container) ?? interval;
-                interval = ExcludeIfNeed(begin, end, 18, 24, container) ?? interval;
+                var wantedEnd = ExcludeIfNeed(begin, end, 0, 9, container);
+                wantedEnd = ExcludeIfNeed(begin, end, 13, 14, container) ?? wantedEnd;
+                wantedEnd = ExcludeIfNeed(begin, end, 18, 24, container) ?? wantedEnd;
 
-
-                begin = interval?.Right.PointValue ?? begin.Date.AddDays(1);
+                begin = wantedEnd ?? begin.Date.AddDays(1);
             }
         }
 
-        static PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItems container)
+        static DateTime? ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container)
         {
 
             var wantedBegin = begin.Date.AddHours(beginHour);
@@ -99,10 +96,10 @@ namespace ConsoleApplication1.TestData
             wantedBegin = PlanningEnvironment<DateTime, TimeSpan>.Max(begin, wantedBegin);
             wantedEnd = PlanningEnvironment<DateTime, TimeSpan>.Min(end, wantedEnd);
 
-            PlanningEnvironment<DateTime, TimeSpan>.Calendars<CalendarItemType>.CalendarItem interval;
+            Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem interval;
             //= container.NewInterval(Point<DateTime>.Right(wantedBegin), Point<DateTime>.Right(wantedEnd, false), CalendarItemType.Unavalable);
-            container.Exclude(out interval, wantedBegin, wantedEnd, CalendarItemType.Unavalable, true, false);
-            return interval;
+            container.Exclude(wantedBegin, wantedEnd, TestCalendarItemType.Unavalable, true, false);
+            return wantedEnd;
         }
 
         #endregion
@@ -111,7 +108,7 @@ namespace ConsoleApplication1.TestData
         {
             var environment = new PlanningEnvironment<DateTime, TimeSpan>();
 
-            var baseCalendar = environment.CreateCalendar<CalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => CalendarItemType.Unknown);
+            var baseCalendar = environment.CreateCalendar<TestCalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => TestCalendarItemType.Unknown);
 
             var r1 = environment.Resources.CreateEmployeeAgent
                 (

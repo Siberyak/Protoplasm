@@ -12,10 +12,10 @@ namespace ConsoleApplication1.TestData
             private readonly CompetencesAbility _competencesAbility;
             private readonly CalendarAbility _calendarAbility;
 
-            public Calendar<CalendarItemType> Calendar => _calendarAbility.Calendar;
+            public Calendar<TestCalendarItemType> Calendar => _calendarAbility.Calendar;
             public IReadOnlyCollection<Competence> Competences => _competencesAbility.Competences;
 
-            public Employee(string caption, IReadOnlyCollection<Competence> competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf) 
+            public Employee(string caption, IReadOnlyCollection<Competence> competences, Calendar<TestCalendarItemType> calendar, params MembershipItemsContainer[] memberOf) 
                 : base(caption, memberOf)
             {
                 _competencesAbility = new CompetencesAbility(competences.Union(MembershipCompetences).ToArray());

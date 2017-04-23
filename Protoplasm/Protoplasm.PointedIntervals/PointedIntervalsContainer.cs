@@ -29,21 +29,21 @@ namespace Protoplasm.PointedIntervals
         where TBound : struct, IComparable<TBound>
     {
         /// <summary>
-        /// 
+        /// a '+' b
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         public delegate TData IncludeData(TData a, TData b);
 
         /// <summary>
-        /// 
+        /// a '-' b
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         public delegate TData ExcludeData(TData a, TData b);
 
         /// <summary>
-        /// 
+        /// data -> 'ToString()'
         /// </summary>
         /// <param name="data"></param>
         public delegate string DataToString(TData data);

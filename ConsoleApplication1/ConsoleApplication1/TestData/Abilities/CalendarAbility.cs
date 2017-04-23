@@ -6,9 +6,9 @@ namespace ConsoleApplication1.TestData
     {
         public class CalendarAbility : Ability
         {
-            public Calendar<CalendarItemType> Calendar { get; }
+            public Calendar<TestCalendarItemType> Calendar { get; }
 
-            public CalendarAbility(Calendar<CalendarItemType> calendar) : base(MappingType.Calendar)
+            public CalendarAbility(Calendar<TestCalendarItemType> calendar) : base(MappingType.Calendar)
             {
                 Calendar = calendar;
             }

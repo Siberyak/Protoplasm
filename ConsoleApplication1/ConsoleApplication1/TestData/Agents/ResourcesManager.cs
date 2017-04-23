@@ -24,7 +24,7 @@ namespace ConsoleApplication1.TestData
                 return new Department(caption, memberOf);
             }
 
-            public EmployeeAgent CreateEmployeeAgent(string caption, Competences competences, Calendar<CalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
+            public EmployeeAgent CreateEmployeeAgent(string caption, Competences competences, Calendar<TestCalendarItemType> calendar, params MembershipItemsContainer[] memberOf)
             {
                 var employee = new Employee(caption, competences, calendar, memberOf);
                 var agent = new EmployeeAgent(employee);
