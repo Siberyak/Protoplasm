@@ -7,6 +7,7 @@ namespace MAS.Core.Compatibility
     public class CompatibilityInfo
     {
         public static CompatibilityInfo[] Empty = new CompatibilityInfo[0];
+
         public IRequirement Requirement;
         public Dictionary<CompatibilityType, IAbility[]> Variants;
         public override string ToString()

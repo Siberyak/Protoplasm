@@ -12,7 +12,7 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            MessagingTests.Test1();
+            MessagingTests.AkkaTest();
 
             Tests.Do();
         }

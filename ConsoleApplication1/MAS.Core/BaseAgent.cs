@@ -41,7 +41,7 @@ namespace MAS.Core
             ////IAbilitiesCompatibilityInfo result;
             ////return requirementsAgent.AbilitiesCompatibilities.TryGetValue(requirementsAgent, out result)
             ////    ? result
-            ////    : new AgentsCompatibilityInfo(requirementsAgent, this, CompatibilityInfo.Empty);
+            ////    : new HoldersCompatibilityInfo(requirementsAgent, this, CompatibilityInfo.Empty);
         }
 
 

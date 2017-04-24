@@ -159,7 +159,7 @@ namespace ConsoleApplication1.TestData
                     Interval<DateTime?>.Empty,
                     Interval<DateTime?>.Empty,
                     Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
-                    Competences.New().AddKeyValue("C2", 7)
+                    Competences.New().AddKeyValue("C2", 7).MemberOf()
                 );
 
 

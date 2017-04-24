@@ -13,6 +13,7 @@ namespace MAS.Core
             }
 
             public IRequest<TRequestData> Request { get; }
+            IRequest IResponse.Request => Request;
         }
     }
 }

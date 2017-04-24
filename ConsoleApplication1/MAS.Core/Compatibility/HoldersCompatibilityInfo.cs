@@ -4,7 +4,7 @@ using MAS.Core.Compatibility.Contracts;
 
 namespace MAS.Core.Compatibility
 {
-    internal class AgentsCompatibilityInfo : IRequirementsCompatibilityInfo, IAbilitiesCompatibilityInfo
+    internal class HoldersCompatibilityInfo : IRequirementsCompatibilityInfo, IAbilitiesCompatibilityInfo
     {
         public readonly IRequirementsHolder RequiremenetsHolder;
         public readonly IAbilitiesHolder AbilitiesHolder;
@@ -12,7 +12,7 @@ namespace MAS.Core.Compatibility
 
         public readonly IReadOnlyCollection<CompatibilityInfo> Details;
 
-        public AgentsCompatibilityInfo(IRequirementsHolder requiremenetsHolder, IAbilitiesHolder abilitiesHolder, IReadOnlyCollection<CompatibilityInfo> details)
+        public HoldersCompatibilityInfo(IRequirementsHolder requiremenetsHolder, IAbilitiesHolder abilitiesHolder, IReadOnlyCollection<CompatibilityInfo> details)
         {
             if(requiremenetsHolder == null)
                 throw new ArgumentNullException(nameof(requiremenetsHolder));

@@ -1,12 +1,18 @@
+using System;
+
 namespace MAS.Core
 {
     public static partial class Messaging<TMessanger>
     {
-        public class Request<TRequestData> : Message<TRequestData>, IRequest<TRequestData>
+        public class Request<TRequestData> : Message<TRequestData>, IRequest<TRequestData>, IResponse, IFaultedReauest
         {
-            public Request(TMessanger sender, TMessanger reciver, TRequestData data = default(TRequestData))
+            public bool NeedResponseInInRequest { get; set; }
+            public bool Handled { get; set; }
+
+            public Request(TMessanger sender, TMessanger reciver, TRequestData data = default(TRequestData), bool needResponseInInRequest = false)
                 : base(sender, reciver, data)
             {
+                NeedResponseInInRequest = needResponseInInRequest;
             }
 
             public Response<TRequestData> Response(TRequestData data)
@@ -23,6 +29,21 @@ namespace MAS.Core
             {
                 Data = data;
                 return this;
+            }
+
+            IRequest IResponse.Request => this;
+
+            private IFaultedReauest _faulted;
+
+            public bool IsFaulted => _faulted != null;
+
+            Exception IFaultedReauest.Exception => _faulted.Exception;
+
+            IFaultedReauest IRequest.Fault(Exception exception)
+            {
+                _faulted = new FaultedRequest(this, exception);
+
+                return NeedResponseInInRequest ? this : _faulted;
             }
         }
     }

@@ -57,7 +57,7 @@
     <Compile Include="BaseEntity.cs" />
     <Compile Include="BaseRequirement.cs" />
     <Compile Include="BaseWorker.cs" />
-    <Compile Include="Compatibility\AgentsCompatibilityInfo.cs" />
+    <Compile Include="Compatibility\HoldersCompatibilityInfo.cs" />
     <Compile Include="Compatibility\CompatibilitiesStorageAgent.cs" />
     <Compile Include="Compatibility\CompatibilityExtender.cs" />
     <Compile Include="Compatibility\CompatibilityInfo.cs" />

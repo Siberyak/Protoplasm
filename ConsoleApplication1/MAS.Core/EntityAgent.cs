@@ -26,11 +26,11 @@ namespace MAS.Core
 
         public override IReadOnlyCollection<BaseRequirement> Requirements => Entity.Requirements;
 
-        //public override AgentsCompatibilityInfo Compatible(BaseAgent requirementsAgent)
+        //public override HoldersCompatibilityInfo Compatible(BaseAgent requirementsAgent)
         //{
         //    var result = requirementsAgent.Requirements.Compatibility(Entity.Abilities);
 
-        //    return new AgentsCompatibilityInfo(requirementsAgent, this, result);
+        //    return new HoldersCompatibilityInfo(requirementsAgent, this, result);
         //}
 
         protected void LifeCircle()

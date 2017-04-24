@@ -25,5 +25,7 @@ namespace ConsoleApplication1.TestData
 
             return MemberOf(competences, out result, memberOf);
         }
+
+        
     }
 }
