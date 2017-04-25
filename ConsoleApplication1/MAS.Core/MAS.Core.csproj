@@ -47,6 +47,7 @@
     <Compile Include="AgentExtender.cs" />
     <Compile Include="BaseAbility.cs" />
     <Compile Include="BaseAgent.cs" />
+    <Compile Include="BaseAgent_Messaging.cs" />
     <Compile Include="Compatibility\Contracts\IAbilitiesCompatibilityInfo.cs" />
     <Compile Include="Compatibility\Contracts\IAbilitiesHolder.cs" />
     <Compile Include="Compatibility\Contracts\IRequirementsHolder.cs" />

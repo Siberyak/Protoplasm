@@ -82,7 +82,7 @@ namespace Protoplasm.Calendars
 
             public IAbstractCalendar[] FullChain()
             {
-                var chain = new IAbstractCalendar[] {this};
+                var chain = new IAbstractCalendar[] { this };
 
                 if (_prev != null)
                     chain = _prev.FullChain().Union(chain).ToArray();
@@ -92,8 +92,6 @@ namespace Protoplasm.Calendars
 
             public IEnumerable<CalendarItem> Get(TTime from, TTime to)
             {
-
-                var result = new List<CalendarItem>();
 
                 var left = Point<TTime>.Left(from, false);
                 var right = Point<TTime>.Right(to, false);
@@ -105,19 +103,34 @@ namespace Protoplasm.Calendars
                     if (Equals(node.Value.Data, default(TData)))
                     {
                         var prev = node.Previous;
+                        var prevprev = prev?.Previous;
+
                         var undefinedInterval = node.Value.Intersect(left, right);
                         Define(undefinedInterval);
+
+                        if (prev?.Alive != true)
+                            prev = prevprev;
 
                         node = (prev ?? _calendarItems.FirstNode).Next;
                         if (Equals(node.Value.Data, default(TData)))
                             node = node.Next;
                     }
 
-                    while (node != null && !Equals(node.Value.Data, default(TData)))
-                    {
-                        result.Add(node.Value);
-                        node = node.Next;
-                    }
+                    node = node?.Next;
+                }
+
+                var result = _calendarItems.SkipWhile(x => !x.Contains(left)).TakeWhile(x => x.Left < right).ToList();
+
+                var first = result.FirstOrDefault();
+                if (first != null && first.Left != left)
+                {
+                    result[0] = new CalendarItem(left, first.Right, first.Data);
+                }
+
+                var last = result.LastOrDefault();
+                if (last != null && last.Right != right)
+                {
+                    result[result.Count - 1] = new CalendarItem(last.Left, right, last.Data);
                 }
 
                 return result;
@@ -130,7 +143,7 @@ namespace Protoplasm.Calendars
 
                 var intervals =
                     _prev?.Get(undefinedInterval.Left.PointValue.Value, undefinedInterval.Right.PointValue.Value)
-                    ?? new[] {new Calendars<TTime, TDuration, TPrevData>.CalendarItem(undefinedInterval.Left, undefinedInterval.Right)};
+                    ?? new[] { new Calendars<TTime, TDuration, TPrevData>.CalendarItem(undefinedInterval.Left, undefinedInterval.Right) };
 
 
 

@@ -19,10 +19,6 @@ namespace ConsoleApplication1.TestData
             }
             protected override ICompatibilitiesAgent CompatibilitiesAgent { get; } = new CompatibilitiesStorageAgent();
 
-            protected override void RegisterBehaviors()
-            {
-
-            }
 
             public WorkItemAgent CreateWorkItemAgent(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
             {

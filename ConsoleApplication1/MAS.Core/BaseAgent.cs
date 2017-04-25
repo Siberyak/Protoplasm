@@ -1,11 +1,15 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Runtime;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 
 namespace MAS.Core
 {
-    public abstract class BaseAgent : IAgent
+    public abstract partial class BaseAgent : IAgent, IMessanger
     {
         protected abstract ICompatibilitiesAgent CompatibilitiesAgent { get; }
 
@@ -13,10 +17,9 @@ namespace MAS.Core
 
         public void Initialize()
         {
-            RegisterBehaviors();
+            InitPersonalHandlers(_personalHandlers);
         }
 
-        protected abstract void RegisterBehaviors();
 
         /// <summary>
         /// Потребности
@@ -67,4 +70,9 @@ namespace MAS.Core
 
         protected abstract bool IsEquals(IAgent other);
     }
+
+    
+
+
+
 }

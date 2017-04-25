@@ -11,10 +11,6 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            protected override void RegisterBehaviors()
-            {
-
-            }
         }
     }
 }

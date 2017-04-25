@@ -11,11 +11,6 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            protected override void RegisterBehaviors()
-            {
-                
-            }
-
             public bool Equals(IAbilitiesHolder other)
             {
                 throw new System.NotImplementedException();

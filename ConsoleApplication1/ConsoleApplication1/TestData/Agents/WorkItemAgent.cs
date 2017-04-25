@@ -12,10 +12,6 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            protected override void RegisterBehaviors()
-            {
-
-            }
 
             public bool Equals(IRequirementsHolder other)
             {

@@ -20,10 +20,6 @@ namespace ConsoleApplication1.TestData
 
             protected override ICompatibilitiesAgent CompatibilitiesAgent { get; } = new CompatibilitiesStorageAgent();
 
-            protected override void RegisterBehaviors()
-            {
-            
-            }
 
             TAgent Initialize<TAgent>(TAgent agent)
                 where TAgent : IManagedAgent

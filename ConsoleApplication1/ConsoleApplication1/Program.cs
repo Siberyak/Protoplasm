@@ -12,9 +12,8 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            MessagingTests.AkkaTest();
-
             Tests.Do();
+            MessagingTests.AkkaTest();
         }
     }
 }

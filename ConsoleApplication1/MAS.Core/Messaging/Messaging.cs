@@ -1,8 +1,33 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using MAS.Core.Contracts;
 
 namespace MAS.Core
 {
+    public interface IMessanger
+    { }
+
+    public static class MessagingExtender
+    {
+        public static void Tell<TMessage>(this IMessanger reciver, TMessage message, IMessanger sender = null)
+        {
+
+        }
+
+        public static Task<bool> Ask<TData>(this IMessanger reciver, out TData data, CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, IMessanger sender = null)
+        {
+            data = default(TData);
+            return Task.FromResult(false);
+        }
+
+        public static Task<bool> Ask<TQuestion, TAnswer>(this IMessanger reciver, TQuestion question, out TAnswer answer, CancellationToken cancellationToken = default(CancellationToken), int? timeout = null, IMessanger sender = null)
+        {
+            answer = default(TAnswer);
+            return Task.FromResult(false);
+        }
+    }
+
     public static partial class Messaging<TMessanger>
     {
         public class MessagingException : Exception

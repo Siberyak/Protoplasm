@@ -8,6 +8,8 @@ namespace Protoplasm.PointedIntervals
 {
     public interface INode<T>
     {
+        bool Alive { get; }
+
         T Value { get; }
 
         INode<T> Previous { get;  }
@@ -86,6 +88,8 @@ namespace Protoplasm.PointedIntervals
                 if(next != null)
                     next.Previous = this;
             }
+
+            public bool Alive => List != null;
 
             public SimpleLinkedList<T> List { get; private set; }
 

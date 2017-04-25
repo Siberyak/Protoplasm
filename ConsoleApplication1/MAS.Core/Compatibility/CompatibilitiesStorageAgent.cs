@@ -17,10 +17,43 @@ namespace MAS.Core.Compatibility
         private readonly ConcurrentDictionary<IAbilitiesHolder, ConcurrentDictionary<IRequirementsHolder, IRequirementsCompatibilityInfo>> _requiremetsCompatibilities
             = new ConcurrentDictionary<IAbilitiesHolder, ConcurrentDictionary<IRequirementsHolder, IRequirementsCompatibilityInfo>>();
 
-        protected override void RegisterBehaviors()
-        {
 
+        protected override void InitPersonalHandlers(HandlersStorage handlers)
+        {
+            handlers.GetBuilder<CompatibilitiesStorageAgent>()
+                .Told<string>((x, s) => s == "start", (x, s) => Start())
+                .Told<string>((x, s) => Start())
+                .Requested(x => DateTime.Now)
+                .Asked<string, Guid>((x, s) => s == "ID", (x, s) => ID);
         }
+
+
+
+        static readonly HandlersStorage Handlers = InitStaticHandlers();
+
+        private static HandlersStorage InitStaticHandlers()
+        {
+            var handlers = new HandlersStorage();
+
+            handlers.GetBuilder<CompatibilitiesStorageAgent>()
+                .Asked<Guid, Guid>((a, q) => a.ID != q, (x, q) => x.ID)
+                .Requested(x => x.Requirements)
+                ;
+
+            return handlers;
+        }
+
+        protected override HandlersStorage GetStaticHandlers()
+        {
+            return Handlers;
+        }
+
+        private void Start()
+        {
+            
+        }
+        
+        
 
         void ICompatibilitiesAgent.Add(IAbilitiesCompatibilityInfo abilitiesCompatibilityInfo)
         {

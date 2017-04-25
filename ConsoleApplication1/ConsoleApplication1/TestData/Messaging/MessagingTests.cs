@@ -178,6 +178,7 @@ akka {
 
     public class Actor1 : ReceiveActor
     {
+
         public Actor1()
         {
             Receive<Greet>(greet => OnGreet(greet));
@@ -201,6 +202,7 @@ akka {
                 }
                 else
                 {
+                    
                     Sender.Tell(request.ResponseInRequest(DateTime.Now));
                 }
             }
@@ -253,10 +255,6 @@ akka {
         }
 
         protected override ICompatibilitiesAgent CompatibilitiesAgent { get; }
-        protected override void RegisterBehaviors()
-        {
-            
-        }
 
         protected override bool IsEquals(IAgent other)
         {
