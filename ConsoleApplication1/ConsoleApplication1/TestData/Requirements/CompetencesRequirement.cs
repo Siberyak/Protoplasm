@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAS.Core;
@@ -12,22 +13,41 @@ namespace ConsoleApplication1.TestData
         public override bool IsMutable => false;
         public Competences Competences { get; }
 
-        public CompetencesRequirement(IReadOnlyCollection<Competence> competences) : base(MappingType.Competences)
+        public CompetencesRequirement(IReadOnlyCollection<Competence> competences) 
         {
             Competences = Competences.New(competences);
         }
 
         public override CompatibilityType Compatible(IAbility ability)
         {
+            var compatibility = Compatible(ability, true);
+            return !compatibility.HasValue
+                ? CompatibilityType.DependsOnScene
+                : compatibility.Value
+                    ? CompatibilityType.Always
+                    : CompatibilityType.Never;
+
+        }
+
+        public override bool Compatible(IAbility ability, IScene scene)
+        {
+            var compatibility = Compatible(ability, false) ?? false;
+            return compatibility;
+        }
+
+        private bool? Compatible(IAbility ability, bool checkMutable)
+        {
             var competencesAbility = ability as CompetencesAbility;
-            if(competencesAbility == null)
-                return CompatibilityType.Never;
+            if (competencesAbility == null)
+                return false;
 
             IEnumerable<CompetenceMatchingResult> result;
-            if(!Competences.Acceptable(competencesAbility.Competences, out result))
-                return CompatibilityType.Never;
+            if (!Competences.Acceptable(competencesAbility.Competences, out result))
+                return false;
 
-            return IsMutable || competencesAbility.IsMutable ? CompatibilityType.DependsOnScene : CompatibilityType.Always;
+            return !checkMutable
+                ? true
+                : (!IsMutable && !competencesAbility.IsMutable ? true : default(bool?));
         }
     }
 }

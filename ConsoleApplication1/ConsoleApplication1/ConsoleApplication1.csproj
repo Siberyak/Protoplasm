@@ -65,10 +65,19 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestData\Abilities\ScheduleAbility.cs" />
+    <Compile Include="TestData\AvailabilityCalendar\IAvailabilityCalendar.cs" />
+    <Compile Include="TestData\AvailabilityCalendar\IAvailabilityData.cs" />
+    <Compile Include="TestData\AvailabilityCalendar\AvailabilityCalendar.cs" />
     <Compile Include="TestData\Agents\DepartmentAgent.cs" />
     <Compile Include="TestData\Agents\EmployeeAgent.cs" />
+    <Compile Include="TestData\Data\Agent.cs" />
+    <Compile Include="TestData\Data\EntityAgent.cs" />
+    <Compile Include="TestData\Data\IEntityAgent.cs" />
+    <Compile Include="TestData\Data\ManagedAgent.cs" />
+    <Compile Include="TestData\Data\ManagedEntityAgent.cs" />
     <Compile Include="TestData\Messaging\MessagingTests.cs" />
-    <Compile Include="Tests\CalendarTests.cs" />
+    <Compile Include="TestData\AvailabilityCalendar\AvailabilityCalendarAdapter.cs" />
     <Compile Include="Tests\CompetencesTests.cs" />
     <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
     <Compile Include="TestData\Data\Calendar.cs" />
@@ -81,7 +90,6 @@
     <Compile Include="TestData\Data\Department.cs" />
     <Compile Include="TestData\Data\Employee.cs" />
     <Compile Include="TestData\Data\Interval.cs" />
-    <Compile Include="TestData\MappingType.cs" />
     <Compile Include="TestData\Competences\MemberOfCompetence.cs" />
     <Compile Include="TestData\PlanningEnvironment.cs" />
     <Compile Include="TestData\Requirements\Requirement.cs" />

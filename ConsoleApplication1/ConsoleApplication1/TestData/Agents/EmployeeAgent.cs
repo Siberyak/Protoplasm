@@ -1,10 +1,13 @@
+using System.ComponentModel;
 using MAS.Core;
 using MAS.Core.Compatibility.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
-    { 
+    {
+        [DisplayName("Employee-Агент")]
+
         public class EmployeeAgent : ManagedEntityAgent<Employee>, IAbilitiesHolder
         {
             public EmployeeAgent(ResourcesManager manager, Employee entity) : base(manager, entity)
@@ -15,6 +18,9 @@ namespace ConsoleApplication1.TestData
             {
                 throw new System.NotImplementedException();
             }
+
+            
+
         }
     }
 }

@@ -1,15 +1,21 @@
+using System;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
-    public abstract class Requirement : BaseRequirement
+    public abstract class Requirement : IRequirement
     {
-        protected Requirement(MappingType mappingType)
+        public virtual bool IsMutable => false;
+        public abstract CompatibilityType Compatible(IAbility ability);
+
+        public abstract bool Compatible(IAbility ability, IScene scene);
+
+        public virtual IRequirement ToScene()
         {
-            MappingType = mappingType;
+            throw new NotImplementedException();
         }
-
-        public MappingType MappingType { get; private set; }
-
     }
 }

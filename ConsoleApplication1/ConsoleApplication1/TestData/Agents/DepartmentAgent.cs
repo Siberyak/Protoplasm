@@ -10,7 +10,6 @@ namespace ConsoleApplication1.TestData
             public DepartmentAgent(ResourcesManager manager, Department entity) : base(manager, entity)
             {
             }
-
         }
     }
 }

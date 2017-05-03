@@ -2,16 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAS.Core;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
-    public abstract class Entity : BaseEntity
+    public abstract class Entity : IAbilitiesHolder, IRequirementsHolder
     {
         public string Caption { get; }
 
         protected Entity(string caption)
-            : base(Guid.NewGuid())
         {
+            //Guid.NewGuid()
             Caption = caption;
         }
 
@@ -20,7 +23,7 @@ namespace ConsoleApplication1.TestData
         private IReadOnlyCollection<Ability> _abilities;
 #pragma warning restore 649
 
-        public override IReadOnlyCollection<BaseRequirement> Requirements => GetRequirements();
+        public IReadOnlyCollection<IRequirement> Requirements => GetRequirements();
 
         protected IReadOnlyCollection<Requirement> GetRequirements()
         {
@@ -32,9 +35,9 @@ namespace ConsoleApplication1.TestData
             return new Requirement[0];
         }
 
-        public override IReadOnlyCollection<BaseAbility> Abilities => GetAbilities();
+        public IReadOnlyCollection<IAbility> Abilities => GetAbilities();
 
-        protected IReadOnlyCollection<BaseAbility> GetAbilities()
+        protected IReadOnlyCollection<Ability> GetAbilities()
         {
             return _abilities ?? GenerateAbilities() ?? new Ability[0];
         }
@@ -44,9 +47,59 @@ namespace ConsoleApplication1.TestData
             return new Ability[0];
         }
 
+        bool IEquatable<IAbilitiesHolder>.Equals(IAbilitiesHolder other)
+        {
+            return ReferenceEquals(this, other);
+        }
+
+        bool IEquatable<IRequirementsHolder>.Equals(IRequirementsHolder other)
+        {
+            return ReferenceEquals(this, other);
+        }
+
         public override string ToString()
         {
             return Caption;
+        }
+
+        IHoldersCompatibilityInfo IAbilitiesHolder.Compatible(IRequirementsHolder requirements)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IAbilitiesHolder.Compatible(IRequirementsHolder requirements, IScene scene)
+        {
+            throw new NotImplementedException();
+        }
+
+        IHoldersCompatibilityInfo IRequirementsHolder.Compatible(IAbilitiesHolder abilities)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IRequirementsHolder.Compatible(IAbilitiesHolder abilities, IScene scene)
+        {
+            throw new NotImplementedException();
+        }
+
+        IAbility IAbilitiesHolder.ToScene(IAbility ability)
+        {
+            return ToScene(ability);
+        }
+
+        IRequirement IRequirementsHolder.ToScene(IRequirement requirement)
+        {
+            return ToScene(requirement);
+        }
+
+        protected virtual IAbility ToScene(IAbility ability)
+        {
+            return ((Ability) ability).ToScene();
+        }
+
+        protected virtual IRequirement ToScene(IRequirement requirement)
+        {
+            return ((Requirement)requirement).ToScene();
         }
     }
 }

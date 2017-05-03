@@ -10,14 +10,16 @@ namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
-        public class WorkItemsManager : IdentifiedAgent, IAgentsManager
+        public class WorkItemsManager : AgentsManager
         {
             private PlanningEnvironment<TTime, TDuration> _environment;
             public WorkItemsManager(PlanningEnvironment<TTime, TDuration> environment)
             {
                 _environment = environment;
             }
-            protected override ICompatibilitiesAgent CompatibilitiesAgent { get; } = new CompatibilitiesStorageAgent();
+
+
+            
 
 
             public WorkItemAgent CreateWorkItemAgent(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)

@@ -1,7 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.IO;
+using MAS.Core.Compatibility;
+using MAS.Core.Contracts;
 using Protoplasm.Calendars;
 using Protoplasm.Calendars.Tests;
+using Protoplasm.PointedIntervals;
 
 
 namespace ConsoleApplication1.TestData
@@ -20,8 +24,6 @@ namespace ConsoleApplication1.TestData
             {
                 Calendars<DateTime, TimeSpan>.GetOffset = (from, to) => from.HasValue && to.HasValue ? to.Value - from.Value : default(TimeSpan?);
 
-                CalendarTests.Calendars();
-
                 WorkCalendarTests.WorkCalendars();
 
                 CompetencesTests.TestCompetencesMatching();
@@ -34,101 +36,25 @@ namespace ConsoleApplication1.TestData
             }
         }
 
-       #region TestCalendarItems
-
-        private static void ByDayOfWeek(Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container, Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem toDefine)
-        {
-            var begin = toDefine.Left.PointValue.Value;
-            var end = toDefine.Right.PointValue.Value;
-
-            while (begin < end)
-            {
-                var available = TestCalendarItemType.Available;
-                var date = begin.Date.AddDays(1);
-                var dayOfWeek = begin.DayOfWeek;
-
-                switch (dayOfWeek)
-                {
-                    case DayOfWeek.Saturday:
-                        date = date.AddDays(1);
-                        available = TestCalendarItemType.Unavalable;
-                        break;
-                    case DayOfWeek.Sunday:
-                        available = TestCalendarItemType.Unavalable;
-                        break;
-                    default:
-                        date = date.AddDays(5 - (int) dayOfWeek);
-                        break;
-                }
-
-                container.Include
-                    (
-                        begin,
-                        begin = PlanningEnvironment<DateTime, TimeSpan>.Min(date, end),
-                        available,
-                        rightIncluded: false
-                    );
-            }
-        }
-
-        private static void ByWorkingTime(Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container, Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem toDefine)
-        {
-            var begin = toDefine.Left.PointValue.Value;
-            var end = toDefine.Right.PointValue.Value;
-
-            container.Include(begin, end, toDefine.Data, rightIncluded: false);
-            if (toDefine.Data == TestCalendarItemType.Unavalable)
-                return;
-
-            while (begin < end)
-            {
-                var wantedEnd = ExcludeIfNeed(begin, end, 0, 9, container);
-                wantedEnd = ExcludeIfNeed(begin, end, 13, 14, container) ?? wantedEnd;
-                wantedEnd = ExcludeIfNeed(begin, end, 18, 24, container) ?? wantedEnd;
-
-                begin = wantedEnd ?? begin.Date.AddDays(1);
-            }
-        }
-
-        static DateTime? ExcludeIfNeed(DateTime begin, DateTime end, int beginHour, int endHour, Calendars<DateTime, TimeSpan, TestCalendarItemType>.ICalendarItems container)
-        {
-
-            var wantedBegin = begin.Date.AddHours(beginHour);
-            var wantedEnd = begin.Date.AddHours(endHour);
-
-
-            if (wantedBegin > end)
-                return null;
-            if (wantedEnd < begin)
-                return null;
-
-            wantedBegin = PlanningEnvironment<DateTime, TimeSpan>.Max(begin, wantedBegin);
-            wantedEnd = PlanningEnvironment<DateTime, TimeSpan>.Min(end, wantedEnd);
-
-            Calendars<DateTime, TimeSpan, TestCalendarItemType>.CalendarItem interval;
-            //= container.NewInterval(Point<DateTime>.Right(wantedBegin), Point<DateTime>.Right(wantedEnd, false), CalendarItemType.Unavalable);
-            container.Exclude(wantedBegin, wantedEnd, TestCalendarItemType.Unavalable, true, false);
-            return wantedEnd;
-        }
-
-        #endregion
-
         private static PlanningEnvironment<DateTime, TimeSpan> TestManagersAdd()
         {
             var environment = new PlanningEnvironment<DateTime, TimeSpan>();
 
-            var baseCalendar = environment.CreateCalendar<TestCalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => TestCalendarItemType.Unknown);
+            //var baseCalendar = environment.CreateCalendar<TestCalendarItemType>(ByDayOfWeek, (a, b) => b, (a, b) => TestCalendarItemType.Unknown);
 
-            var r1 = environment.Resources.CreateEmployeeAgent
+            var adapter = new ByDayOfWeekAvailabilityCalendarAdapter(8, 0, null);
+            var baseCalendar = new AvailabilityCalendar1(adapter);
+
+            var res1 = environment.Resources.CreateEmployeeAgent
                 (
-                    "R1",
+                    "E1",
                     Competences.New().AddKeyValue("курящий", true).AddKeyValue("C1", 10).AddKeyValue("C2", 5),
                     baseCalendar
                 );
 
-            var r2 = environment.Resources.CreateEmployeeAgent
+            var res2 = environment.Resources.CreateEmployeeAgent
                 (
-                    "R2",
+                    "E2",
                     Competences.New().AddKeyValue("курящий", false).AddKeyValue("C1", 5).AddKeyValue("C2", 10),
                     baseCalendar
                 );
@@ -159,22 +85,175 @@ namespace ConsoleApplication1.TestData
                     Interval<DateTime?>.Empty,
                     Interval<DateTime?>.Empty,
                     Interval<TimeSpan?>.New(TimeSpan.FromDays(1)),
-                    Competences.New().AddKeyValue("C2", 7).MemberOf()
+                    Competences.New().AddKeyValue("C2", 7)
                 );
 
 
-            var c1 = r1.Compatible(wi1);
-            var c2 = r2.Compatible(wi1);
+            IScene scene = new Scene();
 
-            var c3 = r1.Compatible(wi2);
-            var c4 = r2.Compatible(wi2);
+            var c1r = res1.Abilities().Compatible(wi1);
+            var c1a = wi1.Requirements().Compatible(res1);
 
-            var c5 = r1.Compatible(wi3);
-            var c6 = r2.Compatible(wi3);
+            Debug.Assert(c1r.Compatibility == CompatibilityType.DependsOnScene);
+            Debug.Assert(ReferenceEquals(c1r, c1a));
+            Debug.Assert(ReferenceEquals(c1r, res1.Abilities().Compatible(wi1)));
+            Debug.Assert(ReferenceEquals(wi1.Requirements().Compatible(res1), c1a));
 
+            var ok1 = c1a.Compatible(scene);
+
+            var c2 = res2.Abilities().Compatible(wi1);
+            Debug.Assert(c2.Compatibility == CompatibilityType.DependsOnScene);
+
+            var c3 = res1.Abilities().Compatible(wi2);
+            Debug.Assert(c3.Compatibility == CompatibilityType.DependsOnScene);
+            var c4 = res2.Abilities().Compatible(wi2);
+            Debug.Assert(c4.Compatibility == CompatibilityType.Never);
+
+            var c5 = res1.Abilities().Compatible(wi3);
+            Debug.Assert(c5.Compatibility == CompatibilityType.Never);
+            var c6 = res2.Abilities().Compatible(wi3);
+            Debug.Assert(c6.Compatibility == CompatibilityType.DependsOnScene);
+
+
+            //res1.Entity.Calendar.CreateSchedule(new PlanningEnvironment<DateTime, TimeSpan>.AllocationsHelper());
+
+            var tmp = res1.Entity.Calendar.Get(new DateTime(2017, 1, 1), DateTime.Today);
 
             return environment;
 
         }
+    }
+
+
+    public struct AvailabilityData : PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData
+    {
+        public override string ToString()
+        {
+            return $"{Value}";
+        }
+
+        public int Value;
+
+        public AvailabilityData(int value)
+        {
+            Value = value;
+        }
+
+        public static implicit operator int(AvailabilityData data)
+        {
+            return data.Value;
+        }
+        public static implicit operator AvailabilityData(int value)
+        {
+            return new AvailabilityData(value);
+        }
+
+        public PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Include(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData availabilityData)
+        {
+            var value = this + (AvailabilityData)availabilityData;
+            return new AvailabilityData(value);
+        }
+
+        public PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData availabilityData)
+        {
+            var value = this - (AvailabilityData)availabilityData;
+            return new AvailabilityData(value);
+        }
+    }
+
+ 
+
+    public class AvailabilityCalendar1 : PlanningEnvironment<DateTime, TimeSpan>.AvailabilityCalendar
+    {
+        public AvailabilityCalendar1(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ICalendarAdapter adapter) : base(adapter)
+        {
+        }
+    }
+
+    class ByDayOfWeekAvailabilityCalendarAdapter : ByDayOfWeekAdapter<PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData>
+    {
+        public ByDayOfWeekAvailabilityCalendarAdapter(AvailabilityData daylyWorkData, AvailabilityData daylyNotWorkData, Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ICalendar baseCalendar) : base(daylyWorkData, daylyNotWorkData, baseCalendar)
+        {
+        }
+
+        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Include(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
+        {
+            return a == null ? b : a.Include(b);
+        }
+
+        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
+        {
+            return a == null ? b : a.Exclude(b);
+        }
+    }
+
+    class Scene : IScene
+    {
+        private Satisfaction _satisfaction;
+
+        public Scene()
+        { }
+
+        private Scene(IScene original)
+        {
+            Original = original;
+        }
+
+        public IScene Original { get; }
+
+        public ISatisfaction Satisfaction => _satisfaction ?? (_satisfaction = new Satisfaction(((Scene)Original)._satisfaction.Value));
+
+        public IScene Branch()
+        {
+            return new Scene(this);
+        }
+
+        public void MergeToOriginal()
+        {
+        }
+
+    }
+
+    public interface ISatisfaction<T> : ISatisfaction, IComparable<ISatisfaction<T>>
+        where T : IComparable<T>
+    {
+        T Delta { get; }
+        T Value { get; }
+    }
+
+
+    public abstract class Satisfaction<T> : ISatisfaction<T>
+        where T : IComparable<T>
+    {
+        protected T _original;
+
+        protected Satisfaction(T original)
+        {
+            _original = original;
+        }
+
+        public T Delta { get; set; }
+        public abstract T Value { get; }
+
+        public int CompareTo(ISatisfaction<T> other)
+        {
+            return other == null ? -1 : Value.CompareTo(other.Value);
+        }
+
+        public int CompareTo(ISatisfaction other)
+        {
+            return CompareTo(other as ISatisfaction<T>);
+        }
+    }
+
+
+
+    public class Satisfaction : Satisfaction<double>
+    {
+        public Satisfaction(double original) : base(original)
+        {
+        }
+
+        public override double Value => _original + Delta;
     }
 }

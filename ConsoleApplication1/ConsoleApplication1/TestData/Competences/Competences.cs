@@ -83,7 +83,6 @@ namespace ConsoleApplication1.TestData
         public int Count => _competences.Count;
 
 
-
         public bool Acceptable(IEnumerable<Competence> competences, out IEnumerable<CompetenceMatchingResult> result)
         {
             result = this

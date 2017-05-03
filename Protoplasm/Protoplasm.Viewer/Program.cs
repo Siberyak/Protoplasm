@@ -17,6 +17,8 @@ namespace Protoplasm.Viewer
         [STAThread]
         static void Main()
         {
+            Loader.Load("staticdata.json");
+
 
             var gr = GetTestData2();
             gr.Datas<TestData1>();

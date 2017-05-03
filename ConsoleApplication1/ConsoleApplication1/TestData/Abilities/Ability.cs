@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
-    public abstract class Ability : BaseAbility
+    public abstract class Ability : IAbility
     {
-        protected Ability(MappingType mappingType)
-        {
-            MappingType = mappingType;
-        }
+        public virtual bool IsMutable => false;
 
-        public MappingType MappingType { get; private set; }
+        public abstract bool Compatible(IRequirement requirement, IScene scene);
 
-        public override CompatibilityType Compatible(IRequirement requirement)
+        public abstract CompatibilityType Compatible(IRequirement requirement);
+
+        public virtual IAbility ToScene()
         {
-            return CompatibilityType.Never;
+            throw new NotImplementedException();
         }
     }
 }

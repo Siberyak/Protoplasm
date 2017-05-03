@@ -77,6 +77,15 @@ namespace Protoplasm.PointedIntervals
             PointedIntervalsContainerExtender.Test();
         }
 
+        public TData Include(TData a, TData b)
+        {
+            return _includeData(a, b);
+        }
+        public TData Exclude(TData a, TData b)
+        {
+            return _excludeData(a, b);
+        }
+
         private readonly CreateInterval _createInterval;
         private readonly IncludeData _includeData;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using MAS.Core;
 using MAS.Core.Compatibility;
@@ -14,18 +15,36 @@ namespace ConsoleApplication1.TestData
             public Interval<TTime?> Finish { get; }
             public Interval<TDuration?> Duration { get; }
 
-            public BoundaryRequirement(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration) : base(MappingType.Boundary)
+            public BoundaryRequirement(Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration) 
+                
             {
                 Start = start;
                 Finish = finish;
                 Duration = duration;
             }
 
+
+
             public override CompatibilityType Compatible(IAbility ability)
             {
-                var calendarAbility = ability as CalendarAbility;
-                return calendarAbility?.Compatible(this) ?? CompatibilityType.Never;
+                return IsCompatible(ability as CalendarAbility);
             }
+
+            public override bool Compatible(IAbility ability, IScene scene)
+            {
+                return IsCompatible(ability as ScheduleAbility, scene);
+            }
+
+            private CompatibilityType IsCompatible(CalendarAbility ability)
+            {
+                return ability?.Compatible(this) ?? CompatibilityType.Never;
+            }
+
+            private bool IsCompatible(ScheduleAbility ability, IScene scene)
+            {
+                return ability?.Compatible(this, scene) ?? false;
+            }
+
 
             public override string ToString()
             {
@@ -33,7 +52,12 @@ namespace ConsoleApplication1.TestData
                 var finish = Finish == Interval<TTime?>.Empty ? null : $"F: {Finish}";
                 var duration = Duration == Interval<TDuration?>.Empty ? null : $"D: {Duration}";
                 var parts = new []{start, finish, duration};
-                return string.Join(", ", parts.Where(x => x != null));
+                return $"Boundary: [{string.Join(", ", parts.Where(x => x != null))}]";
+            }
+
+            public override IRequirement ToScene()
+            {
+                return this;
             }
         }
 

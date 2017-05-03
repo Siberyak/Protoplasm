@@ -40,25 +40,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calendar%28TPrevData%29.cs" />
     <Compile Include="Calendar.cs" />
     <Compile Include="CalendarItem.cs" />
     <Compile Include="CalendarItems.cs" />
-    <Compile Include="Calendars%28TTime, TDuration%29.cs" />
-    <Compile Include="Calendars%28TTime, TDuration, TData%29.cs" />
+    <Compile Include="Calendars.cs" />
     <Compile Include="IAbstractCalendar.cs" />
     <Compile Include="ICalendar.cs" />
     <Compile Include="ICalendarItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\ByDayInfosHelper.cs" />
-    <Compile Include="Tests\ByDayOfWeekHelper.cs" />
-    <Compile Include="Tests\DayInfo.cs" />
-    <Compile Include="Tests\DayInfoBase.cs" />
-    <Compile Include="Tests\Holidays.cs" />
+    <Compile Include="Tests\ByDayInfosAdapter.cs" />
+    <Compile Include="Tests\ByDayOfWeekAdapter.cs" />
+    <Compile Include="WorkCalendar\ByDayInfosAdapter.cs" />
+    <Compile Include="WorkCalendar\ByDayOfWeekAdapter.cs" />
+    <Compile Include="WorkCalendar\DayInfo.cs" />
+    <Compile Include="WorkCalendar\DayInfoBase.cs" />
+    <Compile Include="WorkCalendar\Holidays.cs" />
     <Compile Include="Tests\WorkCalendar.cs" />
-    <Compile Include="Tests\WorkCalendarHelper.cs" />
     <Compile Include="Tests\WorkCalendarTests.cs" />
-    <Compile Include="Tests\YearlyHoliday.cs" />
+    <Compile Include="WorkCalendar\YearlyHoliday.cs" />
+    <Compile Include="WorkCalendar\WorkCalendar.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Protoplasm.PointedIntervals\Protoplasm.PointedIntervals.csproj">

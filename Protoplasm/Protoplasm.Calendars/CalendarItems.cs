@@ -1,3 +1,4 @@
+using System;
 using Protoplasm.PointedIntervals;
 
 namespace Protoplasm.Calendars
@@ -7,7 +8,7 @@ namespace Protoplasm.Calendars
 
         private class CalendarItems : PointedIntervalsContainer<CalendarItem, TTime, TData>, ICalendarItems
         {
-            public CalendarItems(Addition includeData, Substraction excludeData, ToDebugString toDebugString = null)
+            public CalendarItems(Func<TData,TData,TData> includeData, Func<TData, TData, TData> excludeData, Func<TData, string> toDebugString = null)
                 : base
                     (
                     (left, right, data) => new CalendarItem(left, right, data),

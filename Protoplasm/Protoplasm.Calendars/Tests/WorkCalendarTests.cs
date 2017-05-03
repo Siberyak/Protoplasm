@@ -41,14 +41,13 @@ namespace Protoplasm.Calendars.Tests
                 // что бы Duration вычислялся сам для контрольного расчета часов по списку
                 Calendars<DateTime, TimeSpan>.GetOffset = (a, b) => b - a;
 
-                var byDayOfWeek = new ByDayOfWeekHelper();
-                var byDayInfos = new ByDayInfosHelper(Holidays);
-
                 // базовый календарь рабочих дней - [пн. - пт.]:(8 ч.) + [сб. - вскр.]:(0 ч.)
+                var byDayOfWeek = new ByDayOfWeekAdapter();
                 var baseCalendar = new WorkCalendar(byDayOfWeek);
 
                 // праздники + переносы + укороченные предпраздничные
-                var calendar = new WorkCalendar(baseCalendar, byDayInfos);
+                var byDayInfos = new ByDayInfosAdapter(baseCalendar, Holidays);
+                var calendar = new WorkCalendar(byDayInfos);
 
                 // чисто посмотреть разницу
                 var items1 = baseCalendar.Get(new DateTime(2017, 1, 1), DateTime.Today);

@@ -1,21 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hyperion.Internal;
+using Protoplasm.Calendars;
+using Protoplasm.Calendars.Tests;
 
 namespace ConsoleApplication1.TestData
 {
     public partial class PlanningEnvironment<TTime, TDuration>
     {
 
+
         public class Employee : MembershipItem
         {
             private readonly CompetencesAbility _competencesAbility;
             private readonly CalendarAbility _calendarAbility;
 
-            public Calendar<TestCalendarItemType> Calendar => _calendarAbility.Calendar;
+            public IAvailabilityCalendar Calendar => _calendarAbility.Calendar;
             public IReadOnlyCollection<Competence> Competences => _competencesAbility.Competences;
 
-            public Employee(string caption, IReadOnlyCollection<Competence> competences, Calendar<TestCalendarItemType> calendar, params MembershipItemsContainer[] memberOf) 
+            public Employee(string caption, IReadOnlyCollection<Competence> competences, IAvailabilityCalendar calendar, params MembershipItemsContainer[] memberOf) 
                 : base(caption, memberOf)
             {
                 _competencesAbility = new CompetencesAbility(competences.Union(MembershipCompetences).ToArray());
@@ -27,6 +31,7 @@ namespace ConsoleApplication1.TestData
                 return new Ability[] {_competencesAbility, _calendarAbility};
             }
         }
+
 
     }
 }
