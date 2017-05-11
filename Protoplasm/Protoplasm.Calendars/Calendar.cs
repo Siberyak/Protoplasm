@@ -8,121 +8,121 @@ namespace Protoplasm.Calendars
 {
     public static partial class Calendars<TTime, TDuration, TData>
     {
-        public interface ICalendarAdapter
+        private class Translator : CalendarAdapter<TData>
         {
-            IAbstractCalendar BaseCalendar { get; }
+            public Translator(ICalendar baseCalendar) : base(baseCalendar)
+            {
+            }
 
-            void Define(ICalendarItems container, Point<TTime> left, Point<TTime> right);
-            
-            TData Include(TData a, TData b);
-            TData Exclude(TData a, TData b);
+            protected override Point<TTime> DefineByBaseData(ICalendarItems container, Point<TTime> left, Point<TTime> right, TData baseData)
+            {
+                container.Include(left, right, baseData);
+                return right.AsLeft();
+            }
 
-            Func<TData, string> ToDebugString { get; }
+            public override TData Include(TData a, TData b)
+            {
+                return _baseCalendar.Adapter.Include(a, b);
+            }
+
+            public override TData Exclude(TData a, TData b)
+            {
+                return _baseCalendar.Adapter.Exclude(a, b);
+            }
         }
-        public abstract class CalendarAdapter : ICalendarAdapter
-        {
-            public IAbstractCalendar BaseCalendar => null;
-
-            public void Define(ICalendarItems container, Point<TTime> left, Point<TTime> right)
-            {
-                var begin = left.PointValue.Value;
-                var end = right.PointValue.Value;
-
-                var current = begin;
-
-                while (current.CompareTo(end) < 0)
-                {
-                    current = Define(container, current, end);
-                }
-            }
-
-            protected abstract TTime Define(ICalendarItems container, TTime current, TTime end);
-
-            public abstract TData Include(TData a, TData b);
-            public abstract TData Exclude(TData a, TData b);
-
-            public virtual Func<TData, string> ToDebugString => null;
-        }
-        public abstract class CalendarAdapter<TBaseData> : ICalendarAdapter
-        {
-            public IAbstractCalendar BaseCalendar => _baseCalendar;
-
-            private readonly Calendars<TTime, TDuration, TBaseData>.ICalendar _baseCalendar;
-
-            protected CalendarAdapter(Calendars<TTime, TDuration, TBaseData>.ICalendar baseCalendar)
-            {
-                _baseCalendar = baseCalendar;
-            }
-
-            public void Define(ICalendarItems container, Point<TTime> left, Point<TTime> right)
-            {
-                var intervals =
-                    _baseCalendar?.Get(left.PointValue.Value, right.PointValue.Value)
-                    ?? new[] {new Calendars<TTime, TDuration, TBaseData>.CalendarItem(left, right)};
-
-                foreach (var interval in intervals)
-                {
-                    Define(container, interval);
-                }
-
-            }
-
-            private void Define(ICalendarItems container, Calendars<TTime, TDuration, TBaseData>.CalendarItem todefine)
-            {
-                var begin = todefine.Left.PointValue.Value;
-                var end = todefine.Right.PointValue.Value;
-
-                var left = begin;
-
-                while (left.CompareTo(end) < 0)
-                {
-                    left = DefineByBaseData(container, left, end, todefine.Data);
-                }
-            }
-
-            protected abstract TTime DefineByBaseData(ICalendarItems container, TTime left, TTime end, TBaseData baseData);
-            public abstract TData Include(TData a, TData b);
-            public abstract TData Exclude(TData a, TData b);
-
-            public virtual Func<TData, string> ToDebugString => null;
-        }
-
         public class Calendar : ICalendar
         {
-            protected readonly ICalendarAdapter _adapter;
-            private readonly CalendarItems _calendarItems;
-
-            public Calendar(ICalendarAdapter adapter)
+            public ICalendarItemsAdapter Adapter { get; }
+            public ICalendarAdapter CalendarAdapter => Adapter as ICalendarAdapter;
+            public ISchedule CreateSchedule(TDuration epsilon)
             {
-                _adapter = adapter;
+                return new Schedule(new Translator(this), epsilon);
+            }
+
+            private readonly CalendarItems _calendarItems;
+            protected ICalendarItems Items => _calendarItems;
+
+            public Calendar(ICalendarItemsAdapter adapter)
+            {
+                Adapter = adapter;
 
                 // проверить на закольцовывание... на вс€кий случай....
-                if (_adapter.BaseCalendar?.FullChain().Contains(this) == true)
-                    throw new ArgumentException("try to loop detected", nameof(_adapter));
+                if (CalendarAdapter?.BaseCalendar?.FullChain().Contains(this) == true)
+                    throw new ArgumentException("try to loop detected", nameof(Adapter));
 
-                _calendarItems = new CalendarItems(_adapter.Include, _adapter.Exclude, _adapter.ToDebugString);
+                _calendarItems = new CalendarItems(Adapter.Include, Adapter.Exclude, Adapter.ToDebugString);
             }
 
             public IAbstractCalendar[] FullChain()
             {
                 var chain = new IAbstractCalendar[] { this };
 
-                if (_adapter.BaseCalendar != null)
-                    chain = _adapter.BaseCalendar.FullChain().Union(chain).ToArray();
+                if (CalendarAdapter?.BaseCalendar != null)
+                    chain = CalendarAdapter.BaseCalendar.FullChain().Union(chain).ToArray();
 
                 return chain;
             }
 
-            public IEnumerable<CalendarItem> Get(TTime from, TTime to)
+            public IEnumerable<CalendarItem> Get(TTime left, TTime right, bool leftIncluded = false, bool rightIcluded = false)
             {
-                var left = Point<TTime>.Left(from, false);
-                var right = Point<TTime>.Right(to, false);
+                return Get(Point<TTime>.Left(left, leftIncluded), Point<TTime>.Right(right, rightIcluded));
+            }
+
+            public virtual IEnumerable<CalendarItem> Get(Point<TTime> left, Point<TTime> right)
+            {
+                Define(left, right);
+
+                var calendarItems = _calendarItems;
+                return Get(calendarItems, left, right);
+            }
+
+            public static IEnumerable<CalendarItem> Get(IEnumerable<CalendarItem> calendarItems, Point<TTime> left, Point<TTime> right)
+            {
+                var result = calendarItems.SkipWhile(x => !x.Contains(left)).TakeWhile(x => x.Left < right).ToList();
+
+                var first = result.FirstOrDefault();
+                if (first != null && first.Left != left)
+                {
+                    result[0] = new CalendarItem(left, first.Right, first.Data);
+                }
+
+                var last = result.LastOrDefault();
+                if (last != null && last.Right != right)
+                {
+                    result[result.Count - 1] = new CalendarItem(last.Left, right, last.Data);
+                }
+
+                return result;
+            }
+
+            public INode<ICalendarItem> Find(Point<TTime> point)
+            {
+                var node = _calendarItems.Find(point);
+
+                if (!NodeIsUndefined(node) || CalendarAdapter == null)
+                    return node;
+                
+                Define(point.AsLeft(true), point.AsRight(true));
+                node = _calendarItems.Find(point);
+
+                return node;
+            }
+
+            protected static bool NodeIsUndefined(INode<ICalendarItem> node)
+            {
+                return node?.Value == null || Equals(node.Value.Data, default(TData));
+            }
+
+            protected virtual void Define(Point<TTime> left, Point<TTime> right)
+            {
+                if (CalendarAdapter == null)
+                    return;
 
                 var node = _calendarItems.FindNode(x => x.Contains(left));
 
                 while (node != null && node.Value.Left <= right)
                 {
-                    if (Equals(node.Value.Data, default(TData)))
+                    if (NodeIsUndefined(node))
                     {
                         var prev = node.Previous;
                         var prevprev = prev?.Previous;
@@ -140,30 +140,21 @@ namespace Protoplasm.Calendars
 
                     node = node?.Next;
                 }
-
-                var result = _calendarItems.SkipWhile(x => !x.Contains(left)).TakeWhile(x => x.Left < right).ToList();
-
-                var first = result.FirstOrDefault();
-                if (first != null && first.Left != left)
-                {
-                    result[0] = new CalendarItem(left, first.Right, first.Data);
-                }
-
-                var last = result.LastOrDefault();
-                if (last != null && last.Right != right)
-                {
-                    result[result.Count - 1] = new CalendarItem(last.Left, right, last.Data);
-                }
-
-                return result;
             }
 
             private void Define(CalendarItem undefinedInterval)
             {
                 if (undefinedInterval == null)
                     throw new ArgumentNullException(nameof(undefinedInterval));
+                if (CalendarAdapter == null)
+                    throw new NotSupportedException();
 
-                _adapter.Define(_calendarItems, undefinedInterval.Left, undefinedInterval.Right);
+                CalendarAdapter.Define(_calendarItems, undefinedInterval.Left, undefinedInterval.Right);
+            }
+
+            public CalendarItem[] DefinedItems()
+            {
+                return _calendarItems.DefinedItems();
             }
 
             public override string ToString()
@@ -171,7 +162,6 @@ namespace Protoplasm.Calendars
                 return $"{GetType().TypeName()}";
             }
         }
-
 
     }
 }

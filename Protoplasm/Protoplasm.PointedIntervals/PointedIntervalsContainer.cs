@@ -50,11 +50,13 @@ namespace Protoplasm.PointedIntervals
 
 
         public abstract PointedIntervalsContainerBase<TBound, TData> Exclude(PointedInterval<TBound, TData> interval);
+        public abstract PointedIntervalsContainerBase<TBound, TData> Exclude(Point<TBound> left, Point<TBound> right, TData data);
         public abstract PointedIntervalsContainerBase<TBound, TData> Exclude(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true);
         public abstract PointedIntervalsContainerBase<TBound, TData> Include(PointedInterval<TBound, TData> interval);
+        public abstract PointedIntervalsContainerBase<TBound, TData> Include(Point<TBound> left, Point<TBound> right, TData data);
         public abstract PointedIntervalsContainerBase<TBound, TData> Include(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true);
 
-        public abstract PointedInterval<TBound, TData>[] ToArray(bool onlyWithData = true);
+        public abstract PointedInterval<TBound, TData>[] DefinedItems(bool onlyWithData = true);
 
 
     }
@@ -252,15 +254,21 @@ namespace Protoplasm.PointedIntervals
             return Process(interval, (x, y) => _excludeData(x, y));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="leftIncluded"></param>
-        /// <param name="right"></param>
-        /// <param name="rightIncluded"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        //=================
+        public override PointedIntervalsContainerBase<TBound, TData> Include(Point<TBound> left, Point<TBound> right, TData data)
+        {
+            TInterval interval;
+            return Include(out interval, left, right, data);
+        }
+
+        public PointedIntervalsContainerBase<TBound, TData> Include(out TInterval interval, Point<TBound> left, Point<TBound> right, TData data)
+        {
+            interval = NewInterval(left, right, data);
+            return Include(interval);
+        }
+
+
+
         public override PointedIntervalsContainerBase<TBound, TData> Include(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
         {
             TInterval interval;
@@ -269,24 +277,25 @@ namespace Protoplasm.PointedIntervals
 
         public PointedIntervalsContainerBase<TBound, TData> Include(out TInterval interval, TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
         {
-            interval = NewInterval(Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
-            return Include(interval);
+            return Include(out interval, Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="interval"></param>
-        /// <param name="left"></param>
-        /// <param name="leftIncluded"></param>
-        /// <param name="right"></param>
-        /// <param name="rightIncluded"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        //========================
+
+        public PointedIntervalsContainerBase<TBound, TData> Exclude(out TInterval interval, Point<TBound> left, Point<TBound> right, TData data)
+        {
+            interval = NewInterval(left, right, data);
+            return Exclude(interval);
+        }
+
+        public override PointedIntervalsContainerBase<TBound, TData> Exclude(Point<TBound> left, Point<TBound> right, TData data)
+        {
+            TInterval interval;
+            return Exclude(out interval, left, right, data);
+        }
         public PointedIntervalsContainerBase<TBound, TData> Exclude(out TInterval interval, TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
         {
-            interval = NewInterval(Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
-            return Exclude(interval);
+            return Exclude(out interval, Point<TBound>.Left(left, leftIncluded), Point<TBound>.Right(right, rightIncluded), data);
         }
 
         public override PointedIntervalsContainerBase<TBound, TData> Exclude(TBound? left, TBound? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
@@ -299,15 +308,15 @@ namespace Protoplasm.PointedIntervals
         /// 
         /// </summary>
         /// <returns></returns>
-        public TInterval[] ToArray()
+        public TInterval[] DefinedItems()
         {
             TInterval[] array = _intervals.Where(x => !Equals(x.Data, default(TData))).ToArray();
             return array;
         }
 
-        public override PointedInterval<TBound, TData>[] ToArray(bool onlyWithData = true)
+        public override PointedInterval<TBound, TData>[] DefinedItems(bool onlyWithData = true)
         {
-            return ToArray();
+            return DefinedItems();
         }
 
         public IEnumerator<TInterval> GetEnumerator()

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RoundTripHelper.cs" />
     <Compile Include="Compatibility\Contracts\IAbilitiesCompatibilityInfo.cs" />
     <Compile Include="Compatibility\Contracts\IAbilitiesHolder.cs" />
     <Compile Include="Compatibility\Contracts\IHolder.cs" />

@@ -6,7 +6,7 @@ using Protoplasm.Utils;
 
 namespace Protoplasm.PointedIntervals
 {
-    public interface INode<T>
+    public interface INode<out T>
     {
         bool Alive { get; }
 
@@ -15,6 +15,7 @@ namespace Protoplasm.PointedIntervals
         INode<T> Previous { get;  }
 
         INode<T> Next { get; }
+
     }
 
     internal class SimpleLinkedList<T> : IEnumerable<T>

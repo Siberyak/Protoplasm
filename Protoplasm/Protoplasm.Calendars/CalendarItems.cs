@@ -5,8 +5,7 @@ namespace Protoplasm.Calendars
 {
     public static partial class Calendars<TTime, TDuration, TData>
     {
-
-        private class CalendarItems : PointedIntervalsContainer<CalendarItem, TTime, TData>, ICalendarItems
+        internal class CalendarItems : PointedIntervalsContainer<CalendarItem, TTime, TData>, ICalendarItems
         {
             public CalendarItems(Func<TData,TData,TData> includeData, Func<TData, TData, TData> excludeData, Func<TData, string> toDebugString = null)
                 : base
@@ -21,6 +20,11 @@ namespace Protoplasm.Calendars
             {
             }
 
+            public INode<ICalendarItem> Find(Point<TTime> point)
+            {
+                var node = FindNode(x => x.Contains(point));
+                return node;
+            }
 
             void ICalendarItems.Include(Point<TTime> left, Point<TTime> right, TData data)
             {

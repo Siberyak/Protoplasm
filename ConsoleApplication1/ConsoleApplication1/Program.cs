@@ -15,7 +15,7 @@ namespace ConsoleApplication1
             MessagingTests.HandlersTest();
 
             Tests.Do();
-            MessagingTests.AkkaTest();
+            //MessagingTests.AkkaTest();
         }
     }
 }

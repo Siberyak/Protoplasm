@@ -151,7 +151,7 @@ namespace Protoplasm.PointedIntervals
                 if (check == null)
                     return;
 
-                var result = check(container.ToArray());
+                var result = check(container.DefinedItems());
                 Debug.Assert(result);
             }
             catch (Exception ex)

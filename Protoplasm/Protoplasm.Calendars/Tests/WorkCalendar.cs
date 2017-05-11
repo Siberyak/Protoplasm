@@ -15,7 +15,7 @@ namespace Protoplasm.Calendars.Tests
             return days*(data ?? 0);
         }
 
-        public WorkCalendar(Calendars<DateTime,TimeSpan,int?>.ICalendarAdapter adapter)
+        public WorkCalendar(Calendars<DateTime,TimeSpan,int?>.ICalendarItemsAdapter adapter)
             : base(adapter)
         {
         }

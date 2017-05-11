@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MAS.Core.Contracts
 {
     public interface IScene
@@ -10,6 +12,8 @@ namespace MAS.Core.Contracts
 
         ISatisfaction Satisfaction { get; }
 
+        IEnumerable<INegotiator> Negotiators { get; }
+        
 
     }
 }

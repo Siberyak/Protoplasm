@@ -1,4 +1,5 @@
 using System;
+using Protoplasm.PointedIntervals;
 
 namespace Protoplasm.Calendars
 {
@@ -13,29 +14,36 @@ namespace Protoplasm.Calendars
             DaylyNotWorkData = daylyNotWorkData;
         }
 
-        protected override DateTime DefineByBaseData(Calendars<DateTime, TimeSpan, T>.ICalendarItems container, DateTime left, DateTime end, T baseData)
+        protected override Point<DateTime> DefineByBaseData(Calendars<DateTime, TimeSpan, T>.ICalendarItems container, Point<DateTime> left, Point<DateTime> right, T baseData)
         {
-            DateTime? right = left;
+
+            left = left.AsDate(true);
+            right = right.AsDate(false);
+
+            var end = right;
+
+            right = left.AsRight().AddDays(1);
             var value = DaylyNotWorkData;
-            var dayOfWeek = left.DayOfWeek;
+            var dayOfWeek = left.DayOfWeek();
+
             switch (dayOfWeek)
             {
                 case DayOfWeek.Saturday:
-                    right = left.AddDays(1);
+                    right = right.AddDays(1);
                     break;
                 case DayOfWeek.Sunday:
                     break;
                 default:
-                    right = left.AddDays(5 - (int)dayOfWeek);
+                    right = right.AddDays(5 - (int)dayOfWeek);
                     value = DaylyWorkData;
                     break;
             }
 
-            right = Calendars<DateTime, TimeSpan>.Min(right.Value, end).AddDays(1);
+            right = Point<DateTime>.Min(right, end);
 
-            container.Include(left, right, value, rightIncluded: false);
+            container.Include(left, right, value);
 
-            return right.Value;
+            return right.AsLeft();
         }
     }
 }

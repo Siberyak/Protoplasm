@@ -4,6 +4,7 @@ using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
+using Protoplasm.PointedIntervals;
 using Protoplasm.Utils;
 
 namespace ConsoleApplication1.TestData
@@ -22,9 +23,17 @@ namespace ConsoleApplication1.TestData
             
 
 
-            public WorkItemAgent CreateWorkItemAgent(string caption, Interval<TTime?> start, Interval<TTime?> finish, Interval<TDuration?> duration, IReadOnlyCollection<Competence> competences)
+            public WorkItemAgent CreateWorkItemAgent
+                (
+                string caption, 
+                Interval<TTime> start, 
+                Interval<TTime> finish,
+                Interval<TDuration> calendarDuration,
+                Interval<TDuration> workingDuration,
+                IReadOnlyCollection<Competence> competences
+                )
             {
-                var workItem = new WorkItem(caption, start, finish, duration, competences);
+                var workItem = new WorkItem(caption, start, finish, calendarDuration, workingDuration, competences);
                 var agent = new WorkItemAgent(this, workItem);
                 agent.Initialize();
                 return agent;

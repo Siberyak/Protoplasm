@@ -25,56 +25,36 @@ namespace ConsoleApplication1.TestData
             return ReferenceEquals(this, other);
         }
 
-        IReadOnlyCollection<IAbility> IAbilitiesHolder.Abilities => Entity.Abilities;
+        public override IReadOnlyCollection<IRequirement> Requirements => Entity.Requirements;
+        public override IReadOnlyCollection<IAbility> Abilities =>  Entity.Abilities;
 
-        IReadOnlyCollection<IRequirement> IRequirementsHolder.Requirements => Entity.Requirements;
-
-        IHoldersCompatibilityInfo IAbilitiesHolder.Compatible(IRequirementsHolder requirements)
+        public override IHoldersCompatibilityInfo Compatible(IRequirementsHolder requirements)
         {
-            return AbilitiesCompatible(requirements);
+            return ((IAbilitiesHolder)Entity).Compatible(requirements);
         }
 
-        protected virtual IHoldersCompatibilityInfo AbilitiesCompatible(IRequirementsHolder requirements)
+        public override bool Compatible(IRequirementsHolder requirements, IScene scene)
         {
-            return ((IAbilitiesHolder) Entity).Compatible(requirements);
+            return ((IAbilitiesHolder)Entity).Compatible(requirements, scene);
         }
 
-        bool IAbilitiesHolder.Compatible(IRequirementsHolder requirements, IScene scene)
+
+        public override IHoldersCompatibilityInfo Compatible(IAbilitiesHolder abilities)
         {
-            return AbilitiesCompatible(requirements, scene);
+            return ((IRequirementsHolder)Entity).Compatible(abilities);
         }
 
-        protected virtual bool AbilitiesCompatible(IRequirementsHolder requirements, IScene scene)
+        public override bool Compatible(IAbilitiesHolder abilities, IScene scene)
         {
-            return ((IAbilitiesHolder) Entity).Compatible(requirements, scene);
+            return ((IRequirementsHolder)Entity).Compatible(abilities, scene);
         }
 
-        IHoldersCompatibilityInfo IRequirementsHolder.Compatible(IAbilitiesHolder abilities)
-        {
-            return RequirementsCompatible(abilities);
-        }
-
-        protected virtual IHoldersCompatibilityInfo RequirementsCompatible(IAbilitiesHolder abilities)
-        {
-            return ((IRequirementsHolder) Entity).Compatible(abilities);
-        }
-
-        bool IRequirementsHolder.Compatible(IAbilitiesHolder abilities, IScene scene)
-        {
-            return RequirementsCompatible(abilities, scene);
-        }
-
-        protected virtual bool RequirementsCompatible(IAbilitiesHolder abilities, IScene scene)
-        {
-            return ((IRequirementsHolder) Entity).Compatible(abilities, scene);
-        }
-
-        IAbility IAbilitiesHolder.ToScene(IAbility ability)
+        public override IAbility ToScene(IAbility ability)
         {
             return ((IAbilitiesHolder) Entity).ToScene(ability);
         }
 
-        IRequirement IRequirementsHolder.ToScene(IRequirement requirement)
+        public override IRequirement ToScene(IRequirement requirement)
         {
             return ((IRequirementsHolder)Entity).ToScene(requirement);
         }

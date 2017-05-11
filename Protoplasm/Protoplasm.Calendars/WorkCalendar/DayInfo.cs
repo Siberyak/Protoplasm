@@ -25,7 +25,7 @@ namespace Protoplasm.Calendars
 
         public override bool Between(DateTime left, DateTime right)
         {
-            return left <= Date && Date <= right;
+            return left.Date <= Date && Date <= right.Date;
         }
     }
 }

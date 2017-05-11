@@ -4,7 +4,7 @@ using MAS.Core.Contracts;
 
 namespace MAS.Core.Compatibility.Contracts
 {
-    public interface IAbilitiesHolder : IEquatable<IAbilitiesHolder>
+    public interface IAbilitiesHolder : IHolder
     {
         IReadOnlyCollection<IAbility> Abilities { get; }
         IHoldersCompatibilityInfo Compatible(IRequirementsHolder requirements);

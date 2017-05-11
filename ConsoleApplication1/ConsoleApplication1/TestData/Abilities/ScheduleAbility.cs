@@ -18,6 +18,7 @@ namespace ConsoleApplication1.TestData
 
             public override bool Compatible(IRequirement requirement, IScene scene)
             {
+                //_calendarAbility.Calendar.CreateSchedule();
                 //new Schedule<WortTypedCalendarItem>(_calendarAbility.Calendar, new AllocationsHelper());
                 return true;
                 //_calendarAbility.Calendar

@@ -41,13 +41,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calendar.cs" />
+    <Compile Include="CalendarAdapter.cs" />
     <Compile Include="CalendarItem.cs" />
     <Compile Include="CalendarItems.cs" />
     <Compile Include="Calendars.cs" />
-    <Compile Include="IAbstractCalendar.cs" />
-    <Compile Include="ICalendar.cs" />
-    <Compile Include="ICalendarItems.cs" />
+    <Compile Include="Contracts\IAbstractCalendar.cs" />
+    <Compile Include="Contracts\ICalendar.cs" />
+    <Compile Include="Contracts\ICalendarAdapter.cs" />
+    <Compile Include="Contracts\ICalendarItems.cs" />
+    <Compile Include="Contracts\ICalendarItemsAdapter.cs" />
+    <Compile Include="Contracts\ISchedule.cs" />
+    <Compile Include="Contracts\ICalendarItem.cs" />
+    <Compile Include="IteratorInstructions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Schedule.cs" />
+    <Compile Include="Scheduler.cs" />
     <Compile Include="Tests\ByDayInfosAdapter.cs" />
     <Compile Include="Tests\ByDayOfWeekAdapter.cs" />
     <Compile Include="WorkCalendar\ByDayInfosAdapter.cs" />

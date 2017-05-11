@@ -34,12 +34,12 @@ namespace Protoplasm.Calendars.Tests
 
         public static void WorkCalendars()
         {
-            var original = Calendars<DateTime, TimeSpan>.GetOffset;
+            var original = Calendars<DateTime, TimeSpan>.ToDuration;
 
             try
             {
                 // что бы Duration вычислялся сам для контрольного расчета часов по списку
-                Calendars<DateTime, TimeSpan>.GetOffset = (a, b) => b - a;
+                Calendars<DateTime, TimeSpan>.ToDuration = (a, b) => b - a;
 
                 // базовый календарь рабочих дней - [пн. - пт.]:(8 ч.) + [сб. - вскр.]:(0 ч.)
                 var byDayOfWeek = new ByDayOfWeekAdapter();
@@ -67,7 +67,7 @@ namespace Protoplasm.Calendars.Tests
             }
             finally
             {
-                Calendars<DateTime, TimeSpan>.GetOffset = original;
+                Calendars<DateTime, TimeSpan>.ToDuration = original;
             }
 
         }

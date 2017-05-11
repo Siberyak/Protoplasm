@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+using MAS.Core.Compatibility.Contracts;
+
 namespace ConsoleApplication1.TestData
 {
-    public class ManagedAgent : Agent, IManagedAgent
+    public abstract class ManagedAgent : Agent, IManagedAgent
     {
         public ManagedAgent(IAgentsManager manager)
         {
@@ -8,5 +11,10 @@ namespace ConsoleApplication1.TestData
         }
 
         public IAgentsManager Manager { get; }
+
+        public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
+        {
+            return Manager[this];
+        }
     }
 }

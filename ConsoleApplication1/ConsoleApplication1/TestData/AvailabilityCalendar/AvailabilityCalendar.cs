@@ -7,7 +7,7 @@ namespace ConsoleApplication1.TestData
 
         public abstract class AvailabilityCalendar : Calendars<TTime, TDuration, IAvailabilityData>.Calendar, IAvailabilityCalendar
         {
-            protected AvailabilityCalendar(Calendars<TTime, TDuration, IAvailabilityData>.ICalendarAdapter adapter) : base(adapter)
+            protected AvailabilityCalendar(Calendars<TTime, TDuration, IAvailabilityData>.ICalendarItemsAdapter adapter) : base(adapter)
             {
             }
         }

@@ -4,6 +4,6 @@ namespace MAS.Core.Compatibility.Contracts
 {
     public interface IHolder
     {
-        INegotiator GetNegotiator(IScene scene);
+        INegotiator this[IScene scene] { get; }
     }
 }

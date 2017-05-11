@@ -93,7 +93,7 @@ namespace Protoplasm.PointedIntervals
         {
             PointValue = pointValue;
             Direction = direction;
-            Included = !Equals(pointValue, default(TBound?)) && included;
+            Included = pointValue.HasValue && included;
         }
 
         /// <summary>
@@ -115,6 +115,7 @@ namespace Protoplasm.PointedIntervals
         {
             return new Point<TBound>(default(TBound?), PointDirection.Left, false);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -132,6 +133,20 @@ namespace Protoplasm.PointedIntervals
         public static Point<TBound> Right()
         {
             return new Point<TBound>(default(TBound?), PointDirection.Right, false);
+        }
+
+        public Point<TBound> AsRight(bool? included = null)
+        {
+            return Direction == PointDirection.Right && included == Included
+                ? this
+                : Right(PointValue, included ?? !Included);
+        }
+
+        public Point<TBound> AsLeft(bool? included = null)
+        {
+            return Direction == PointDirection.Left && included == Included
+                ? this
+                : Left(PointValue, included ?? !Included);
         }
 
         /// <summary>
@@ -318,8 +333,19 @@ namespace Protoplasm.PointedIntervals
         public Point<TBound>[] Split()
         {
             return Direction == PointDirection.Left 
-                ? new[] {Right(this, !Included), this} 
-                : new[] { this, Left(this, !Included) };
+                ? new[] { AsRight(), this} 
+                : new[] { this, AsLeft() };
         }
+
+        public static Point<TBound> Min(Point<TBound> a, Point<TBound> b)
+        {
+            return a <= b ? a : b;
+        }
+        public static Point<TBound> Max(Point<TBound> a, Point<TBound> b)
+        {
+            return a >= b ? a : b;
+        }
+
+        public bool IsUndefined => !PointValue.HasValue;
     }
 }

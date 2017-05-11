@@ -66,6 +66,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestData\Abilities\ScheduleAbility.cs" />
+    <Compile Include="TestData\Agents\AgentsManager.cs" />
+    <Compile Include="TestData\Agents\IAgentsManager.cs" />
+    <Compile Include="TestData\Agents\IManagedAgent.cs" />
+    <Compile Include="TestData\Data\Negotiator.cs" />
     <Compile Include="TestData\AvailabilityCalendar\IAvailabilityCalendar.cs" />
     <Compile Include="TestData\AvailabilityCalendar\IAvailabilityData.cs" />
     <Compile Include="TestData\AvailabilityCalendar\AvailabilityCalendar.cs" />

@@ -10,6 +10,11 @@ namespace ConsoleApplication1.TestData
 {
     public abstract class Entity : IAbilitiesHolder, IRequirementsHolder
     {
+        public IAgent Agent { get; set; }
+
+
+        public INegotiator this[IScene scene] => Agent[scene];
+
         public string Caption { get; }
 
         protected Entity(string caption)
@@ -47,15 +52,6 @@ namespace ConsoleApplication1.TestData
             return new Ability[0];
         }
 
-        bool IEquatable<IAbilitiesHolder>.Equals(IAbilitiesHolder other)
-        {
-            return ReferenceEquals(this, other);
-        }
-
-        bool IEquatable<IRequirementsHolder>.Equals(IRequirementsHolder other)
-        {
-            return ReferenceEquals(this, other);
-        }
 
         public override string ToString()
         {

@@ -7,7 +7,7 @@ using Protoplasm.Utils;
 
 namespace ConsoleApplication1.TestData
 {
-    public class ManagedEntityAgent<TEntity> : EntityAgent<TEntity>, IManagedAgent
+    public abstract class ManagedEntityAgent<TEntity> : EntityAgent<TEntity>, IManagedAgent
         where TEntity : Entity
     {
         public IAgentsManager Manager { get; }
@@ -17,31 +17,45 @@ namespace ConsoleApplication1.TestData
             Manager = manager;
         }
 
-
-
-        protected override IHoldersCompatibilityInfo AbilitiesCompatible(IRequirementsHolder requirements)
+        public override IHoldersCompatibilityInfo Compatible(IRequirementsHolder requirements)
         {
-            return Manager.Compatible(requirements, this);
+            return Manager.Compatible(this, requirements);
         }
 
-        protected override bool AbilitiesCompatible(IRequirementsHolder requirements, IScene scene)
+        public override IHoldersCompatibilityInfo Compatible(IAbilitiesHolder abilities)
         {
-            return base.AbilitiesCompatible(requirements, scene);
+            return Manager.Compatible(abilities, this);
         }
 
-        protected override IHoldersCompatibilityInfo RequirementsCompatible(IAbilitiesHolder abilities)
+        public override bool Compatible(IRequirementsHolder requirements, IScene scene)
         {
-            return Manager.Compatible(this, abilities);
+            var info = Manager.Compatible(this, requirements);
+            return base.Compatible(requirements, scene);
         }
 
-        protected override bool RequirementsCompatible(IAbilitiesHolder abilities, IScene scene)
+        public override bool Compatible(IAbilitiesHolder abilities, IScene scene)
         {
-            return base.RequirementsCompatible(abilities, scene);
+            return base.Compatible(abilities, scene);
+        }
+
+        bool IRequirementsHolder.Compatible(IAbilitiesHolder abilities, IScene scene)
+        {
+            return Compatible(abilities, scene);
+        }
+
+        bool IAbilitiesHolder.Compatible(IRequirementsHolder requirements, IScene scene)
+        {
+            return Compatible(requirements, scene);
         }
 
         public override string ToString()
         {
             return $"{GetType().DisplayName()}: [{Entity}]";
+        }
+
+        public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
+        {
+            return Manager[this];
         }
     }
 }

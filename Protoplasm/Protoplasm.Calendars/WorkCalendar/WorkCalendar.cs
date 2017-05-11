@@ -8,8 +8,8 @@ namespace Protoplasm.Calendars
         public T Amount(int year)
         {
             var left = new DateTime(year, 1, 1);
-            var items = Get(left, left.AddYears(1).AddDays(-1));
-            var result = items.Select(Amount).Aggregate((a, b) => _adapter.Include(a, b));
+            var items = Get(left.Left(true), left.AddYears(1).Right(false));
+            var result = items.Select(Amount).Aggregate((a, b) => Adapter.Include(a, b));
             return result;
         }
 
@@ -24,7 +24,7 @@ namespace Protoplasm.Calendars
         protected abstract T Amount(int days, T data);
 
 
-        protected WorkCalendar(Calendars<DateTime, TimeSpan, T>.ICalendarAdapter adapter)
+        protected WorkCalendar(Calendars<DateTime, TimeSpan, T>.ICalendarItemsAdapter adapter)
             : base(adapter)
         {
         }

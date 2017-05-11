@@ -9,8 +9,10 @@ namespace Protoplasm.PointedIntervals
     /// </summary>
     /// <typeparam name="TBound"></typeparam>
     /// <typeparam name="TData"></typeparam>
-    public abstract class PointedInterval<TBound, TData> where TBound : struct, IComparable<TBound>
+    public abstract class PointedInterval<TBound, TData> : Interval<TBound>
+        where TBound : struct, IComparable<TBound>
     {
+
         /// <summary>
         /// Возвращает строку, представляющую текущий объект.
         /// </summary>
@@ -20,17 +22,8 @@ namespace Protoplasm.PointedIntervals
         public override string ToString()
         {
             var data = DataToString == null ? (object)Data : DataToString(Data);
-            return $"{Left}, {Right}, Data = [{data}]";
+            return $"{base.ToString()}, Data = [{data}]";
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public readonly Point<TBound> Left;
-        /// <summary>
-        /// 
-        /// </summary>
-        public readonly Point<TBound> Right;
 
         /// <summary>
         /// 
@@ -55,33 +48,31 @@ namespace Protoplasm.PointedIntervals
         { }
 
         protected PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
+            : base(left, right)
         {
-            Left = left ?? Point<TBound>.Left();
-            Right = right ?? Point<TBound>.Right();
-
-            if (Left > Right)
-                throw new Exception("left > right");
 
             Data = data;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public bool Contains(Point<TBound> point)
-        {
-            return Left <= point && point <= Right;
-        }
 
-        internal bool TrySplit(Point<TBound> point, out Point<TBound>[] points)
+        protected internal bool TrySplit(Point<TBound> point, out Point<TBound>[] points, bool selfAsSplitted = false)
         {
             points = null;
 
+            if (!Contains(point))
+                return false;
+
             // [[, ]], ((, )) 
             if (Left.Equals(point) || Right.Equals(point))
+            {
+                if(selfAsSplitted)
+                {
+                    points = new[] {Left, Right};
+                    return true;
+                }
+
                 return false;
+            }
 
 
             var equalsToLeft = Equals(Left.PointValue, point.PointValue);
