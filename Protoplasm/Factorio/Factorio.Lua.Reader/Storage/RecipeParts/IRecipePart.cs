@@ -11,5 +11,7 @@ namespace Factorio.Lua.Reader
 
         [Browsable(false)]
         string _Icon { get; set; }
+
+        string _Order { get; set; }
     }
 }

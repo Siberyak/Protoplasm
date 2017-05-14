@@ -15,12 +15,4 @@ namespace Factorio.Lua.Reader
             return $"{Type}: '{Name}'" ?? base.ToString();
         }
     }
-
-    [JsonObject(MemberSerialization.OptIn)]
-    public class TypedNamedIconedBase : TypedNamedBase
-    {
-        [JsonProperty("icon")]
-        public string _Icon { get; set; }
-
-    }
 }

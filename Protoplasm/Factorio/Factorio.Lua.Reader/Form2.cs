@@ -17,6 +17,7 @@ namespace Factorio.Lua.Reader
         {
             InitializeComponent();
         }
+
     }
 
 }

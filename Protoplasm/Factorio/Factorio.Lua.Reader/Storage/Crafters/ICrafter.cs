@@ -3,12 +3,11 @@ using Protoplasm.Utils.Graph;
 
 namespace Factorio.Lua.Reader
 {
-    public interface ICrafter : INode, IStoragedData
+    public interface ICrafter : INode, IStoragedData, ILocalized
     {
         object[] _CraftingCategories { get; }
 
-        string Name { get; }
+        string _Icon { get; }
 
-      
     }
 }

@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using DevExpress.Utils;
 
 namespace Factorio.Lua.Reader
 {
-    public class ImagesHelper
+    public static class ImagesHelper
     {
         public static readonly ImageCollection Images32 = new ImageCollection() { ImageSize = new Size(32, 32) };
         public static readonly ImageCollection Images64 = new ImageCollection() { ImageSize = new Size(64, 64) };
@@ -15,19 +18,25 @@ namespace Factorio.Lua.Reader
 
         public delegate Image ImageLoaderDelegate<T>(T key);
 
-        public static int GetIndex32<T>(T key, ImageLoaderDelegate<T> loader)
+        public static int? GetIndex32<TData, T>(TData data, T key, ImageLoaderDelegate<TData> loader)
+        {
+            return GetIndex(key, k => loader(data), _indexes32, Images32);
+        }
+
+        public static int? GetIndex32<T>(T key, ImageLoaderDelegate<T> loader)
         {
             return GetIndex(key, loader, _indexes32, Images32);
         }
-        public static int GetIndex64<T>(T key, ImageLoaderDelegate<T> loader)
+
+        public static int? GetIndex64<T>(T key, ImageLoaderDelegate<T> loader)
         {
             return GetIndex(key, loader, _indexes64, Images64);
         }
 
-        private static int GetIndex<T>(T key, ImageLoaderDelegate<T> loader, Dictionary<object, int> indexes, ImageCollection images)
+        private static int? GetIndex<T>(T key, ImageLoaderDelegate<T> loader, Dictionary<object, int> indexes, ImageCollection images)
         {
             if (key == null)
-                return -1;
+                return null;
 
             lock (indexes)
             {
@@ -35,18 +44,16 @@ namespace Factorio.Lua.Reader
                     return indexes[key];
 
                 var image = loader?.Invoke(key);
-                var index = -1;
-                if (image != null)
-                {
-                    index = images.Images.Add(image);
-                }
+                if (image == null)
+                    return null;
 
+                var index = images.Images.Add(image);
                 indexes.Add(key, index);
                 return index;
             }
         }
 
-        public static Image LoadImage(Storage storage, string key)
+        public static Bitmap LoadImage(Storage storage, string key)
         {
             var parts = key.Split('/');
 
@@ -59,8 +66,126 @@ namespace Factorio.Lua.Reader
 
             parts[0] = mod.dir;
             var path = Path.Combine(parts);
-            var image = System.Drawing.Image.FromFile(path);
-            return image;
+            var image = Image.FromFile(path);
+            return new Bitmap(image);
+        }
+
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            DrawImageTo(image, destImage, destRect);
+
+            return destImage;
+        }
+
+        public static void DrawImageTo(Image image, Bitmap destImage, Rectangle destRect)
+        {
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceOver;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+        }
+
+        public static Image IconLoader(Storage storage, string key)
+        {
+            return ImagesHelper.LoadImage(storage, key);
+        }
+
+        public static Image Image32<T>(this T key, ImageLoaderDelegate<T> loader)
+        {
+            var index32 = GetIndex32(key, loader);
+            return index32.HasValue ? Images32.Images[index32.Value] : null;
+        }
+
+        public static Image Image32(this Recipe recipe)
+        {
+            var index32 = recipe.ImageIndex32();
+            return index32 == -1 ? null : Images32.Images[index32];
+        }
+
+        public static int ImageIndex32(this Recipe recipe)
+        {
+            var imageIndex = ImagesHelper.GetIndex32(recipe._Icon, k => IconLoader(recipe.Storage, k))
+                             ?? ImagesHelper.GetIndex32(recipe.Icons, "MixedIcon: " + recipe.Name, d => MixedIconLoader(recipe.Storage, d))
+                             ?? ImagesHelper.GetIndex32(recipe.Icon, k => IconLoader(recipe.Storage, k))
+                             ?? -1;
+            return imageIndex;
+        }
+
+        public static Image MixedIconLoader(Storage storage, IconInfo[] data)
+        {
+            if(data == null || data.Length == 0)
+                return null;
+
+            Bitmap result = new Bitmap(32, 32);
+            result.MakeTransparent();
+
+            foreach (var iconInfo in data)
+            {
+                var dest = new Rectangle(0, 0, 32, 32);
+
+                var image = ImagesHelper.LoadImage(storage, iconInfo.Icon);
+                image.MakeTransparent(image.GetPixel(0, 0));
+
+                if (iconInfo.Tint != null)
+                {
+                    var bitmap = new Bitmap(image);
+                    for (var x = 0; x < bitmap.Width; x++)
+                    {
+                        for (var y = 0; y < bitmap.Height; y++)
+                        {
+                            bitmap.SetPixel(x, y, iconInfo.Tint.Transform(bitmap.GetPixel(x, y)));
+                        }
+                    }
+                    image = bitmap;
+                }
+
+
+                if (iconInfo.Scale.HasValue)
+                {
+                    var width = Convert.ToInt32(Math.Round(image.Width * iconInfo.Scale.Value));
+                    var height = Convert.ToInt32(Math.Round(image.Height * iconInfo.Scale.Value));
+                    image = ImagesHelper.ResizeImage(image, width, height);
+
+                    dest = new Rectangle((result.Width-width)/2, (result.Height-height)/2, width, height);
+                }
+
+                if (iconInfo.Shift != null)
+                {
+                    if (iconInfo.Shift.Length != 2)
+                    {
+                    }
+                    else
+                    {
+                        dest = new Rectangle(dest.X+Convert.ToInt32(iconInfo.Shift[0]), dest.Y + Convert.ToInt32(iconInfo.Shift[1]), dest.Width, dest.Height);
+                    }
+                }
+
+                ImagesHelper.DrawImageTo(image, result, dest);
+            }
+
+            return result;
         }
     }
 }

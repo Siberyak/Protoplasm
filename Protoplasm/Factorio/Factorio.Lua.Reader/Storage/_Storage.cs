@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using DevExpress.XtraPrinting.Native;
 using Factorio.Lua.Reader;
 using Factorio.Lua.Reader.Graph;
 using Newtonsoft.Json;
@@ -177,6 +178,11 @@ namespace Factorio.Lua.Reader
 
         public class PropInfo
         {
+            public override string ToString()
+            {
+                return $"{Name}, type={Type}";
+            }
+
             public string Name;
             public uint Count;
             public readonly List<JTokenType> Types = new List<JTokenType>();
@@ -286,7 +292,8 @@ namespace Factorio.Lua.Reader
                 }
             }
         }
-
+        //*[@id="mw-content-text"]/ul[2]
+        private static string xpath = "//*[@id=\"mw-content-text\"]/ul[2]";
         private static string xml = @"
 <data>
 <ul><li> <a href=""/Prototype/AmmoCategory"" title=""Prototype/AmmoCategory"">Prototype/AmmoCategory</a> <b>ammo-category</b></li>
@@ -300,7 +307,6 @@ namespace Factorio.Lua.Reader
 <ul><li> <a href=""/index.php?title=Prototype/FlameThrowerExplosion&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/FlameThrowerExplosion (page does not exist)"">Prototype/FlameThrowerExplosion</a> <b>flame-thrower-explosion</b></li></ul></li>
 <li> <a href=""/Prototype/EntityWithHealth"" title=""Prototype/EntityWithHealth"">Prototype/EntityWithHealth</a> &lt;abstract&gt;
 <ul><li> <a href=""/Prototype/Accumulator"" title=""Prototype/Accumulator"">Prototype/Accumulator</a> <b>accumulator</b></li>
-<li> <a href=""/Prototype/AssemblingMachine"" title=""Prototype/AssemblingMachine"">Prototype/AssemblingMachine</a> <b>assembling-machine</b></li>
 <li> <a href=""/index.php?title=Prototype/Beacon&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Beacon (page does not exist)"">Prototype/Beacon</a> <b>beacon</b></li>
 <li> <a href=""/Prototype/Car"" title=""Prototype/Car"">Prototype/Car</a> <b>car</b></li>
 <li> <a href=""/Prototype/Character"" title=""Prototype/Character"">Prototype/Character</a> <b>player</b></li>
@@ -316,7 +322,8 @@ namespace Factorio.Lua.Reader
 <li> <a href=""/index.php?title=Prototype/Market&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Market (page does not exist)"">Prototype/Market</a> <b>market</b></li>
 <li> <a href=""/Prototype/MiningDrill"" title=""Prototype/MiningDrill"">Prototype/MiningDrill</a> <b>mining-drill</b></li>
 <li> <a href=""/Prototype/PipeConnectable"" title=""Prototype/PipeConnectable"">Prototype/PipeConnectable</a> &lt;abstract&gt;
-<ul><li> <a href=""/index.php?title=Prototype/Boiler&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Boiler (page does not exist)"">Prototype/Boiler</a> <b>boiler</b></li>
+<ul><li> <a href=""/Prototype/AssemblingMachine"" title=""Prototype/AssemblingMachine"">Prototype/AssemblingMachine</a> <b>assembling-machine</b></li>
+<li> <a href=""/index.php?title=Prototype/Boiler&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Boiler (page does not exist)"">Prototype/Boiler</a> <b>boiler</b></li>
 <li> <a href=""/Prototype/Generator"" title=""Prototype/Generator"">Prototype/Generator</a> <b>generator</b></li>
 <li> <a href=""/index.php?title=Prototype/Pump&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Pump (page does not exist)"">Prototype/Pump</a> <b>pump</b></li>
 <li> <a href=""/index.php?title=Prototype/Pipe&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Pipe (page does not exist)"">Prototype/Pipe</a> <b>pipe</b></li>
@@ -356,7 +363,7 @@ namespace Factorio.Lua.Reader
 <li> <a href=""/index.php?title=Prototype/Resource&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Resource (page does not exist)"">Prototype/Resource</a> <b>resource</b></li>
 <li> <a href=""/index.php?title=Prototype/Smoke&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Smoke (page does not exist)"">Prototype/Smoke</a> <b>smoke</b></li>
 <li> <a href=""/index.php?title=Prototype/Sticker&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Sticker (page does not exist)"">Prototype/Sticker</a> <b>sticker</b></li></ul></li>
-<li> <a href=""/Prototype/Item"" title=""Prototype/Item"" class=""mw-redirect"">Prototype/Item</a> <b>item</b>
+<li> <a href=""/Prototype/Item"" class=""mw-redirect"" title=""Prototype/Item"">Prototype/Item</a> <b>item</b>
 <ul><li> <a href=""/index.php?title=Prototype/Ammo&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Ammo (page does not exist)"">Prototype/Ammo</a> <b>ammo</b></li>
 <li> <a href=""/index.php?title=Prototype/Armor&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Armor (page does not exist)"">Prototype/Armor</a> <b>armor</b></li>
 <li> <a href=""/index.php?title=Prototype/Capsule&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Capsule (page does not exist)"">Prototype/Capsule</a> <b>capsule</b></li>
@@ -377,8 +384,9 @@ namespace Factorio.Lua.Reader
 <li> <a href=""/index.php?title=Prototype/RailCategory&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/RailCategory (page does not exist)"">Prototype/RailCategory</a> <b>rail-category</b></li>
 <li> <a href=""/Prototype/Recipe"" title=""Prototype/Recipe"">Prototype/Recipe</a> <b>recipe</b></li>
 <li> <a href=""/Prototype/RecipeCategory"" title=""Prototype/RecipeCategory"">Prototype/RecipeCategory</a> <b>recipe-category</b></li>
-<li> <a href=""/index.php?title=Prototype/Technology&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Technology (page does not exist)"">Prototype/Technology</a> <b>technology</b></li>
+<li> <a href=""/Prototype/Technology"" class=""mw-redirect"" title=""Prototype/Technology"">Prototype/Technology</a> <b>technology</b></li>
 <li> <a href=""/index.php?title=Prototype/Tile&amp;action=edit&amp;redlink=1"" class=""new"" title=""Prototype/Tile (page does not exist)"">Prototype/Tile</a> <b>tile</b></li></ul>
+
 </data>";
 
 
@@ -401,6 +409,7 @@ namespace Factorio.Lua.Reader
                 child.SetParent(null);
             }
 
+            var tmp = hierarchy.GroupBy(x => x.Text).Where(x => x.Count() > 1).ToArray();
             var hh = hierarchy.ToDictionary(x => x.Text);
 
             foreach (var prototypeInfo in hierarchy.ToArray())
@@ -434,6 +443,9 @@ namespace Factorio.Lua.Reader
             }
 
             var sb = new StringBuilder();
+            sb.AppendLine("// ReSharper disable InconsistentNaming");
+            sb.AppendLine("// ReSharper disable PartialTypeWithSinglePart");
+            sb.AppendLine();
             sb.AppendLine("//*************************************************************************************");
             sb.AppendLine("//");
             sb.AppendLine("//     G E N E R A T E D   C L A S S E S");
@@ -470,6 +482,13 @@ namespace Factorio.Lua.Reader
 
                 if (baseType == typeof(TypedNamedBase).Name || baseType == typeof(TypedBase).Name)
                     propsByKey.RemoveAll(x => x.Name == "type");
+
+                PropInfo iconPropInfo;
+                if (baseType == typeof (TypedNamedBase).Name && (iconPropInfo = propsByKey.FirstOrDefault(x =>x.Name == "icon")) != null)
+                {
+                    propsByKey.Remove(iconPropInfo);
+                    baseType = typeof (TypedNamedIconedBase).Name;
+                }
 
                 if (!notExists && propsByKey.Count == 0)
                     continue;

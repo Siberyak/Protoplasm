@@ -7,5 +7,12 @@ namespace Factorio.Lua.Reader
     {
         [JsonProperty("crafting_categories")]
         public object[] _CraftingCategories { get; set; }
+
+        public string Category => "entity-name";
+        public object[] _LocalisedName => null;
+
+        [JsonProperty("icon")]
+        public string _Icon { get; set; }
+
     }
 }

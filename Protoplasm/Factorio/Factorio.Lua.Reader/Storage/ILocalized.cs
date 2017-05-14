@@ -6,5 +6,7 @@ namespace Factorio.Lua.Reader
         Storage Storage { get; }
         string Name { get; }
         object[] _LocalisedName { get; }
+
+        string LocalizedName { get; }
     }
 }

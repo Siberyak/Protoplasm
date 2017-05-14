@@ -11,11 +11,16 @@ using Protoplasm.Utils.Graph;
 namespace Factorio.Lua.Reader
 {
     [JsonObject("recipe", MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Recipe : TypedNamedBase, ILocalized
+    public partial class Recipe : TypedNamedIconedBase, ILocalized
     {
+        public static readonly string ClockIcon = "__core__/graphics/clock-icon.png";
+
         string ILocalized.Category => "recipe-name";
 
         public override string LocalizedName => this.LocalisedName() ?? Result?.LocalisedName() ?? Name;
+
+        [JsonProperty("localised_name")]
+        public object[] _LocalisedName { get; set; }
 
         public override string ToString()
         {
@@ -35,13 +40,12 @@ namespace Factorio.Lua.Reader
             }
         }
 
-        public object[] Results
+        public IRecipePart[] Results
         {
             get
             {
                 return References.OfType<RecipePartEdge>().Where(x => x.Direction == Direction.Output)
                     .Select(x => x.Part)
-                    .Cast<object>()
                     .ToArray();
             }
         }
@@ -72,7 +76,7 @@ namespace Factorio.Lua.Reader
         public string _Subgroup { get; set; }
 
         [JsonProperty("energy_required")]
-        public double _EnergyRequired { get; set; }
+        public double _EnergyRequired { get; set; } = 0.5;
 
         [JsonProperty("enabled")]
         public bool _Enabled { get; set; }
@@ -83,7 +87,8 @@ namespace Factorio.Lua.Reader
         [JsonProperty("ingredients")]
         public object[] _Ingredients { get; set; }
 
-
+        [JsonProperty("icons")]
+        public IconInfo[] Icons { get; set; }
 
 
         public override void SetToken(JToken token)
@@ -96,6 +101,12 @@ namespace Factorio.Lua.Reader
                 JsonConvert.PopulateObject(json, this);
             }
         }
+
+        [JsonProperty("normal")]
+        public object _Normal { get; set; }
+
+        [JsonProperty("hidden")]
+        public bool _Hidden { get; set; }
 
         public override void ProcessLinks()
         {
@@ -162,7 +173,10 @@ namespace Factorio.Lua.Reader
         }
 
         public RecipeCategory RecipeCategory => References.OfType<RecipeRecipeCategoryEdge>().FirstOrDefault()?.To;
+        public string Order => _Order ?? Results.FirstOrDefault()?._Order;
 
+        [JsonProperty("order")]
+        public string _Order { get; set; }
         private void Populate(JToken token, bool input)
         {
             object amount = null;

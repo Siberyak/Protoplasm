@@ -76,7 +76,7 @@ namespace Factorio.Lua.Reader
             if(icon == null)
                 return;
 
-            e.NodeImageIndex = ImagesHelper.GetIndex32(icon, IconLoader);
+            e.NodeImageIndex = ImagesHelper.GetIndex32(icon, IconLoader) ?? -1;
 
         }
 

@@ -48,7 +48,8 @@ namespace Factorio.Lua.Reader
         [JsonProperty("healing_value")]
         public double _HealingValue { get; set; }
 
-
+        [JsonProperty("localised_name")]
+        public object[] _LocalisedName { get; set; }
         public override void ProcessLinks()
         {
             base.ProcessLinks();

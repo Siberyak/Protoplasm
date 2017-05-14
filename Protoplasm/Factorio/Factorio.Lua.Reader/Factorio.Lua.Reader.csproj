@@ -93,6 +93,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RecipeView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RecipeView.Designer.cs">
+      <DependentUpon>RecipeView.cs</DependentUpon>
+    </Compile>
     <Compile Include="RecipiesControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -102,6 +108,7 @@
     <Compile Include="Storage\ILocalized.cs" />
     <Compile Include="Storage\LocalizedExtender.cs" />
     <Compile Include="Storage\PlaceResultEdge.cs" />
+    <Compile Include="Storage\TypedNamedIconedBase.cs" />
     <Compile Include="UI.Nodes\CrafterNode.cs" />
     <Compile Include="UI.Nodes\ItemGroupNode.cs" />
     <Compile Include="UI.Nodes\ItemNode.cs" />
@@ -193,6 +200,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="RecipeView.resx">
+      <DependentUpon>RecipeView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RecipiesControl.resx">
       <DependentUpon>RecipiesControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -206,6 +216,9 @@
       <Project>{19baf319-a0ba-4c50-b580-32647171c73b}</Project>
       <Name>Protoplasm.Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

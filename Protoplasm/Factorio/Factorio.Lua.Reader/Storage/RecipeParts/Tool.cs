@@ -10,5 +10,8 @@ namespace Factorio.Lua.Reader
         object[] ILocalized._LocalisedName => null;
 
         public override string LocalizedName => this.LocalisedName() ?? Name;
+        [JsonProperty("order")]
+        public string _Order { get; set; }
+
     }
 }
