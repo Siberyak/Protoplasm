@@ -328,16 +328,54 @@ namespace Protoplasm.PointedIntervals
         {
             return GetEnumerator();
         }
-    }
 
-    public class IntervalsOfIntervalDataContainer<TInterval, TBound, TData> : PointedIntervalsContainer<TInterval, TBound, TData>
-    where TBound : struct, IComparable<TBound>
-    where TInterval : PointedInterval<TBound, TData>
-    where TData : IIntervalData<TData>
-    {
-        public IntervalsOfIntervalDataContainer(CreateInterval createInterval, DataToString dataToString = null)
-            : base(createInterval, (a, b) => a.Include(b), (a, b) => a.Exclude(b), dataToString)
+        public IEnumerable<TInterval> Get(Interval<TBound> interval)
         {
+            return interval == null ? new TInterval[0] : Get(interval.Left, interval.Right);
+        }
+
+        public IEnumerable<TInterval> Get(Point<TBound> left, Point<TBound> right)
+        {
+            var result = this.SkipWhile(x => !x.Contains(left)).TakeWhile(x => x.Left < right).ToList();
+
+            var first = result.FirstOrDefault();
+            if (first != null && first.Left != left)
+            {
+                result[0] = NewInterval(left, first.Right, first.Data, _dataToString);
+            }
+
+            var last = result.LastOrDefault();
+            if (last != null && last.Right != right)
+            {
+                result[result.Count - 1] = NewInterval(last.Left, right, last.Data, _dataToString); 
+            }
+
+            return result;
         }
     }
+
+    public class PointedIntervalsContainer<TBound, TData> : PointedIntervalsContainer<PointedInterval<TBound, TData>, TBound, TData>
+        where TBound : struct, IComparable<TBound>
+    {
+        public PointedIntervalsContainer(IncludeData includeData, ExcludeData excludeData, DataToString dataToString = null) 
+            : base(CreatePointedInterval, includeData, excludeData, dataToString)
+        {
+        }
+
+        private static PointedInterval<TBound, TData> CreatePointedInterval(Point<TBound> left, Point<TBound> right, TData data)
+        {
+            return new PointedInterval<TBound, TData>(left, right, data);
+        }
+    }
+
+    //public class IntervalsOfIntervalDataContainer<TInterval, TBound, TData> : PointedIntervalsContainer<TInterval, TBound, TData>
+    //where TBound : struct, IComparable<TBound>
+    //where TInterval : PointedInterval<TBound, TData>
+    //where TData : IIntervalData<TData>
+    //{
+    //    public IntervalsOfIntervalDataContainer(CreateInterval createInterval, DataToString dataToString = null)
+    //        : base(createInterval, (a, b) => a.Include(b), (a, b) => a.Exclude(b), dataToString)
+    //    {
+    //    }
+    //}
 }

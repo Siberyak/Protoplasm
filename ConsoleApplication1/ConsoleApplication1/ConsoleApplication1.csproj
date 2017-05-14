@@ -104,6 +104,9 @@
     <Compile Include="TestData\Agents\WorkItemsManager.cs" />
     <Compile Include="TestData\Abilities\Ability.cs" />
     <Compile Include="TestData\Data\WorkItem.cs" />
+    <Compile Include="Tests\ISatisfaction.cs" />
+    <Compile Include="Tests\Satisfaction.cs" />
+    <Compile Include="Tests\Scene.cs" />
     <Compile Include="Tests\Tests.cs" />
   </ItemGroup>
   <ItemGroup>

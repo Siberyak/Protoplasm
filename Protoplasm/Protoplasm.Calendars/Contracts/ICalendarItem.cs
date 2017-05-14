@@ -7,6 +7,10 @@ namespace Protoplasm.Calendars
     {
         public interface ICalendarItem
         {
+            bool IsDefined { get; }
+            bool IsUndefined { get; }
+            bool IsPartialDefined { get; }
+
             Point<TTime> Left { get; }
             Point<TTime> Right { get; }
             TDuration? Duration { get; }

@@ -21,16 +21,17 @@ namespace Protoplasm.Calendars
                 return Intersect(left, right);
             }
 
-            public ICalendarItem Intersect(Interval<TTime> interval)
+            public new ICalendarItem Intersect(Interval<TTime> interval)
             {
                 return Intersect(interval.Left, interval.Right);
             }
 
-            public CalendarItem Intersect(Point<TTime> left, Point<TTime> right)
+            public new ICalendarItem Intersect(Point<TTime> left, Point<TTime> right)
             {
-                var l = Left <= left ? left : Left;
-                var r = Right >= right ? right : Right;
-                return new CalendarItem(l, r, Data) {DataToString = DataToString};
+                var intersection = base.Intersect(left, right);
+                if (intersection == null)
+                    return null;
+                return new CalendarItem(intersection.Left, intersection.Right, Data) {DataToString = DataToString};
             }
 
             public override string ToString()

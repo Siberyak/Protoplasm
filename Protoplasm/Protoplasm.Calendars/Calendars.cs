@@ -1,5 +1,6 @@
 using System;
 using Protoplasm.PointedIntervals;
+using Protoplasm.Utils;
 
 namespace Protoplasm.Calendars
 {
@@ -13,9 +14,18 @@ namespace Protoplasm.Calendars
         where TTime : struct, IComparable<TTime> 
         where TDuration : struct, IComparable<TDuration>
     {
+        static Calendars()
+        {
+            DataAdapter<TDuration>.Add = (a, b) => AddDuration(a, b);
+            DataAdapter<TDuration>.Subst = (a, b) => SubstDuration(a, b);
+        }
+
         public static Func<TTime?, TTime?, TDuration?> ToDuration;
         public static Func<TTime?, TDuration?, TTime?> OffsetToRight;
         public static Func<TTime?, TDuration?, TTime?> OffsetToLeft;
+        public static Func<TDuration, TDuration, TDuration> AddDuration;
+        public static Func<TDuration, TDuration, TDuration> SubstDuration;
+
 
         public static TTime Min(TTime a, TTime b)
         {
@@ -81,6 +91,23 @@ namespace Protoplasm.Calendars
                 : a.HasValue ? a : b;
         }
 
+
+        public static TDuration? Add(TDuration? a, TDuration? b)
+        {
+            return a.HasValue && b.HasValue
+                ? AddDuration(a.Value, b.Value)
+                : a.HasValue
+                    ? a
+                    : b;
+        }
+        public static TDuration? Subst(TDuration? a, TDuration? b)
+        {
+            return a.HasValue && b.HasValue
+                ? SubstDuration(a.Value, b.Value)
+                : b.HasValue
+                    ? SubstDuration(default(TDuration), b.Value)
+                    : a;
+        }
 
         public static Point<TTime> OffsetPointToLeft(Point<TTime> point, TDuration offset)
         {

@@ -54,7 +54,8 @@ namespace Protoplasm.Calendars
 
             public IEnumerable<CalendarItem> Get(Point<TTime> @from, Point<TTime> to)
             {
-                return Calendar.Get(_allocated, @from, to);
+                var calendarItems = _allocated.Get(@from, to);
+                return calendarItems;
             }
 
             public void Include(Point<TTime> left, Point<TTime> right, TData data)

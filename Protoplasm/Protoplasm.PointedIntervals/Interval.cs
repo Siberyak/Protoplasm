@@ -41,6 +41,18 @@ namespace Protoplasm.PointedIntervals
                 throw new Exception("left > right");
         }
 
+        public Interval<TBound> Intersect(Interval<TBound> interval)
+        {
+            return Intersect(interval.Left, interval.Right);
+        }
+
+        public Interval<TBound> Intersect(Point<TBound> left, Point<TBound> right)
+        {
+            var l = Left <= left ? left : Left;
+            var r = Right >= right ? right : Right;
+            return l > r ? null : new Interval<TBound>(l, r);
+        }
+
         public static Interval<TBound> New(TBound value)
         {
             return new Interval<TBound>(value, value, true, true);

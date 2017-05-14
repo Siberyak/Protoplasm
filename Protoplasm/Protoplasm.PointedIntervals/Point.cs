@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Protoplasm.PointedIntervals
 {
@@ -337,13 +338,16 @@ namespace Protoplasm.PointedIntervals
                 : new[] { this, AsLeft() };
         }
 
-        public static Point<TBound> Min(Point<TBound> a, Point<TBound> b)
+        public static Point<TBound> Min(Point<TBound> a, Point<TBound> b, params Point<TBound>[] other)
         {
-            return a <= b ? a : b;
+            var result = a <= b ? a : b;
+            return other.Aggregate(result, (current, point) => Min(current, point));
         }
-        public static Point<TBound> Max(Point<TBound> a, Point<TBound> b)
+
+        public static Point<TBound> Max(Point<TBound> a, Point<TBound> b, params Point<TBound>[] other)
         {
-            return a >= b ? a : b;
+            var result = a >= b ? a : b;
+            return other.Aggregate(result, (current, point) => Max(current, point));
         }
 
         public bool IsUndefined => !PointValue.HasValue;

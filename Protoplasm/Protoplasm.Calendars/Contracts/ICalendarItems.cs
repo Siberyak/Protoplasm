@@ -8,6 +8,7 @@ namespace Protoplasm.Calendars
 
         public interface ICalendarItems
         {
+
             void Include(Point<TTime> left, Point<TTime> right, TData data);
             void Include(TTime? left, TTime? right, TData data, bool leftIncluded = true, bool rightIncluded = true);
 

@@ -101,6 +101,11 @@ namespace Protoplasm.Utils.Graph
 
         public void AddNode<TNodeData>(IDataNode<TNodeData> node)
         {
+            AddNode((INode)node);
+        }
+
+        protected void AddNode(INode node)
+        {
             if (!_nodes.Contains(node))
             {
                 _nodes.Add(node);
@@ -109,6 +114,12 @@ namespace Protoplasm.Utils.Graph
         }
 
         public void AddEdge<TEdgeData>(IDataEdge<TEdgeData> edge)
+        {
+            if (!EdgesDataList.Contains(edge))
+                EdgesDataList.Add(edge);
+        }
+
+        public void AddEdge(IEdge edge)
         {
             if (!EdgesDataList.Contains(edge))
                 EdgesDataList.Add(edge);
@@ -160,39 +171,6 @@ namespace Protoplasm.Utils.Graph
         {
             var query = Edges.OfType<IDataEdge<T>>();
             return predicate == null ? query : query.Where(predicate);
-        }
-    }
-
-
-    public static class GraphExtender
-    {
-        public static IEnumerable<INode> ReferencedNodes<TEdgeType>(this INode node, Func<TEdgeType, bool> predicate = null)
-            where TEdgeType : IEdge
-        {
-            var query = node.References.OfType<TEdgeType>();
-            var edges = predicate == null ? query : query.Where(predicate);
-            return edges.Select(x => x.To);
-        }
-        public static IEnumerable<INode> ReferencedByNodes<TEdgeType>(this INode node, Func<TEdgeType, bool> predicate = null)
-            where TEdgeType : IEdge
-        {
-            var query = node.BackReferences.OfType<TEdgeType>();
-            var edges = predicate == null ? query : query.Where(predicate);
-            return edges.Select(x => x.From);
-        }
-
-
-        public static IEnumerable<TNode> ReferencedNodes<TEdgeType, TNode>(this INode node, Func<TEdgeType, bool> predicate = null)
-            where TNode : INode
-            where TEdgeType : IEdge
-        {
-            return node.ReferencedNodes(predicate).OfType<TNode>();
-        }
-        public static IEnumerable<TNode> ReferencedByNodes<TEdge, TNode>(this INode node, Func<TEdge, bool> predicate = null)
-            where TNode : INode
-            where TEdge : IEdge
-        {
-            return node.ReferencedByNodes(predicate).OfType<TNode>();
         }
     }
 }

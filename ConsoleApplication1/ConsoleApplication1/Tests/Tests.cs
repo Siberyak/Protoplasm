@@ -138,7 +138,6 @@ namespace ConsoleApplication1.TestData
             var tmp = res1.Entity.Calendar.Get(new DateTime(2017, 1, 1), left);
 
 
-
             var adc = new AmountedDataCalendar();
 
             adc.Get(left.AddDays(-2), right.AddDays(2));
@@ -157,9 +156,6 @@ namespace ConsoleApplication1.TestData
 
             wi1.TrySatisfy(branch1, out resultScene);
 
-
-            Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
-                .CalculateAmount = (dur, availabilityData, amount) => new Appointment(amount.Appointee, 1);
             Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
                 .AddAmount = (a, b) => new Appointment(a.Appointee, a.Value+b.Value);
             Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
@@ -168,10 +164,14 @@ namespace ConsoleApplication1.TestData
             Calendars<DateTime, TimeSpan>.OffsetToLeft = (dt, span) => dt?.Add(-(span ?? TimeSpan.Zero));
             Calendars<DateTime, TimeSpan>.OffsetToRight = (dt, span) => dt?.Add(span ?? TimeSpan.Zero);
 
+            Calendars<DateTime, TimeSpan>.AddDuration = (a, b) => a + b;
+            Calendars<DateTime, TimeSpan>.SubstDuration = (a, b) => a - b;
+
+
             var tmpSch = adc.CreateSchedule(TimeSpan.FromMinutes(15));
             var scheduler = new Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
                 (
-                tmpSch, ProcessInstructionsRequest
+                tmpSch, ProcessInstructionsRequest, ProcessAmountRequest, PrecessDurationByAmount
                 );
 
             var start = new Interval<DateTime>(left.Left(true));
@@ -196,11 +196,29 @@ namespace ConsoleApplication1.TestData
                     kind
                 );
 
-            //определен только один горизонт и не определена длительность
+            //определен один диапазон и не определена длительность
             FindAllocationWithException<ArgumentException>(scheduler, null, finish, null, null, requiredAmount, kind);
 
-            //определен только один горизонт и не определена максимальная длительность
+            //определен один диапазон и не определена максимальная длительность
             FindAllocationWithException<ArgumentException>(scheduler, null, finish, null, new Interval<TimeSpan>(Point<TimeSpan>.Left(TimeSpan.FromHours(1)), null), requiredAmount, kind);
+
+            tmpSch.Exclude(left.AddDays(9).AddHours(14).Left(true), left.AddDays(9).AddHours(16).Right(false), AmountedData.Appoint("222", 1));
+
+
+            TestTestDataScheduller();
+
+
+            scheduler.FindAllocation
+                (
+                    new Interval<DateTime>(left.Left(true), left.AddDays(10).Right(true)),
+                    new Interval<DateTime>(left.AddDays(10).Left(true), left.AddDays(20).Right(true)),
+                    null,
+                    new Interval<TimeSpan>(TimeSpan.FromHours(8), TimeSpan.FromHours(12), true, true),
+                    requiredAmount,
+                    kind
+                );
+
+            scheduler.FindAllocation(new Interval<DateTime>(left.Left(true), left.AddDays(10).Right(true)), finish, totalDuration, null, requiredAmount, kind);
 
 
 
@@ -220,6 +238,37 @@ namespace ConsoleApplication1.TestData
             return environment;
 
         }
+
+        private static TimeSpan PrecessDurationByAmount(TimeSpan fullduration, Appointment fullamount, Appointment amount)
+        {
+            var k = amount.Value/fullamount.Value;
+            return TimeSpan.FromTicks(Convert.ToInt64(Math.Round(fullduration.Ticks * k)));
+        }
+
+
+        private static void TestTestDataScheduller()
+        {
+            var calendar = new TestDataCalendar();
+            var schedule = calendar.CreateSchedule(TimeSpan.FromMinutes(15));
+            var scheduler = new TestDataScheduller(schedule);
+
+            var left = DateTime.Today;
+
+            schedule.Exclude(left.AddDays(9).AddHours(14).Left(true), left.AddDays(9).AddHours(15).Right(false), new TestData("14-15"));
+            schedule.Exclude(left.AddDays(9).AddHours(16).Left(true), left.AddDays(9).AddHours(17).Right(false), new TestData("16-17"));
+
+            scheduler.FindAllocation
+                (
+                    new Interval<DateTime>(left.Left(true), left.AddDays(10).Right(true)),
+                    new Interval<DateTime>(left.AddDays(10).Left(true), left.AddDays(20).Right(true)),
+                    null,
+                    new Interval<TimeSpan>(TimeSpan.FromHours(8), TimeSpan.FromHours(12), true, true),
+                    new TestAppointment("123", 6), 
+                    SchedulerKind.LeftToRight
+                );
+
+        }
+
 
         static void FindAllocationWithException<T>(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment> scheduler, Interval<DateTime> start, Interval<DateTime> finish, Interval<TimeSpan> totalDuration, Interval<TimeSpan> duration, Appointment amount, SchedulerKind kind)
             where T : Exception
@@ -249,9 +298,26 @@ namespace ConsoleApplication1.TestData
             }
         }
 
-        private static IteratorInstructions ProcessInstructionsRequest(TimeSpan duration, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount, out Appointment amount)
+        private static Appointment ProcessAmountRequest(TimeSpan duration, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
         {
-            amount = new Appointment(requiredamount.Appointee, duration.TotalHours);
+            if (!(data is AmountedData))
+                return null;
+
+            return null;
+        }
+
+        private static IteratorInstructions ProcessInstructionsRequest(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
+        {
+            if (!(data is AmountedData))
+                return IteratorInstructions.Skip;
+            
+            var amountedData = ((AmountedData)data);
+            if(amountedData.Appointments.Any(x => x.Appointee != requiredamount.Appointee))
+                return IteratorInstructions.Reject;
+            
+            if(amountedData.Available <= 0)
+                return IteratorInstructions.Skip;
+
             return IteratorInstructions.Accept;
         }
     }
@@ -295,7 +361,8 @@ namespace ConsoleApplication1.TestData
 
     public struct AmountedData : PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData
     {
-        private readonly IEnumerable<Appointment> _appointments; 
+        public IEnumerable<Appointment> Appointments { get; }
+
         public int Available { get; }
 
         public AmountedData(int totalAmount) : this(new Appointment[0], totalAmount)
@@ -303,7 +370,7 @@ namespace ConsoleApplication1.TestData
 
         private AmountedData(IEnumerable<Appointment> appointments, int available)
         {
-            _appointments = appointments;
+            Appointments = appointments;
             Available = available;
         }
 
@@ -315,7 +382,7 @@ namespace ConsoleApplication1.TestData
 
         public AmountedData Include(AmountedData amountedData)
         {
-            var appointments = _appointments.Concat(amountedData._appointments)
+            var appointments = Appointments.Concat(amountedData.Appointments)
                 .GroupBy(x => x.Appointee)
                 .Select(x => new Appointment(x.Key, x.Sum(y => y.Value)))
                 .Where(x => x.Value != 0)
@@ -334,7 +401,7 @@ namespace ConsoleApplication1.TestData
 
         public AmountedData Exclude(AmountedData amountedData)
         {
-            var appointments = _appointments.Concat(amountedData._appointments.Select(x => x.Invert()))
+            var appointments = Appointments.Concat(amountedData.Appointments.Select(x => x.Invert()))
                 .GroupBy(x => x.Appointee)
                 .Select(x => new Appointment(x.Key, x.Sum(y => y.Value)))
                 .Where(x => x.Value != 0)
@@ -347,8 +414,8 @@ namespace ConsoleApplication1.TestData
 
         public override string ToString()
         {
-            var appointed = _appointments.Sum(x => x.Value);
-            return $"статок: {Available}, Распределено (сумма): [{appointed} на {_appointments.Count()} 'кусков']";
+            var appointed = Appointments.Sum(x => x.Value);
+            return $"статок: {Available}, Распределено (сумма): [{appointed} на {Appointments.Count()} 'кусков']";
         }
 
         public static AmountedData Appoint(string appointee, int amount)
@@ -357,7 +424,195 @@ namespace ConsoleApplication1.TestData
         }
     }
 
-    class Appointment : IComparable<Appointment>
+
+
+    class TestData : PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData
+    {
+        public override string ToString()
+        {
+            return $"'{Appointee}'";
+        }
+
+        public string Appointee;
+
+        public TestData(string appointee)
+        {
+            Appointee = appointee;
+        }
+
+        public PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Include(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData availabilityData)
+        {
+            var testdata = availabilityData as TestData ?? new TestData(null);
+            if (Appointee == null || Equals(Appointee, testdata.Appointee))
+                return new TestData(testdata.Appointee);
+
+            throw new NotSupportedException();
+        }
+
+        public PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData availabilityData)
+        {
+            var testdata = availabilityData as TestData ?? new TestData(null);
+            if (Appointee == null && Equals(Appointee, testdata.Appointee))
+                return new TestData(null);
+
+            throw new NotSupportedException();
+        }
+    }
+
+
+    abstract class AvailabilityCalendarAdapter<T> : Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.CalendarAdapter
+        where T : PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData
+    {
+        public override void Define(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ICalendarItems container, Point<DateTime> left, Point<DateTime> right)
+        {
+            container.Include(left, right, GetDefinedData());
+        }
+
+        protected abstract T GetDefinedData();
+
+        protected override DateTime Define(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ICalendarItems container, DateTime left, DateTime right)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Include(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
+        {
+            return a == null
+                ? b
+                : b == null
+                    ? a
+                    : a.Include(b);
+        }
+
+        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
+        {
+            return a == null
+                ? b
+                : b == null
+                    ? a
+                    : a.Exclude(b);
+        }
+    }
+
+    class TestAppointment : IComparable<TestAppointment>
+    {
+        public override string ToString()
+        {
+            return $"'{Appointee}': {Hours} ч.";
+        }
+
+        public string Appointee;
+
+        public double Hours;
+
+        public TestAppointment()
+        {
+        }
+
+        public TestAppointment(string appointee, double hours)
+        {
+            Appointee = appointee;
+            Hours = hours;
+        }
+
+        public int CompareTo(TestAppointment other)
+        {
+            if(other.Appointee != Appointee)
+                throw new NotSupportedException();
+            return Hours.CompareTo(other.Hours);
+        }
+    }
+
+    class TestDataCalendarAdapter : AvailabilityCalendarAdapter<TestData>
+    {
+        protected override TestData GetDefinedData()
+        {
+            return new TestData(null);
+        }
+    }
+
+    class TestDataCalendar : PlanningEnvironment<DateTime, TimeSpan>.AvailabilityCalendar
+    {
+        public TestDataCalendar() : base(new TestDataCalendarAdapter())
+        {
+        }
+    }
+
+    class TestDataScheduller : Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<TestAppointment>
+    {
+        static TestDataScheduller()
+        {
+            AddAmount = Add;
+            SubstAmount = Subst;
+        }
+
+        public TestDataScheduller(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ISchedule schedule) : base(schedule, ResponseInstructions, ResponseAmount, ResponseDuration)
+        {}
+
+        private static TimeSpan ResponseDuration(TimeSpan fullduration, TestAppointment fullamount, TestAppointment amount)
+        {
+            var k = amount.Hours / fullamount.Hours;
+            return TimeSpan.FromTicks(Convert.ToInt64(Math.Round(fullduration.Ticks * k)));
+        }
+
+        static TestAppointment Add(TestAppointment a, TestAppointment b)
+        {
+            if (a == null && b == null)
+                return null;
+
+            if (a == null)
+                return b;
+
+            if (b == null)
+                return a;
+
+            if (a.Appointee != b.Appointee)
+                throw new NotSupportedException();
+
+            return new TestAppointment(a.Appointee, a.Hours + b.Hours);
+        }
+
+        static TestAppointment Subst(TestAppointment a, TestAppointment b)
+        {
+            if (a == null && b == null)
+                return null;
+
+            if (a == null)
+                return new TestAppointment(b.Appointee, -b.Hours);
+
+            if (b == null)
+                return a;
+
+            if (a.Appointee != b.Appointee)
+                throw new NotSupportedException();
+
+            return new TestAppointment(a.Appointee, a.Hours - b.Hours);
+        }
+
+        private static IteratorInstructions ResponseInstructions(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
+        {
+            var testData = data as TestData;
+            if(testData == null || requiredamount?.Appointee == null)
+                throw new NotSupportedException();
+
+            if (testData.Appointee == requiredamount.Appointee)
+                return IteratorInstructions.Skip;
+
+            return testData.Appointee == null 
+                ? IteratorInstructions.Accept 
+                : IteratorInstructions.Reject;
+        }
+
+        private static TestAppointment ResponseAmount(TimeSpan duration, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
+        {
+            if(ResponseInstructions(data, requiredamount) != IteratorInstructions.Accept)
+                throw new NotSupportedException();
+
+            return new TestAppointment(requiredamount.Appointee, duration.TotalHours);
+        }
+    }
+
+    public class Appointment : IComparable<Appointment>
     {
         public Appointment(string appointee, double value)
         {
@@ -382,34 +637,11 @@ namespace ConsoleApplication1.TestData
         }
     }
 
-    class AmountedDataCalendarItemsAdapter : Calendars<DateTime,TimeSpan,PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData>.CalendarAdapter
+    class AmountedDataCalendarItemsAdapter : AvailabilityCalendarAdapter<AmountedData>
     {
-        public override void Define(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime,TimeSpan>.IAvailabilityData>.ICalendarItems container, Point<DateTime> left, Point<DateTime> right)
+        protected override AmountedData GetDefinedData()
         {
-            container.Include(left, right, new AmountedData(10));
-        }
-
-        protected override DateTime Define(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ICalendarItems container, DateTime left, DateTime right)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Include(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
-        {
-            return a == null
-                ? b
-                : b == null
-                    ? a
-                    : a.Include(b);
-        }
-
-        public override PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData a, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData b)
-        {
-            return a == null
-                ? b
-                : b == null
-                    ? a
-                    : a.Exclude(b);
+            return new AmountedData(10);
         }
     }
 
@@ -442,105 +674,5 @@ namespace ConsoleApplication1.TestData
         {
             return a == null ? b : a.Exclude(b);
         }
-    }
-
-    public class Scene : IScene
-    {
-        private Satisfaction _satisfaction;
-
-        public Scene()
-        { }
-
-        private Scene(IScene original)
-        {
-            Original = original;
-        }
-
-        public IScene Original { get; }
-
-        public ISatisfaction Satisfaction => _satisfaction ?? (_satisfaction = new Satisfaction(((Scene)Original)._satisfaction?.Value ?? 0));
-
-        private readonly List<INegotiator> _negotiators = new List<INegotiator>();
-        public IEnumerable<INegotiator> Negotiators
-        {
-            get
-            {
-                lock (_negotiators)
-                {
-                    return _negotiators.ToArray();
-                }
-            }
-        }
-
-        public INegotiator Negotiator(IAgent agent)
-        {
-            lock (_negotiators)
-            {
-                var negotiator = _negotiators.FirstOrDefault(x => x.Agent == agent)
-                    ?? CreateNegotiator(agent);
-
-                return negotiator;
-            }
-        }
-
-        private INegotiator CreateNegotiator(IAgent agent)
-        {
-            var negotiator = agent.Negotiator(this);
-            _negotiators.Add(negotiator);
-            return negotiator;
-        }
-
-        public IScene Branch()
-        {
-            return new Scene(this);
-        }
-
-        public void MergeToOriginal()
-        {
-        }
-
-    }
-
-    public interface ISatisfaction<T> : ISatisfaction, IComparable<ISatisfaction<T>>
-        where T : IComparable<T>
-    {
-        T Delta { get; }
-        T Value { get; }
-    }
-
-
-    public abstract class Satisfaction<T> : ISatisfaction<T>
-        where T : IComparable<T>
-    {
-        protected T _original;
-
-        protected Satisfaction(T original)
-        {
-            _original = original;
-        }
-
-        public T Delta { get; set; }
-        public abstract T Value { get; }
-
-        public int CompareTo(ISatisfaction<T> other)
-        {
-            return other == null ? -1 : Value.CompareTo(other.Value);
-        }
-
-        public int CompareTo(ISatisfaction other)
-        {
-            return CompareTo(other as ISatisfaction<T>);
-        }
-    }
-
-
-
-    public class Satisfaction : Satisfaction<double>
-    {
-        public Satisfaction(double original) : base(original)
-        {
-        }
-
-        public override double Value => _original + Delta;
     }
 }

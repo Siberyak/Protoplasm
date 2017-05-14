@@ -9,7 +9,7 @@ namespace Protoplasm.PointedIntervals
     /// </summary>
     /// <typeparam name="TBound"></typeparam>
     /// <typeparam name="TData"></typeparam>
-    public abstract class PointedInterval<TBound, TData> : Interval<TBound>
+    public class PointedInterval<TBound, TData> : Interval<TBound>
         where TBound : struct, IComparable<TBound>
     {
 
@@ -43,11 +43,11 @@ namespace Protoplasm.PointedIntervals
         /// <param name="right"></param>
         /// <param name="rightIncluded"></param>
         /// <param name="data"></param>
-        protected PointedInterval(TBound? left, bool leftIncluded, TBound? right, bool rightIncluded, TData data)
+        protected internal PointedInterval(TBound? left, bool leftIncluded, TBound? right, bool rightIncluded, TData data)
             : this(left.HasValue ? Point<TBound>.Left(left.Value, leftIncluded) : Point<TBound>.Left(), right.HasValue ? Point<TBound>.Right(right.Value, rightIncluded) : Point<TBound>.Right(), data)
         { }
 
-        protected PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
+        protected internal PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
             : base(left, right)
         {
 

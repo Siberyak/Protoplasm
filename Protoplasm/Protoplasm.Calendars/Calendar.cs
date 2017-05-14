@@ -72,28 +72,10 @@ namespace Protoplasm.Calendars
             {
                 Define(left, right);
 
-                var calendarItems = _calendarItems;
-                return Get(calendarItems, left, right);
+                var calendarItems = _calendarItems.Get(left, right);
+                return calendarItems;
             }
 
-            public static IEnumerable<CalendarItem> Get(IEnumerable<CalendarItem> calendarItems, Point<TTime> left, Point<TTime> right)
-            {
-                var result = calendarItems.SkipWhile(x => !x.Contains(left)).TakeWhile(x => x.Left < right).ToList();
-
-                var first = result.FirstOrDefault();
-                if (first != null && first.Left != left)
-                {
-                    result[0] = new CalendarItem(left, first.Right, first.Data);
-                }
-
-                var last = result.LastOrDefault();
-                if (last != null && last.Right != right)
-                {
-                    result[result.Count - 1] = new CalendarItem(last.Left, right, last.Data);
-                }
-
-                return result;
-            }
 
             public INode<ICalendarItem> Find(Point<TTime> point)
             {
@@ -142,7 +124,7 @@ namespace Protoplasm.Calendars
                 }
             }
 
-            private void Define(CalendarItem undefinedInterval)
+            private void Define(ICalendarItem undefinedInterval)
             {
                 if (undefinedInterval == null)
                     throw new ArgumentNullException(nameof(undefinedInterval));
