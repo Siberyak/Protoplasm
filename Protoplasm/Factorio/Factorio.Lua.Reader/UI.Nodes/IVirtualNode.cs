@@ -4,6 +4,6 @@ namespace Factorio.Lua.Reader
     {
         object NodeData { get; }
 
-        string Icon { get; }
+        int IconIndex { get; }
     }
 }

@@ -9,12 +9,6 @@ namespace Factorio.Lua.Reader
 
         object[] ILocalized._LocalisedName => null;
 
-        public override string LocalizedName => this.LocalisedName() ?? Name;
-
-        public override string ToString()
-        {
-            return $"{Type}: '{LocalizedName}'" ?? base.ToString();
-        }
 
         [JsonProperty("flags")]
         public object _Flags { get; set; }

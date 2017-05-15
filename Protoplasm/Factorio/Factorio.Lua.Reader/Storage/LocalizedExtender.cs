@@ -7,6 +7,9 @@ namespace Factorio.Lua.Reader
     {
         public static string LocalisedName(this ILocalized localized)
         {
+            if (localized == null)
+                return null;
+
             string result = null;
             var args = localized._LocalisedName ?? new object[0];
             if (args.Length > 0)

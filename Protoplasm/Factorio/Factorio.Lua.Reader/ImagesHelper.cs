@@ -118,17 +118,43 @@ namespace Factorio.Lua.Reader
             return index32.HasValue ? Images32.Images[index32.Value] : null;
         }
 
+        public static Image Image32(this IIconed data)
+        {
+            var index32 = data.ImageIndex32();
+            return index32 == -1 ? null : Images32.Images[index32];
+        }
+
         public static Image Image32(this Recipe recipe)
         {
             var index32 = recipe.ImageIndex32();
             return index32 == -1 ? null : Images32.Images[index32];
         }
 
-        public static int ImageIndex32(this Recipe recipe)
+        public static Image Image32(this Item part)
         {
-            var imageIndex = ImagesHelper.GetIndex32(recipe._Icon, k => IconLoader(recipe.Storage, k))
-                             ?? ImagesHelper.GetIndex32(recipe.Icons, "MixedIcon: " + recipe.Name, d => MixedIconLoader(recipe.Storage, d))
-                             ?? ImagesHelper.GetIndex32(recipe.Icon, k => IconLoader(recipe.Storage, k))
+            var index32 = part.ImageIndex32();
+            return index32 == -1 ? null : Images32.Images[index32];
+        }
+
+        public static int ImageIndex32(this IIconed data)
+        {
+            var imageIndex = GetIndex32(data._Icon, k => IconLoader(data.Storage, k)) ?? -1;
+            return imageIndex;
+        }
+
+        public static int ImageIndex32(this Recipe data)
+        {
+            var imageIndex = ImagesHelper.GetIndex32(data._Icon, k => IconLoader(data.Storage, k))
+                             ?? ImagesHelper.GetIndex32(data.Icons, "MixedIcon: " + data.Name, d => MixedIconLoader(data.Storage, d))
+                             ?? ImagesHelper.GetIndex32(data.Icon, k => IconLoader(data.Storage, k))
+                             ?? -1;
+            return imageIndex;
+        }
+
+        public static int ImageIndex32(this Item data)
+        {
+            var imageIndex = ImagesHelper.GetIndex32(data._Icon, k => IconLoader(data.Storage, k))
+                             ?? ImagesHelper.GetIndex32(data.Icons, "MixedIcon: " + data.Name, d => MixedIconLoader(data.Storage, d))
                              ?? -1;
             return imageIndex;
         }

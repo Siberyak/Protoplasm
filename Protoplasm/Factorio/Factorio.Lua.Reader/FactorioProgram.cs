@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Factorio.Lua.Reader
 {
-    internal class Program
+    internal class FactorioProgram
     {
 
         [STAThread]
@@ -49,19 +49,8 @@ namespace Factorio.Lua.Reader
             UserLookAndFeel.Default.SetSkinStyle("Visual Studio 2013 Blue");
 
 
-            Application.Run(new Form1());
-
-
-            //var current = Environment.CurrentDirectory;
-            //Environment.CurrentDirectory = @"C:\Games\Steam\steamapps\common\Factorio\data\core\lualib\";
-            //var lua = new Lua();
-            //lua["container_module_loader"] = null;
-            //var tmp = Directory.GetFiles(Environment.CurrentDirectory, "*.lua").Select(x => lua.DoFile(x)).ToArray();
-
-            //lua.DoFile(@".\data.lua");
-            //Environment.CurrentDirectory = @"C:\Games\Steam\steamapps\common\Factorio\data\base\";
-            //lua.DoFile(@".\data.lua");
-            //var table = lua.GetTable("data");
+            //Application.Run(new Form1());
+            Application.Run(new RibbonForm2());
         }
 
         public static void Load()

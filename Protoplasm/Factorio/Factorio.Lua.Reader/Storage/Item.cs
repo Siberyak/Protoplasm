@@ -7,16 +7,17 @@ using Protoplasm.Utils.Graph;
 namespace Factorio.Lua.Reader
 {
     [JsonObject("item", MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Item : TypedNamedBase, ILocalized
+    public partial class Item : TypedNamedIconedBase, ILocalized, IRecipePart
     {
-        string ILocalized.Category => "item-name";
-        public override string LocalizedName => this.LocalisedName() ?? PlaceResult?.LocalisedName() ?? Name;
-        public override string ToString()
-        {
-            return $"{Type}: '{LocalizedName}'" ?? base.ToString();
-        }
+        public virtual string Category => "item-name";
+        public override string LocalizedName => this.LocalisedName()
+            ?? PlaceResult?.LocalisedName()
+            ?? PlaceAsEquipmentResult?.LocalisedName()
+            ?? Name;
 
         public Entity PlaceResult => References.OfType<PlaceResultEdge>().FirstOrDefault()?.Entity;
+        public Equipment PlaceAsEquipmentResult => References.OfType<PlaceAsEquipmentResultEdge>().FirstOrDefault()?.Equipment;
+        public Tile PlaceAsTileResult => References.OfType<PlaceAsTileResultEdge>().FirstOrDefault()?.Tile;
 
         private string _subgroup;
 
@@ -29,8 +30,6 @@ namespace Factorio.Lua.Reader
         [JsonProperty("stack_size")]
         public uint _StackSize { get; set; }
 
-        [JsonProperty("icon")]
-        public string _Icon { get; set; }
 
         [JsonProperty("subgroup")]
         public string _Subgroup
@@ -50,6 +49,13 @@ namespace Factorio.Lua.Reader
 
         [JsonProperty("localised_name")]
         public object[] _LocalisedName { get; set; }
+
+        [JsonProperty("place_as_tile")]
+        public object _PlaceAsTile { get; set; }
+
+        [JsonProperty("icons")]
+        public IconInfo[] Icons { get; set; }
+
         public override void ProcessLinks()
         {
             base.ProcessLinks();
@@ -64,6 +70,25 @@ namespace Factorio.Lua.Reader
                 if (entity != null)
                 {
                     Storage.Link<PlaceResultEdge>(this, entity);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(_PlacedAsEquipmentResult))
+            {
+                var equipment = Storage.Nodes<Equipment>(x => x.Name == _PlaceResult).FirstOrDefault();
+                if (equipment != null)
+                {
+                    Storage.Link<PlaceAsEquipmentResultEdge>(this, equipment);
+                }
+            }
+
+            if (_PlaceAsTile != null)
+            {
+                var result = ((JObject) _PlaceAsTile)["result"].Value<string>();
+                var tile = Storage.Nodes<Tile>(x => x.Name == result).FirstOrDefault();
+                if (tile != null)
+                {
+                    Storage.Link<PlaceAsTileResultEdge>(this, tile);
                 }
             }
         }

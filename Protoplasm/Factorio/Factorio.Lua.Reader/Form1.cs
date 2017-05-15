@@ -18,7 +18,7 @@ namespace Factorio.Lua.Reader
 {
     public partial class Form1 : Form
     {
-        private Storage _storage;
+        private Storage _storage => Storage.Current;
 
         public Form1()
         {
@@ -27,10 +27,6 @@ namespace Factorio.Lua.Reader
 
         void LoadData()
         {
-            var flag = false;
-            if (flag)
-                Program.Load();
-            _storage = Storage.Load();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -72,11 +68,7 @@ namespace Factorio.Lua.Reader
         private void GetStateImage(object sender, GetStateImageEventArgs e)
         {
             var data = treeList1.GetDataRecordByNode(e.Node);
-            var icon = (data as IVirtualNode)?.Icon;
-            if(icon == null)
-                return;
-
-            e.NodeImageIndex = ImagesHelper.GetIndex32(icon, IconLoader) ?? -1;
+            e.NodeImageIndex = (data as IVirtualNode)?.IconIndex ?? -1;
 
         }
 
@@ -96,9 +88,21 @@ namespace Factorio.Lua.Reader
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
-            var form2 = new Form2();
-            form2.Controls.Add(new RecipiesControl(_storage) {Dock = DockStyle.Fill});
-            form2.ShowDialog();
+            //var form2 = new Form2();
+            //var recipiesControl = new RecipiesControl(_storage) {Dock = DockStyle.Fill};
+            //recipiesControl.Selected += RecipeSelected;
+            //form2.Controls.Add(recipiesControl);
+            //form2.ShowDialog();
+
+            var recipe = RecipiesControl.SelectRecipe();
+
+        }
+
+        private void RecipeSelected(object sender, EventArgs e)
+        {
+            var control = (RecipiesControl) sender;
+            var recipe = control.Recipe;
+            ((Form)control.Parent).DialogResult = DialogResult.OK;
         }
     }
 

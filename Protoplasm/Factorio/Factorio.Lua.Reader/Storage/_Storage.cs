@@ -95,8 +95,26 @@ namespace Factorio.Lua.Reader
             return list;
         }
 
-        public static Storage Load()
+        public static Storage Current
         {
+            get
+            {
+                lock (_locker)
+                {
+                    return _current ?? (_current = Load());
+                }
+            }
+        }
+
+        static readonly object _locker = new object();
+
+        private static Storage Load()
+        {
+
+            var flag = false;
+            if (flag)
+                FactorioProgram.Load();
+
 
             _typesAttributes = typeof(Base).Assembly.GetTypes()
                 .Select(x => new { Type = x, Attribute = x.Attribute<JsonObjectAttribute>() })
@@ -627,6 +645,8 @@ namespace Factorio.Lua.Reader
             {"entity-name", _entityRegex },
             {"item-name", _itemRegex },
         };
+
+        private static Storage _current;
     }
 
     //class FF : INodesFactory, IEdgesFactory

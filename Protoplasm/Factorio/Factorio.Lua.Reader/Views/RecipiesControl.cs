@@ -18,19 +18,18 @@ namespace Factorio.Lua.Reader
 {
     public partial class RecipiesControl : UserControl
     {
-        private readonly Storage _storage;
+        private Storage _storage => Storage.Current;
 
         public RecipiesControl()
         {
             InitializeComponent();
             propertyGridControl1.AutoGenerateRows = true;
-        }
-
-        public RecipiesControl(Storage storage) : this()
-        {
-            _storage = storage;
             MinimumSize = new Size(80 * 6, 400);
         }
+
+
+        public event EventHandler Selected;
+        public Recipe Recipe;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -62,6 +61,7 @@ namespace Factorio.Lua.Reader
                         var button = Add((Control)itemGroupControl.Tag, recipe, groupIndex);
                         button.Tag = recipe;
                         button.Click += RecipeButtonClick;
+                        button.DoubleClick += RecipeButtonDoubleClick;
                     }
 
                     Point point = (Point) ((Control) itemGroupControl.Tag).Tag;
@@ -71,11 +71,18 @@ namespace Factorio.Lua.Reader
             }
         }
 
+        private void RecipeButtonDoubleClick(object sender, EventArgs e)
+        {
+            RecipeButtonClick(sender, e);
+            OnSelected();
+        }
+
         private void RecipeButtonClick(object sender, EventArgs e)
         {
             var recipe = ((Control) sender).Tag as Recipe;
             propertyGridControl1.SelectedObject = recipe;
             recipeView1.Recipe = recipe;
+            Recipe = recipe;
         }
 
         private static CheckButton AddButton(Control holdedBy, int perLine, int dim, ImageCollection images, int imageIndex, string toolTip, int groupIndex)
@@ -146,6 +153,29 @@ namespace Factorio.Lua.Reader
             var button = AddButton(holdedBy, perLine, dim, images, imageIndex, toolTip, groupIndex+100);
             button.Tag = new PanelControl() { BorderStyle = BorderStyles.NoBorder, Dock = DockStyle.Fill, Tag = new Point(0, 0) };
             return button;
+        }
+
+        protected virtual void OnSelected()
+        {
+            Selected?.Invoke(this, EventArgs.Empty);
+        }
+
+        public static Recipe SelectRecipe()
+        {
+            var form = new Form() {MinimumSize = new Size(850,950)};
+            //form.SizeChanged += (sender, args) => form.Text = $"{form.Size}";
+            var control = new RecipiesControl { Dock = DockStyle.Fill };
+            control.Selected += OnRecipeSelected;
+            form.Controls.Add(control);
+            var dialogResult = form.ShowDialog();
+            return dialogResult == DialogResult.OK
+                ? control.Recipe
+                : null;
+        }
+
+        private static void OnRecipeSelected(object sender, EventArgs e)
+        {
+            ((Form)((Control)sender).Parent).DialogResult = DialogResult.OK;
         }
     }
 

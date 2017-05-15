@@ -17,9 +17,11 @@ namespace Factorio.Lua.Reader
 
         public override object NodeData => Data;
 
-        public override string Icon => (Data as IRecipePart)?._Icon;
-
-
+        public override int IconIndex =>
+            (Data as Recipe)?.ImageIndex32()
+            ?? (Data as Item)?.ImageIndex32()
+            ?? (Data as IIconed)?.ImageIndex32()
+            ?? -1;
     }
 
     abstract class VirtualTreeListData : TreeList.IVirtualTreeListData, IVirtualNode
@@ -50,6 +52,6 @@ namespace Factorio.Lua.Reader
 
         public abstract object NodeData { get; }
 
-        public virtual string Icon { get; } = null;
+        public virtual int IconIndex { get; } = -1;
     }
 }

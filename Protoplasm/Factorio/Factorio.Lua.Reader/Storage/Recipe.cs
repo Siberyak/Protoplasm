@@ -22,11 +22,6 @@ namespace Factorio.Lua.Reader
         [JsonProperty("localised_name")]
         public object[] _LocalisedName { get; set; }
 
-        public override string ToString()
-        {
-            return $"{Type}: '{LocalizedName}'" ?? base.ToString();
-        }
-
         public string Icon => _Icon ?? (Results[0] as IRecipePart)?._Icon;
 
         public ItemSubGroup SubGroup => References.OfType<RecipeItemSubGroupEdge>().FirstOrDefault()?.ItemSubGroup;
@@ -37,6 +32,14 @@ namespace Factorio.Lua.Reader
             {
                 return References.OfType<RecipePartEdge>().OrderBy(x => x.Direction)
                     .ToArray();
+            }
+        }
+
+        public IRecipePart[] AllParts
+        {
+            get
+            {
+                return Parts.Select(x => x.Part).Union(Results).ToArray();
             }
         }
 

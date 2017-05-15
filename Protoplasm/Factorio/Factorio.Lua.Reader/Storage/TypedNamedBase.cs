@@ -8,11 +8,11 @@ namespace Factorio.Lua.Reader
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        public virtual string LocalizedName => Name;
+        public virtual string LocalizedName => (this as ILocalized)?.LocalisedName() ?? Name;
 
         public override string ToString()
         {
-            return $"{Type}: '{Name}'" ?? base.ToString();
+            return $"{Type}: '{LocalizedName}'" ?? base.ToString();
         }
     }
 }

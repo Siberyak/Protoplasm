@@ -9,16 +9,13 @@ using Newtonsoft.Json.Linq;
 namespace Factorio.Lua.Reader
 {
     [JsonObject("technology", MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Technology : TypedNamedBase, ILocalized
+    public partial class Technology : TypedNamedIconedBase, ILocalized
     {
         string ILocalized.Category => "technology-name";
-        public override string LocalizedName => this.LocalisedName() ??  Name;
 
         [JsonProperty("order")]
         public string Order { get; set; }
 
-        [JsonProperty("icon")]
-        public string icon { get; set; }
 
         [JsonProperty("prerequisites")]
         public string[] prerequisites { get; set; }
