@@ -1,13 +1,29 @@
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
+using DevExpress.XtraEditors;
 using DevExpress.XtraLayout;
+using DevExpress.XtraLayout.Utils;
 
 namespace Factorio.Lua.Reader
 {
     public interface ILayoutedView
     {
         LayoutControl LayoutControl { get; }
+    }
+
+    public interface ISelectorView
+    {
+        event EventHandler Selected;
+
+        void AfterLoad();
+    }
+
+    public interface ISelectorView<out TResult> : ISelectorView
+    {
+        TResult Selection { get; }
     }
 
     public static class LayoutControlExtender
@@ -24,7 +40,11 @@ namespace Factorio.Lua.Reader
 
         public static void TerminateLayout(this LayoutControlGroup control)
         {
-            control.Add(new EmptySpaceItem() { Location = new Point(0, control.Height - 10) });
+            var emptySpaceItem = new EmptySpaceItem { Location = new Point(0, control.Height - 10) };
+            var lastItem = control.Items.LastOrDefault();
+            control.Add(emptySpaceItem);
+            if (lastItem != null)
+                emptySpaceItem.Move(lastItem, InsertType.Bottom);
         }
 
         public static void AddSeparator(this ILayoutedView control)
@@ -41,6 +61,50 @@ namespace Factorio.Lua.Reader
             control.Add(new SimpleSeparator() { Location = NextLocation(control) });
         }
 
+        public static LayoutControlItem AddControl<T>(this ILayoutedView control, Action<LayoutControlItem, T> init)
+            where T : Control, new()
+        {
+            return control.LayoutControl.AddControl(init);
+        }
+
+        public static LayoutControlItem AddControl<T>(this LayoutControl control, Action<LayoutControlItem, T> init)
+            where T : Control, new()
+        {
+            var edit = new T {Name = $"edit{Guid.NewGuid()}"};
+            var item = new LayoutControlItem(control, edit) {Name = $"item{Guid.NewGuid()}"};
+
+            init?.Invoke(item, edit);
+
+            control.Root.Add(item);
+            return item;
+        }
+
+
+        public static LayoutControlItem AddImage(this ILayoutedView control, Image image, Point? location = null)
+        {
+            return control.LayoutControl.AddImage(image);
+        }
+
+        public static LayoutControlItem AddImage(this LayoutControl control, Image image, Point? location = null)
+        {
+            var loc = location ?? control.NextLocation();
+
+            var edit = new PictureEdit {Image = image, Size = image.Size, MinimumSize = image.Size, MaximumSize = image.Size, Name = $"edit{Guid.NewGuid()}", ReadOnly = true};
+            edit.BackColor = Color.Transparent;
+
+            var item = new LayoutControlItem(control, edit);
+
+            item.TextVisible = false;
+            item.Name = $"item{Guid.NewGuid()}";
+            item.Location = loc;
+            item.Size = image.Size;
+            item.MaxSize = image.Size;
+            item.MinSize = image.Size;
+
+            control.Root.Add(item);
+            return item;
+        }
+
         public static SimpleLabelItem AddLabel(this ILayoutedView control, string text, int? imageIndex = null, Color? foreColor = null)
         {
             return control.LayoutControl.AddLabel(text, imageIndex, foreColor);
@@ -54,7 +118,7 @@ namespace Factorio.Lua.Reader
         {
 
             var item = new SimpleLabelItem();
-            ((ISupportInitialize) item).BeginInit();
+            ((ISupportInitialize)item).BeginInit();
             item.AllowHotTrack = false;
 
             if (foreColor.HasValue)
@@ -68,13 +132,13 @@ namespace Factorio.Lua.Reader
 
             item.Location = location;
 
-            item.Name = "simpleLabelItem2";
+            item.Name = $"simpleLabelItem{Guid.NewGuid()}";
             item.Text = text;
             item.ImageIndex = imageIndex ?? -1;
 
             control.Add(item);
 
-            ((ISupportInitialize) (item)).EndInit();
+            ((ISupportInitialize)(item)).EndInit();
             return item;
         }
 

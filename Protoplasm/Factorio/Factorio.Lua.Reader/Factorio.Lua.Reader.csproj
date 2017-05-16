@@ -120,6 +120,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Views\CraftersView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\CraftersView.Designer.cs">
+      <DependentUpon>CraftersView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\LayoutedView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -211,6 +217,7 @@
     <Compile Include="UI.Nodes\VirtualTreeListData.cs" />
     <Compile Include="Views\CraftInfo.cs" />
     <Compile Include="Views\Part.cs" />
+    <Compile Include="Views\ViewsExtender.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

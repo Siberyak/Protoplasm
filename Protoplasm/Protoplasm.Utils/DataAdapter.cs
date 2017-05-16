@@ -3,8 +3,7 @@ using System.Diagnostics;
 
 namespace Protoplasm.Utils
 {
-    public struct DataAdapter<T> : IEquatable<DataAdapter<T>>
-        where T : IComparable<T>
+    public struct DataAdapter<T> : IEquatable<DataAdapter<T>> where T : IComparable<T>
     {
         private static bool _selfTested;
 
@@ -87,6 +86,15 @@ namespace Protoplasm.Utils
             Value = value;
         }
 
+        public DataAdapter<T> Max(DataAdapter<T> other)
+        {
+            return this >= other ? this : other;
+        }
+        public DataAdapter<T> Min(DataAdapter<T> other)
+        {
+            return this <= other ? this : other;
+        }
+
         public static implicit operator DataAdapter<T>(T value)
         {
             return !Equals(value, default(T)) ? new DataAdapter<T>(value) : default(DataAdapter<T>);
@@ -136,5 +144,14 @@ namespace Protoplasm.Utils
             return a.Value.CompareTo(b.Value) < 0;
         }
 
+        public static T Min(T a, T b)
+        {
+            return a.CompareTo(b) <= 0 ? a : b;
+        }
+
+        public static T Max(T a, T b)
+        {
+            return a.CompareTo(b) >= 0 ? a : b;
+        }
     }
 }

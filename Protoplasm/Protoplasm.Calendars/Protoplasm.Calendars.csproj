@@ -52,7 +52,7 @@
     <Compile Include="Contracts\ICalendarItemsAdapter.cs" />
     <Compile Include="Contracts\ISchedule.cs" />
     <Compile Include="Contracts\ICalendarItem.cs" />
-    <Compile Include="IteratorInstructions.cs" />
+    <Compile Include="IteratorInstruction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schedule.cs" />
     <Compile Include="Scheduler.cs" />

@@ -31,28 +31,26 @@
             this.ribbon = new DevExpress.XtraBars.Ribbon.RibbonControl();
             this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             this._setCrafterButtonItem = new DevExpress.XtraBars.BarButtonItem();
+            this.barButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
             this.ribbonPage1 = new DevExpress.XtraBars.Ribbon.RibbonPage();
             this.ribbonPageGroup1 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.ribbonPageGroup2 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
+            this.ribbonPageGroup3 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
             this.repositoryItemTimeEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemTimeEdit();
             this.ribbonStatusBar = new DevExpress.XtraBars.Ribbon.RibbonStatusBar();
             this._craftsGrid = new DevExpress.XtraGrid.GridControl();
-            this._craftsView = new DevExpress.XtraGrid.Views.Layout.LayoutView();
-            this.layoutViewCard1 = new DevExpress.XtraGrid.Views.Layout.LayoutViewCard();
             this._partsGrid = new DevExpress.XtraGrid.GridControl();
             this._partsView = new DevExpress.XtraGrid.Views.Card.CardView();
             this.splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
-            this.ribbonPageGroup3 = new DevExpress.XtraBars.Ribbon.RibbonPageGroup();
-            this.barButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
+            this._craftsView = new DevExpress.XtraGrid.Views.Card.CardView();
             ((System.ComponentModel.ISupportInitialize)(this.ribbon)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemTimeEdit1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._craftsGrid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._craftsView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.layoutViewCard1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._partsGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._partsView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).BeginInit();
             this.splitContainerControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._craftsView)).BeginInit();
             this.SuspendLayout();
             // 
             // ribbon
@@ -86,6 +84,14 @@
             this._setCrafterButtonItem.Enabled = false;
             this._setCrafterButtonItem.Id = 3;
             this._setCrafterButtonItem.Name = "_setCrafterButtonItem";
+            this._setCrafterButtonItem.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this._setCrafterButtonItem_ItemClick);
+            // 
+            // barButtonItem2
+            // 
+            this.barButtonItem2.Caption = "barButtonItem2";
+            this.barButtonItem2.Id = 4;
+            this.barButtonItem2.Name = "barButtonItem2";
+            this.barButtonItem2.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem2_ItemClick);
             // 
             // ribbonPage1
             // 
@@ -108,6 +114,12 @@
             this.ribbonPageGroup2.Name = "ribbonPageGroup2";
             this.ribbonPageGroup2.Text = "ribbonPageGroup2";
             // 
+            // ribbonPageGroup3
+            // 
+            this.ribbonPageGroup3.ItemLinks.Add(this.barButtonItem2);
+            this.ribbonPageGroup3.Name = "ribbonPageGroup3";
+            this.ribbonPageGroup3.Text = "ribbonPageGroup3";
+            // 
             // repositoryItemTimeEdit1
             // 
             this.repositoryItemTimeEdit1.AutoHeight = false;
@@ -124,27 +136,15 @@
             // 
             // _craftsGrid
             // 
-            this._craftsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._craftsGrid.Dock = System.Windows.Forms.DockStyle.Left;
             this._craftsGrid.Location = new System.Drawing.Point(0, 0);
             this._craftsGrid.MainView = this._craftsView;
             this._craftsGrid.MenuManager = this.ribbon;
             this._craftsGrid.Name = "_craftsGrid";
-            this._craftsGrid.Size = new System.Drawing.Size(587, 506);
+            this._craftsGrid.Size = new System.Drawing.Size(248, 506);
             this._craftsGrid.TabIndex = 2;
             this._craftsGrid.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this._craftsView});
-            // 
-            // _craftsView
-            // 
-            this._craftsView.GridControl = this._craftsGrid;
-            this._craftsView.Name = "_craftsView";
-            this._craftsView.OptionsBehavior.Editable = false;
-            this._craftsView.TemplateCard = this.layoutViewCard1;
-            // 
-            // layoutViewCard1
-            // 
-            this.layoutViewCard1.ExpandButtonLocation = DevExpress.Utils.GroupElementLocation.AfterText;
-            this.layoutViewCard1.Name = "layoutViewCard1";
             // 
             // _partsGrid
             // 
@@ -153,7 +153,7 @@
             this._partsGrid.MainView = this._partsView;
             this._partsGrid.MenuManager = this.ribbon;
             this._partsGrid.Name = "_partsGrid";
-            this._partsGrid.Size = new System.Drawing.Size(489, 506);
+            this._partsGrid.Size = new System.Drawing.Size(222, 506);
             this._partsGrid.TabIndex = 5;
             this._partsGrid.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this._partsView});
@@ -162,9 +162,10 @@
             // 
             this._partsView.FocusedCardTopFieldIndex = 0;
             this._partsView.GridControl = this._partsGrid;
-            this._partsView.MaximumCardColumns = 2;
+            this._partsView.MaximumCardColumns = 1;
             this._partsView.Name = "_partsView";
             this._partsView.OptionsBehavior.Editable = false;
+            this._partsView.OptionsView.ShowQuickCustomizeButton = false;
             this._partsView.VertScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Auto;
             // 
             // splitContainerControl1
@@ -177,22 +178,17 @@
             this.splitContainerControl1.Panel2.Controls.Add(this._craftsGrid);
             this.splitContainerControl1.Panel2.Text = "Panel2";
             this.splitContainerControl1.Size = new System.Drawing.Size(1081, 506);
-            this.splitContainerControl1.SplitterPosition = 489;
+            this.splitContainerControl1.SplitterPosition = 222;
             this.splitContainerControl1.TabIndex = 8;
             this.splitContainerControl1.Text = "splitContainerControl1";
             // 
-            // ribbonPageGroup3
+            // _craftsView
             // 
-            this.ribbonPageGroup3.ItemLinks.Add(this.barButtonItem2);
-            this.ribbonPageGroup3.Name = "ribbonPageGroup3";
-            this.ribbonPageGroup3.Text = "ribbonPageGroup3";
-            // 
-            // barButtonItem2
-            // 
-            this.barButtonItem2.Caption = "barButtonItem2";
-            this.barButtonItem2.Id = 4;
-            this.barButtonItem2.Name = "barButtonItem2";
-            this.barButtonItem2.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem2_ItemClick);
+            this._craftsView.FocusedCardTopFieldIndex = 0;
+            this._craftsView.GridControl = this._craftsGrid;
+            this._craftsView.Name = "_craftsView";
+            this._craftsView.OptionsBehavior.Editable = false;
+            this._craftsView.OptionsView.ShowQuickCustomizeButton = false;
             // 
             // RibbonForm2
             // 
@@ -209,12 +205,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.ribbon)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemTimeEdit1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._craftsGrid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._craftsView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.layoutViewCard1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._partsGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._partsView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).EndInit();
             this.splitContainerControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._craftsView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -234,9 +229,8 @@
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup2;
         private DevExpress.XtraEditors.SplitContainerControl splitContainerControl1;
         private DevExpress.XtraBars.BarButtonItem _setCrafterButtonItem;
-        private DevExpress.XtraGrid.Views.Layout.LayoutView _craftsView;
-        private DevExpress.XtraGrid.Views.Layout.LayoutViewCard layoutViewCard1;
         private DevExpress.XtraBars.BarButtonItem barButtonItem2;
         private DevExpress.XtraBars.Ribbon.RibbonPageGroup ribbonPageGroup3;
+        private DevExpress.XtraGrid.Views.Card.CardView _craftsView;
     }
 }

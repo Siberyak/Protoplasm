@@ -12,7 +12,7 @@ namespace Factorio.Lua.Reader
         public Part(IRecipePart part, IBindingList<CraftInfo> crafts)
         {
             _part = part;
-            _list = new PredicatedList<CraftInfo>(crafts, x => x._recpe.AllParts.Contains(part));
+            _list = new PredicatedList<CraftInfo>(crafts, x => x._recipe.AllParts.Contains(part));
             _list.BeforeRemoveItem += BeforeRemove;
             _list.ListChanged += ListChanged;
             _image = _part?.Image32();

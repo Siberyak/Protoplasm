@@ -16,7 +16,7 @@ using Protoplasm.Utils.Graph;
 
 namespace Factorio.Lua.Reader
 {
-    public partial class RecipiesControl : UserControl
+    public partial class RecipiesControl : UserControl, ISelectorView<Recipe>
     {
         private Storage _storage => Storage.Current;
 
@@ -28,48 +28,15 @@ namespace Factorio.Lua.Reader
         }
 
 
-        public event EventHandler Selected;
         public Recipe Recipe;
 
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            AfterLoad();
-        }
+        public Recipe Selection => Recipe;
 
-        private void AfterLoad()
-        {
-            var recipes = _storage.Nodes<Recipe>(x => !x._Hidden).ToArray();
-            var groupBy = recipes.GroupBy(x => x.SubGroup).GroupBy(x => x.Key.ItemGroup);
-
-            splitContainerControl1.Panel1.Tag = new Point(0, 0);
-
-            var groupIndex = -1;
-            foreach (var g1 in groupBy.OrderBy(x => x.Key._Order))
-            {
-                groupIndex++;
-
-                ItemGroup itemGroup = g1.Key;
-                var itemGroupControl = Add(splitContainerControl1.Panel1, itemGroup);
-                
-                foreach (var g2 in g1.OrderBy(x => x.Key.Order))
-                {
-                    ItemSubGroup itemSubGroup = g2.Key;
-
-                    foreach (var recipe in g2.OrderBy(x => x.Order))
-                    {
-                        var button = Add((Control)itemGroupControl.Tag, recipe, groupIndex);
-                        button.Tag = recipe;
-                        button.Click += RecipeButtonClick;
-                        button.DoubleClick += RecipeButtonDoubleClick;
-                    }
-
-                    Point point = (Point) ((Control) itemGroupControl.Tag).Tag;
-                    if(point.X != 0)
-                        ((Control)itemGroupControl.Tag).Tag = new Point(0, point.Y+1);
-                }
-            }
-        }
+        //protected override void OnLoad(EventArgs e)
+        //{
+        //    base.OnLoad(e);
+        //    AfterLoad();
+        //}
 
         private void RecipeButtonDoubleClick(object sender, EventArgs e)
         {
@@ -102,7 +69,7 @@ namespace Factorio.Lua.Reader
 
             var button = new CheckButton
             {
-                Size = new Size(dim-6, dim-6),
+                Size = new Size(dim - 6, dim - 6),
                 ImageList = images,
                 ImageIndex = imageIndex,
                 ImageLocation = ImageLocation.MiddleCenter,
@@ -155,6 +122,7 @@ namespace Factorio.Lua.Reader
             return button;
         }
 
+        public event EventHandler Selected;
         protected virtual void OnSelected()
         {
             Selected?.Invoke(this, EventArgs.Empty);
@@ -162,20 +130,50 @@ namespace Factorio.Lua.Reader
 
         public static Recipe SelectRecipe()
         {
-            var form = new Form() {MinimumSize = new Size(850,950)};
-            //form.SizeChanged += (sender, args) => form.Text = $"{form.Size}";
-            var control = new RecipiesControl { Dock = DockStyle.Fill };
-            control.Selected += OnRecipeSelected;
-            form.Controls.Add(control);
-            var dialogResult = form.ShowDialog();
-            return dialogResult == DialogResult.OK
-                ? control.Recipe
-                : null;
+            var minimumSize = new Size(850,950);
+            Recipe recipe;
+            return ViewsExtender.SelectResult<RecipiesControl, Recipe>(out recipe, minimumSize)
+                ? recipe
+                : default(Recipe);
         }
 
-        private static void OnRecipeSelected(object sender, EventArgs e)
+        protected static void SetOkDialogesult(object sender, EventArgs e)
         {
             ((Form)((Control)sender).Parent).DialogResult = DialogResult.OK;
+        }
+
+        void ISelectorView.AfterLoad()
+        {
+            var recipes = _storage.Nodes<Recipe>(x => !x._Hidden).ToArray();
+            var groupBy = recipes.GroupBy(x => x.SubGroup).GroupBy(x => x.Key.ItemGroup);
+
+            splitContainerControl1.Panel1.Tag = new Point(0, 0);
+
+            var groupIndex = -1;
+            foreach (var g1 in groupBy.OrderBy(x => x.Key._Order))
+            {
+                groupIndex++;
+
+                ItemGroup itemGroup = g1.Key;
+                var itemGroupControl = Add(splitContainerControl1.Panel1, itemGroup);
+                
+                foreach (var g2 in g1.OrderBy(x => x.Key.Order))
+                {
+                    ItemSubGroup itemSubGroup = g2.Key;
+
+                    foreach (var recipe in g2.OrderBy(x => x.Order))
+                    {
+                        var button = Add((Control)itemGroupControl.Tag, recipe, groupIndex);
+                        button.Tag = recipe;
+                        button.Click += RecipeButtonClick;
+                        button.DoubleClick += RecipeButtonDoubleClick;
+                    }
+
+                    Point point = (Point) ((Control) itemGroupControl.Tag).Tag;
+                    if(point.X != 0)
+                        ((Control)itemGroupControl.Tag).Tag = new Point(0, point.Y+1);
+                }
+            }
         }
     }
 

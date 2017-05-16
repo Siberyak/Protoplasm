@@ -9,9 +9,11 @@ namespace Factorio.Lua.Reader
         public object[] _CraftingCategories { get; set; }
 
         public string Category => "entity-name";
+
         public object[] _LocalisedName => null;
 
-
+        [JsonProperty("crafting_speed")]
+        public double _CraftingSpeed { get; set; }
 
     }
 }

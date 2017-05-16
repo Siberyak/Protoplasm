@@ -278,13 +278,36 @@ namespace Protoplasm.Calendars
 
             class Iterator
             {
-                class IteratorInterval : PointedInterval<TTime, Tuple<TData, IteratorInstructions>>
+                class IteratorIntervalData
                 {
-                    protected internal IteratorInterval(TTime? left, bool leftIncluded, TTime? right, bool rightIncluded, Tuple<TData, IteratorInstructions> data) : base(left, leftIncluded, right, rightIncluded, data)
+                    public readonly TData OriginalData;
+                    public readonly IteratorInstruction Instruction;
+                    public readonly DataAdapter<TAmount> MinDurationAmount;
+                    public readonly DataAdapter<TAmount> Amount;
+
+                    public IteratorIntervalData(TData originalData, IteratorInstruction instruction, TAmount amount = default(TAmount), TAmount minDurationAmount = default(TAmount))
+                    {
+                        OriginalData = originalData;
+                        Instruction = instruction;
+                        Amount = amount;
+                        MinDurationAmount = minDurationAmount;
+                    }
+                }
+                class IteratorInterval : PointedInterval<TTime, IteratorIntervalData>
+                {
+                    protected internal IteratorInterval(Interval<TTime> interval, IteratorIntervalData data = null)
+                        : this(interval.Left, interval.Right, data ?? new IteratorIntervalData(default(TData), default(IteratorInstruction)))
+                    {
+
+                    }
+
+                    protected internal IteratorInterval(TTime? left, bool leftIncluded, TTime? right, bool rightIncluded, IteratorIntervalData data)
+                        : base(left, leftIncluded, right, rightIncluded, data)
                     {
                     }
 
-                    protected internal IteratorInterval(Point<TTime> left = null, Point<TTime> right = null, Tuple<TData, IteratorInstructions> data = null) : base(left, right, data)
+                    protected internal IteratorInterval(Point<TTime> left = null, Point<TTime> right = null, IteratorIntervalData data = null)
+                        : base(left, right, data)
                     {
                     }
 
@@ -292,6 +315,18 @@ namespace Protoplasm.Calendars
                     {
                         var intersect = base.Intersect(interval);
                         return intersect == null ? null : new IteratorInterval(intersect.Left, intersect.Right, Data);
+                    }
+
+                    public static Interval<TTime> StartFinishInterval(IteratorInterval start, IteratorInterval finish, SchedulerKind kind)
+                    {
+                        if (kind == SchedulerKind.LeftToRight)
+                        {
+                            return new Interval<TTime>(start.Right.AsLeft(), finish.Right);
+                        }
+                        else
+                        {
+                            return new Interval<TTime>(finish.Left, start.Left.AsRight());
+                        }
                     }
                 }
 
@@ -360,6 +395,33 @@ namespace Protoplasm.Calendars
                     }
                 }
 
+                class DurationInterval : Interval<TDuration>
+                {
+                    public DataAdapter<TDuration> Duration => Right.PointValue.Value;
+                    public TDuration Value => Duration.Value;
+
+                    public DurationInterval() : base(Point<TDuration>.Left(default(TDuration)), Point<TDuration>.Right(default(TDuration)))
+                    {
+                    }
+
+                    internal DurationInterval(TDuration duration) : base(Point<TDuration>.Left(default(TDuration)), Point<TDuration>.Right(duration))
+                    {
+                    }
+
+                    internal DurationInterval(DataAdapter<TDuration> duration) : this(duration.Value)
+                    {
+                    }
+
+                    public static DurationInterval operator +(DurationInterval interval, DataAdapter<TDuration> duration)
+                    {
+                        return new DurationInterval(interval.Duration + duration);
+                    }
+                    public static DurationInterval operator -(DurationInterval interval, DataAdapter<TDuration> duration)
+                    {
+                        return new DurationInterval(interval.Duration - duration);
+                    }
+                }
+
                 public void Init()
                 {
                     //Func<ICalendarItem, Point<TTime>, TAmount, AmountedInterval> f;
@@ -369,105 +431,178 @@ namespace Protoplasm.Calendars
                     //    f = (ci, p, a) => new AmountedInterval(ci.Left, p, a);
 
 
-                    var tuples = new PointedIntervalsContainer<IteratorInterval, TTime, Tuple<TData, IteratorInstructions>>
+                    var container = new PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData>
                         (
-                        (left, right, dt) => new IteratorInterval(left, right, dt), 
-                        (tuple, tuple1) => tuple1,
-                        (tuple, tuple1) => null
+                        (left, right, dt) => new IteratorInterval(left, right, dt),
+                        (a, b) => b,
+                        (a, b) => null
                         );
+
 
                     var items = _schedule.Available.Get(_restrictions.Start.Left, _restrictions.Finish.Right);
                     foreach (var item in items)
                     {
                         var instructions = RequestInstructions(item);
-                        if(instructions == IteratorInstructions.Skip)
-                            continue;
 
-                        tuples.Include(item.Left, item.Right, new Tuple<TData, IteratorInstructions>(item.Data, instructions));
+                        var minDurationAmount = instructions == IteratorInstruction.Accept
+                            ? _requestAmount(MinDuration, item.Data, _restrictions.RequiredAmount)
+                            : default(TAmount);
+
+                        var intervalAmount = instructions == IteratorInstruction.Accept
+                            ? _requestAmount(item.Duration.Value, item.Data, _restrictions.RequiredAmount)
+                            : default(TAmount);
+
+                        container.Include
+                            (
+                                item.Left,
+                                item.Right,
+                                new IteratorIntervalData(item.Data, instructions, intervalAmount, minDurationAmount)
+                            );
                     }
 
 
                     var getPoint = _kind == SchedulerKind.LeftToRight
-                            ? (Func<Interval<TTime>, Point<TTime>>) (i => i.Left)
+                            ? (Func<Interval<TTime>, Point<TTime>>)(i => i.Left)
                             : (i => i.Right);
 
 
                     var point = getPoint(_startArea);
-                    
 
-                    var i1 = tuples.Get(_startArea);
-                    var i2 = tuples.Get(_finishArea);
+
+                    var i1 = container.Get(_startArea);
+                    var i2 = container.Get(_finishArea);
 
                     var nextpoint = _offsetNext(point, _restrictions.Duration.Left.PointValue.Value);
 
 
-                    var node = tuples.FindNode(x => x.Contains(point));
-                    var startNode = _getPrevNode(node);
+                    var finishhNode = container.FindNode(x => x.Contains(point));
+                    var startNode = _getPrevNode(finishhNode);
 
                     DataAdapter<TAmount> amount = default(TAmount);
-                    DataAdapter<TAmount> rest = _restrictions.RequiredAmount;
-                    DataAdapter<TDuration> duration = default(TDuration);
-                    DataAdapter<TDuration> totalDuration = default(TDuration);
+                    var duration = new DurationInterval();
+                    var totalDuration = new DurationInterval();
 
                     IteratorInterval finishIntersection = null;
+                    var skipped = false;
+                    var accepted = false;
 
-                    while ((finishIntersection = node.Value.Intersect(_finishArea)) == null)
+                    while (finishhNode.Value.Data != null)
                     {
 
-                        DataAdapter<TDuration> nodeDuration = ToDuration(node.Value);
+                        DataAdapter<TDuration> nodeDuration = ToDuration(finishhNode.Value);
 
-                        if (Equals(node.Value.Data, default(TData)))
-                        {
-                            totalDuration += nodeDuration;
-                            continue;
-                        }
-
-                        var data = node.Value.Data.Item1;
-                        var instructions = node.Value.Data.Item2;
+                        var intervalData = finishhNode.Value.Data;
+                        var data = intervalData.OriginalData;
+                        var instructions = intervalData.Instruction;
 
                         switch (instructions)
                         {
-                            case IteratorInstructions.Reject:
-                                startNode = _getPrevNode(node);
-                                amount = default(TAmount);
-                                rest = _restrictions.RequiredAmount;
-                                totalDuration = default(TDuration);
+                            case IteratorInstruction.Skip:
+                                if (skipped)
+                                    ObstructByRejected(ref startNode, ref finishhNode, container);
+                                else
+                                    totalDuration += nodeDuration;
+
+                                skipped = true;
                                 break;
-                            case IteratorInstructions.Accept:
-                                DataAdapter<TAmount> nodeAmount = _requestAmount(nodeDuration.Value, data, _restrictions.RequiredAmount);
-                                
+                            case IteratorInstruction.Reject:
+                                accepted = false;
+                                skipped = true;
+
+                                ObstructByRejected(ref startNode, ref finishhNode, container);
+
+                                amount = default(TAmount);
+                                duration = new DurationInterval();
+                                totalDuration = new DurationInterval();
+                                break;
+                            case IteratorInstruction.Accept:
+                                var nodeAmount = intervalData.Amount;
+
+                                var d = duration + nodeDuration;
+                                var td = totalDuration + nodeDuration;
+                                var a = amount + nodeAmount;
+
+
+                                // длительности недобор до минимума
+                                var lower1 = d.Right < _restrictions.Duration.Left;
+                                var lower2 = td.Right < _restrictions.TotalDuration.Left;
+
+                                // длительности в рамках требований
+                                var in1 = _restrictions.Duration.Contains(d.Right);
+                                var in2 = _restrictions.TotalDuration.Contains(td.Right);
+
+                                // недобор объёма
+                                var lowerA = a <= _restrictions.RequiredAmount;
+
+                                // берем всё, если:
+                                if (
+                                    // два недобора
+                                    lower1 && lower2
+                                    // один недобор и один в рамках
+                                    || (lower1 && in2) || (in1 && lower2)
+                                    // два в рамках и amount не больше требуемого
+                                    || (in1 && in2 && lowerA)
+                                    )
+                                {
+                                    duration = d;
+                                    totalDuration = td;
+                                    amount = a;
+                                    break;
+                                }
+
+
+
+
+                                // если недобор объёма, 
+                                // то надо двигать начало на максимальное отклонение по длительности 
+                                // и идти дальше
+                                if (lowerA)
+                                {
+                                    ObstructStartByDurations(ref startNode, ref finishhNode, container, ref d, ref td, ref a);
+
+                                    duration = d;
+                                    totalDuration = td;
+                                    amount = a;
+                                    break;
+                                }
+
+
+                                var minDuratonAmount = intervalData.MinDurationAmount;
+
+
+
                                 // учесть минимальный кусок
-                                var minDuratonAmount = _requestAmount(MinDuration, data, _restrictions.RequiredAmount);
+                                if (!accepted)
+                                {
 
-                                totalDuration += MinDuration;
-                                duration += MinDuration;
+                                    totalDuration += MinDuration;
+                                    duration += MinDuration;
 
-                                amount += minDuratonAmount;
-                                rest -= minDuratonAmount;
+                                    amount += minDuratonAmount;
 
-                                nodeAmount -= minDuratonAmount; 
-                                nodeDuration -= MinDuration;
-                                
+                                    nodeAmount -= minDuratonAmount;
+                                    nodeDuration -= MinDuration;
+                                }
+
+                                accepted = true;
+                                skipped = false;
+
                                 // оценить и, если надо, подтянуть хвост
 
                                 duration += nodeDuration;
                                 amount += nodeAmount;
-                                rest -= nodeAmount;
-
-                                var restDuration = _requestDurationByAmount(duration.Value, amount.Value, rest.Value);
 
                                 totalDuration += nodeDuration;
-
 
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
 
-                        node = _getNextNode(node);
+                        finishhNode = _getNextNode(finishhNode);
                     }
 
-                    var finishNode = node;
+                    var finishNode = finishhNode;
 
                     var startIntersection = _startArea.Intersect(startNode.Value);
 
@@ -478,6 +613,105 @@ namespace Protoplasm.Calendars
                     //INode<ICalendarItem> node = MoveNode(null, _startArea);
                     //if(node == null)
                     //    return;
+                }
+
+                private static void Obstruct(ref INode<IteratorInterval> startNode, PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData> container, Interval<TTime> interval)
+                {
+                    container.Exclude(new IteratorInterval(interval));
+                    if (!startNode.Alive)
+                    {
+                        var point = startNode.Value.Left;
+                        startNode = container.FindNode(x => x.Contains(point));
+                    }
+                }
+
+                private void ObstructByRejected(ref INode<IteratorInterval> startNode, ref INode<IteratorInterval> finishhNode, PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData> container)
+                {
+                    var startFinishInterval = IteratorInterval.StartFinishInterval(startNode.Value, finishhNode.Value, _kind);
+                    Obstruct(ref startNode, container, startFinishInterval);
+
+                    finishhNode = startNode;
+                }
+
+                private void ObstructStartByDurations(ref INode<IteratorInterval> startNode, ref INode<IteratorInterval> finishhNode, PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData> container, ref DurationInterval duration, ref DurationInterval totalDuration, ref DataAdapter<TAmount> amount)
+                {
+                    var requiredAmount = _restrictions.RequiredAmount;
+                    var zero = default(TDuration);
+
+                    // превышения длительности
+                    var delta = duration.Duration - (_restrictions.Duration.Right.PointValue ?? duration.Duration);
+                    var totalDelta = totalDuration.Duration - (_restrictions.TotalDuration.Right.PointValue ?? totalDuration.Duration);
+
+
+                    while (delta > zero || totalDelta > zero)
+                    {
+                        var currentNode = _getNextNode(startNode);
+
+                        DataAdapter<TDuration> nodeDuration = ToDuration(currentNode.Value);
+                        var interval = finishhNode.Value;
+                        var intervalData = interval.Data;
+                        var data = intervalData.OriginalData;
+
+
+                        DataAdapter<TAmount> nodeAmount = _requestAmount(nodeDuration.Value, data, requiredAmount);
+
+                        switch (intervalData.Instruction)
+                        {
+                            case IteratorInstruction.Skip:
+                                totalDelta -= nodeDuration;
+                                totalDuration = new DurationInterval(totalDuration.Duration - nodeDuration);
+                                Obstruct(ref startNode, container, interval);
+                                break;
+                            case IteratorInstruction.Reject:
+                                throw new NotSupportedException("не должно такого быть, от слова 'никогда'");
+                            case IteratorInstruction.Accept:
+
+                                // если длительность не меньше, чем какая-нить из дельт...
+                                var takeFullNodeDuration = nodeDuration <= delta || nodeDuration <= totalDelta;
+
+                                // ... то ...
+                                var obstructDuration = takeFullNodeDuration
+                                    ? nodeDuration // ... режем целиком
+                                    : delta.Max(totalDelta); // ... иначе будем резать по максимальной дельте
+
+                                // если режем не целиком
+                                if (!takeFullNodeDuration)
+                                {
+                                    // и остаток длительносит меньше минимальной длительности
+                                    if (nodeDuration - obstructDuration < MinDuration)
+                                    {
+                                        // то режем целиком
+                                        obstructDuration = nodeDuration;
+                                        takeFullNodeDuration = true;
+                                    }
+                                }
+                                var obstrucAmount = takeFullNodeDuration
+                                    ? nodeAmount // режем целиком
+                                    : _requestAmount(obstructDuration.Value, data, requiredAmount); // иначе будем резать по максимальной дельте
+
+                                delta -= obstructDuration;
+                                totalDelta -= obstructDuration;
+
+                                amount -= obstrucAmount;
+                                duration = new DurationInterval(duration.Duration - obstructDuration);
+                                totalDuration = new DurationInterval(totalDuration.Duration - obstructDuration);
+
+                                if (takeFullNodeDuration)
+                                {
+                                    Obstruct(ref startNode, container, interval);
+                                }
+                                else
+                                {
+                                    var right = interval.Left.AsRight();
+                                    right = Calendars<TTime, TDuration>.OffsetPointToRight(right, obstructDuration.Value);
+                                    Obstruct(ref startNode, container, new Interval<TTime>(interval.Left, right));
+                                }
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+
+                    }
                 }
 
                 private TDuration MinDuration
@@ -506,12 +740,12 @@ namespace Protoplasm.Calendars
                 //        return null; // всё, отпрыгались...
 
                 //    var duration = ToDuration(intersection.Left, intersection.Right);
-                //    var instruction = RequestInstructions(duration, node.Value.Data);
+                //    var instruction = RequestInstructions(duration, node.Value.OriginalData);
 
-                //    if (instruction == IteratorInstructions.Accept)
+                //    if (instruction == IteratorInstruction.Accept)
                 //        return node;
 
-                //    if (instruction == IteratorInstructions.Reject)
+                //    if (instruction == IteratorInstruction.Reject)
                 //    {
                 //        // reset
                 //    }
@@ -541,12 +775,12 @@ namespace Protoplasm.Calendars
                 //        var instruction = RequestInstructions(node.Value, out nodeAmount);
                 //        switch (instruction)
                 //        {
-                //            case IteratorInstructions.Skip:
+                //            case IteratorInstruction.Skip:
                 //                break;
-                //            case IteratorInstructions.Reject:
+                //            case IteratorInstruction.Reject:
                 //                Reset();
                 //                break;
-                //            case IteratorInstructions.Accept:
+                //            case IteratorInstruction.Accept:
                 //                Amount = Add(Amount, nodeAmount);
                 //                _nodes.Add(node);
                 //                break;
@@ -564,7 +798,7 @@ namespace Protoplasm.Calendars
                 //    Amount = default(TAmount);
                 //}
 
-                private IteratorInstructions RequestInstructions(ICalendarItem item)
+                private IteratorInstruction RequestInstructions(ICalendarItem item)
                 {
                     var left = item.Left;
                     var right = Point<TTime>.Min(item.Right, _restrictions.Start.Right);
@@ -575,7 +809,7 @@ namespace Protoplasm.Calendars
                 }
 
 
-                private IteratorInstructions RequestInstructions(TData data)
+                private IteratorInstruction RequestInstructions(TData data)
                 {
                     return _requestInstructions(data, _restrictions.RequiredAmount);
                 }
@@ -607,7 +841,7 @@ namespace Protoplasm.Calendars
                 //                continue;
                 //            }
 
-                //            var nodeData = node.Value.Data;
+                //            var nodeData = node.Value.OriginalData;
                 //            var nodeDuration = ToDuration(node.Value.Left, node.Value.Right);
                 //            var nodeAmount = Amount(nodeDuration, nodeData, _restrictions.RequiredAmount);
 
@@ -669,7 +903,7 @@ namespace Protoplasm.Calendars
             //    //if (nodeAm)
             //}
 
-            public delegate IteratorInstructions RequestInstructionsDelegate(TData data, TAmount requiredAmount);
+            public delegate IteratorInstruction RequestInstructionsDelegate(TData data, TAmount requiredAmount);
 
             public delegate TAmount RequestAmountDelegate(TDuration duration, TData data, TAmount requiredAmount);
 

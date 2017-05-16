@@ -254,8 +254,37 @@ namespace ConsoleApplication1.TestData
 
             var left = DateTime.Today;
 
-            schedule.Exclude(left.AddDays(9).AddHours(14).Left(true), left.AddDays(9).AddHours(15).Right(false), new TestData("14-15"));
-            schedule.Exclude(left.AddDays(9).AddHours(16).Left(true), left.AddDays(9).AddHours(17).Right(false), new TestData("16-17"));
+            // for reject
+            schedule.Exclude
+                (
+                    left.AddDays(9).AddHours(14).Left(true),
+                    left.AddDays(9).AddHours(15).Right(false),
+                    new TestData("14-15")
+                );
+
+            // for skip
+            schedule.Exclude
+                (
+                left.AddDays(9).AddHours(15).AddMinutes(20).Left(true),
+                left.AddDays(9).AddHours(15).AddMinutes(40).Right(false),
+                new TestData("-= ! =-")
+                );
+
+            // for reject
+            schedule.Exclude
+                (
+                left.AddDays(9).AddHours(16).Left(true),
+                left.AddDays(9).AddHours(17).Right(false),
+                new TestData("16-17")
+                );
+
+            // for skip
+            schedule.Exclude
+                (
+                left.AddDays(9).AddHours(19).Left(true),
+                left.AddDays(9).AddHours(20).Right(false),
+                new TestData("-= ! =-")
+                );
 
             scheduler.FindAllocation
                 (
@@ -306,19 +335,19 @@ namespace ConsoleApplication1.TestData
             return null;
         }
 
-        private static IteratorInstructions ProcessInstructionsRequest(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
+        private static IteratorInstruction ProcessInstructionsRequest(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
         {
             if (!(data is AmountedData))
-                return IteratorInstructions.Skip;
+                return IteratorInstruction.Skip;
             
             var amountedData = ((AmountedData)data);
             if(amountedData.Appointments.Any(x => x.Appointee != requiredamount.Appointee))
-                return IteratorInstructions.Reject;
+                return IteratorInstruction.Reject;
             
             if(amountedData.Available <= 0)
-                return IteratorInstructions.Skip;
+                return IteratorInstruction.Skip;
 
-            return IteratorInstructions.Accept;
+            return IteratorInstruction.Accept;
         }
     }
 
@@ -589,23 +618,23 @@ namespace ConsoleApplication1.TestData
             return new TestAppointment(a.Appointee, a.Hours - b.Hours);
         }
 
-        private static IteratorInstructions ResponseInstructions(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
+        private static IteratorInstruction ResponseInstructions(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
         {
             var testData = data as TestData;
             if(testData == null || requiredamount?.Appointee == null)
                 throw new NotSupportedException();
 
-            if (testData.Appointee == requiredamount.Appointee)
-                return IteratorInstructions.Skip;
+            if (testData.Appointee == "-= ! =-")
+                return IteratorInstruction.Skip;
 
             return testData.Appointee == null 
-                ? IteratorInstructions.Accept 
-                : IteratorInstructions.Reject;
+                ? IteratorInstruction.Accept 
+                : IteratorInstruction.Reject;
         }
 
         private static TestAppointment ResponseAmount(TimeSpan duration, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
         {
-            if(ResponseInstructions(data, requiredamount) != IteratorInstructions.Accept)
+            if(ResponseInstructions(data, requiredamount) != IteratorInstruction.Accept)
                 throw new NotSupportedException();
 
             return new TestAppointment(requiredamount.Appointee, duration.TotalHours);

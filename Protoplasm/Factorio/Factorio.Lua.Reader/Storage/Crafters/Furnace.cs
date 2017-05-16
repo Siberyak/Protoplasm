@@ -7,5 +7,8 @@ namespace Factorio.Lua.Reader
     {
         [JsonProperty("crafting_categories")]
         public object[] _CraftingCategories { get; set; }
+
+        [JsonProperty("crafting_speed")]
+        public double _CraftingSpeed { get; set; }
     }
 }

@@ -1,8 +1,11 @@
-﻿using DevExpress.XtraLayout;
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+using DevExpress.XtraLayout;
 
 namespace Factorio.Lua.Reader
 {
-    public partial class LayoutedView : DevExpress.XtraEditors.XtraUserControl, ILayoutedView
+    public partial class LayoutedView : DevExpress.XtraEditors.XtraUserControl, ILayoutedView, ISelectorView
     {
         public LayoutedView()
         {
@@ -10,5 +13,21 @@ namespace Factorio.Lua.Reader
         }
 
         public LayoutControl LayoutControl => _layoutControl;
+
+        public event EventHandler Selected;
+        protected virtual void OnSelected()
+        {
+            Selected?.Invoke(this, EventArgs.Empty);
+        }
+
+        void ISelectorView.AfterLoad()
+        {
+            AfterLoad();
+        }
+
+        protected virtual void AfterLoad()
+        {}
     }
+
+
 }

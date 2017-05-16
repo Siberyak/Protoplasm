@@ -575,8 +575,7 @@ namespace Factorio.Lua.Reader
         [JsonProperty("corpse")]
         public string _Corpse { get; set; }
 
-        [JsonProperty("crafting_speed")]
-        public float _CraftingSpeed { get; set; }
+
 
         [JsonProperty("dying_explosion")]
         public string _DyingExplosion { get; set; }
@@ -943,8 +942,7 @@ namespace Factorio.Lua.Reader
         [JsonProperty("corpse")]
         public string _Corpse { get; set; }
 
-        [JsonProperty("crafting_speed")]
-        public float _CraftingSpeed { get; set; }
+
 
         [JsonProperty("energy_source")]
         public object _EnergySource { get; set; }
@@ -5948,9 +5946,6 @@ namespace Factorio.Lua.Reader
 
         [JsonProperty("corpse")]
         public string _Corpse { get; set; }
-
-        [JsonProperty("crafting_speed")]
-        public float _CraftingSpeed { get; set; }
 
         [JsonProperty("door_back_open_offset")]
         public object[] _DoorBackOpenOffset { get; set; }

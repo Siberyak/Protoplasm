@@ -9,15 +9,15 @@ namespace Factorio.Lua.Reader
 
         ICrafter _crafter;
         private int _count = 1;
-        internal Recipe _recpe;
+        internal Recipe _recipe;
 
-        public CraftInfo(Recipe recpe)
+        public CraftInfo(Recipe recipe)
         {
-            _recpe = recpe;
-            _image = _recpe.Image32();
+            _recipe = recipe;
+            _image = _recipe.Image32();
         }
 
-        public string Name => _recpe.LocalizedName;
+        public string Name => _recipe.LocalizedName;
 
 
         public int Count
@@ -31,7 +31,7 @@ namespace Factorio.Lua.Reader
             }
         }
 
-        //[Browsable(false)]
+        [Browsable(false)]
         public ICrafter Crafter
         {
             get { return _crafter; }
@@ -42,5 +42,10 @@ namespace Factorio.Lua.Reader
                 OnPropertyChanged();
             }
         }
+        public double RecipeTime => _recipe._EnergyRequired;
+
+        public double? Speed => Crafter?._CraftingSpeed;
+
+        public double? CraftTime => _recipe._EnergyRequired/Speed;
     }
 }

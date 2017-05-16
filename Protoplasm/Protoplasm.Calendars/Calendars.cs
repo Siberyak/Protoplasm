@@ -29,11 +29,11 @@ namespace Protoplasm.Calendars
 
         public static TTime Min(TTime a, TTime b)
         {
-            return Min<TTime>(a, b);
+            return DataAdapter<TTime>.Min(a, b);
         }
         public static TTime Max(TTime a, TTime b)
         {
-            return Min<TTime>(a, b);
+            return DataAdapter<TTime>.Max(a, b);
         }
         public static TTime? Min(TTime? a, TTime? b)
         {
@@ -46,11 +46,11 @@ namespace Protoplasm.Calendars
 
         public static TDuration Min(TDuration a, TDuration b)
         {
-            return Min<TDuration>(a, b);
+            return DataAdapter<TDuration>.Min(a, b);
         }
         public static TDuration Max(TDuration a, TDuration b)
         {
-            return Max<TDuration>(a, b);
+            return DataAdapter<TDuration>.Max(a, b);
         }
 
         public static TDuration? Min(TDuration? a, TDuration? b)
@@ -63,23 +63,11 @@ namespace Protoplasm.Calendars
         }
 
 
-        private static T Min<T>(T a, T b)
-            where T : IComparable<T>
-        {
-            return a.CompareTo(b) <= 0 ? a : b;
-        }
-
-        private static T Max<T>(T a, T b)
-            where T : IComparable<T>
-        {
-            return a.CompareTo(b) >= 0 ? a : b;
-        }
-
         private static T? Min<T>(T? a, T? b)
             where T : struct, IComparable<T>
         {
             return a.HasValue && b.HasValue
-                ? Min(a.Value, b.Value)
+                ? DataAdapter<T>.Min(a.Value, b.Value)
                 : a.HasValue ? a : b;
         }
 
@@ -87,7 +75,7 @@ namespace Protoplasm.Calendars
             where T : struct , IComparable<T>
         {
             return a.HasValue && b.HasValue
-                ? Max(a.Value, b.Value)
+                ? DataAdapter<T>.Max(a.Value, b.Value)
                 : a.HasValue ? a : b;
         }
 

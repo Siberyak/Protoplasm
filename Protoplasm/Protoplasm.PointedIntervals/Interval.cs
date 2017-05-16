@@ -76,5 +76,22 @@ namespace Protoplasm.PointedIntervals
         {
             return $"{Left}, {Right}";
         }
+
+        public static bool operator >(Interval<TBound> interval, Point<TBound> point)
+        {
+            return interval.Left > point;
+        }
+        public static bool operator <(Interval<TBound> interval, Point<TBound> point)
+        {
+            return interval.Right < point;
+        }
+        public static bool operator >(Point<TBound> point, Interval<TBound> interval)
+        {
+            return interval < point;
+        }
+        public static bool operator <(Point<TBound> point, Interval<TBound> interval)
+        {
+            return interval > point;
+        }
     }
 }

@@ -1,11 +1,11 @@
+using System;
+
 namespace Protoplasm.Calendars
 {
-    public enum IteratorInstructions
+    public enum IteratorInstruction
     {
         Skip,
         Reject,
         Accept
     }
-
-    
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Protoplasm.Utils.Graph;
@@ -24,6 +25,7 @@ namespace Factorio.Lua.Reader
             }
         }
 
+        public IEnumerable<ICrafter> Crafters => References.OfType<RecipeCategoryCrafterEdge>().Select(x => x.Crafter);
     }
 
     public class RecipeCategoryCrafterEdge : EdgeBase
