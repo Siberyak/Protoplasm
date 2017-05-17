@@ -22,7 +22,16 @@ namespace Protoplasm.PointedIntervals
         public override string ToString()
         {
             var data = DataToString == null ? (object)Data : DataToString(Data);
-            return $"{base.ToString()}, Data = [{data}]";
+            return $"{base.ToString()}{CustomToStringBeforeData()}, Data = [{data}]{CustomToStringAfterData()}";
+        }
+        protected virtual string CustomToStringBeforeData()
+        {
+            return null;
+        }
+
+        protected virtual string CustomToStringAfterData()
+        {
+            return null;
         }
 
         /// <summary>

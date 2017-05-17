@@ -13,8 +13,6 @@ namespace Protoplasm.PointedIntervals
     {
         private static bool _tested;
 
-        
-
         /// <summary>
         /// 
         /// </summary>

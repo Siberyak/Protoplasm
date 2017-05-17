@@ -3,56 +3,106 @@ using System.Diagnostics;
 
 namespace Protoplasm.Utils
 {
-    public struct DataAdapter<T> : IEquatable<DataAdapter<T>> where T : IComparable<T>
+    class DataAdapterInitializer
     {
-        private static bool _selfTested;
+        internal static readonly object Locker = new object();
+        internal static bool DataAdapterSelfTested;
+        internal static bool DataAdapterDefaultsInited;
 
+        static void Test()
+        {
+            lock (Locker)
+            {
+                if (DataAdapterSelfTested)
+                    return;
+
+                DataAdapter<int> one = 1;
+                DataAdapter<int> zerro = 0;
+
+                Debug.Assert(zerro + one == 1);
+                Debug.Assert(zerro + one == one);
+
+                Debug.Assert(one > 0);
+                Debug.Assert(one >= 0);
+                Debug.Assert(one != 0);
+                Debug.Assert(!(one == 0));
+                Debug.Assert(!(one <= 0));
+                Debug.Assert(!(one < 0));
+
+                DataAdapter<int> minus_one;
+                Debug.Assert((minus_one = one - 2) == -1);
+                Debug.Assert(!(minus_one > 0));
+                Debug.Assert(!(minus_one >= 0));
+                Debug.Assert(minus_one != 0);
+                Debug.Assert(!(minus_one == 0));
+                Debug.Assert(minus_one <= 0);
+                Debug.Assert(minus_one < 0);
+
+
+                Debug.Assert(!(minus_one + one > 0));
+                Debug.Assert(minus_one + one >= 0);
+                Debug.Assert(!(minus_one + one != 0));
+                Debug.Assert(minus_one + one == 0);
+                Debug.Assert(minus_one + one <= 0);
+                Debug.Assert(!(minus_one + one < 0));
+
+                Debug.Assert(!(minus_one + one > zerro));
+                Debug.Assert(minus_one + one >= zerro);
+                Debug.Assert(!(minus_one + one != zerro));
+                Debug.Assert(minus_one + one == zerro);
+                Debug.Assert(minus_one + one <= zerro);
+                Debug.Assert(!(minus_one + one < zerro));
+
+                DataAdapterSelfTested = true;
+            }
+        }
+
+        internal static void InitDefaults()
+        {
+            lock (Locker)
+            {
+                if(DataAdapterDefaultsInited)
+                {
+                    return;
+                }
+
+                DataAdapter<int>.Add = (a, b) => a + b;
+                DataAdapter<int>.Subst = (a, b) => a - b;
+
+                DataAdapter<long>.Add = (a, b) => a + b;
+                DataAdapter<long>.Subst = (a, b) => a - b;
+
+                //DataAdapter<byte>.Add = (a, b) => a + b;
+                //DataAdapter<byte>.Subst = (a, b) => a - b;
+
+                //DataAdapter<short>.Add = (a, b) => a + b;
+                //DataAdapter<short>.Subst = (a, b) => a - b;
+
+                DataAdapter<double>.Add = (a, b) => a + b;
+                DataAdapter<double>.Subst = (a, b) => a - b;
+
+                DataAdapter<decimal>.Add = (a, b) => a + b;
+                DataAdapter<decimal>.Subst = (a, b) => a - b;
+
+                DataAdapter<float>.Add = (a, b) => a + b;
+                DataAdapter<float>.Subst = (a, b) => a - b;
+
+                DataAdapter<TimeSpan>.Add = (a, b) => a + b;
+                DataAdapter<TimeSpan>.Subst = (a, b) => a - b;
+
+                Test();
+
+                DataAdapterDefaultsInited = true;
+            }
+        }
+    }
+
+    public struct DataAdapter<T> : IEquatable<DataAdapter<T>> 
+        where T : IComparable<T>
+    {
         static DataAdapter()
         {
-            if (_selfTested)
-                return;
-
-            DataAdapter<int>.Add = (a, b) => a + b;
-            DataAdapter<int>.Subst = (a, b) => a - b;
-
-            DataAdapter<int> one = 1;
-            DataAdapter<int> zerro = 0;
-
-            Debug.Assert(zerro + one == 1);
-            Debug.Assert(zerro + one == one);
-
-            Debug.Assert(one > 0);
-            Debug.Assert(one >= 0);
-            Debug.Assert(one != 0);
-            Debug.Assert(!(one == 0));
-            Debug.Assert(!(one <= 0));
-            Debug.Assert(!(one < 0));
-
-            DataAdapter<int> minus_one;
-            Debug.Assert((minus_one = one - 2) == -1);
-            Debug.Assert(!(minus_one > 0));
-            Debug.Assert(!(minus_one >= 0));
-            Debug.Assert(minus_one != 0);
-            Debug.Assert(!(minus_one == 0));
-            Debug.Assert(minus_one <= 0);
-            Debug.Assert(minus_one < 0);
-
-
-            Debug.Assert(!(minus_one + one > 0));
-            Debug.Assert(minus_one + one >= 0);
-            Debug.Assert(!(minus_one + one != 0));
-            Debug.Assert(minus_one + one == 0);
-            Debug.Assert(minus_one + one <= 0);
-            Debug.Assert(!(minus_one + one < 0));
-
-            Debug.Assert(!(minus_one + one > zerro));
-            Debug.Assert(minus_one + one >= zerro);
-            Debug.Assert(!(minus_one + one != zerro));
-            Debug.Assert(minus_one + one == zerro);
-            Debug.Assert(minus_one + one <= zerro);
-            Debug.Assert(!(minus_one + one < zerro));
-
-            _selfTested = true;
+            DataAdapterInitializer.InitDefaults();
         }
 
         public override string ToString()
@@ -79,6 +129,21 @@ namespace Protoplasm.Utils
 
         public static Func<T, T, T> Add;
         public static Func<T, T, T> Subst;
+
+
+        static T AddValue(T a, T b)
+        {
+            if (Add == null)
+                throw new DataAdapterCustomizationException(new ArgumentNullException(nameof(Add)));
+            return Add(a, b);
+        }
+
+        private static DataAdapter<T> SubstValue(DataAdapter<T> a, DataAdapter<T> b)
+        {
+            if (Subst == null)
+                throw new DataAdapterCustomizationException(new ArgumentNullException(nameof(Subst)));
+            return Subst(a.Value, b.Value);
+        }
 
         public readonly T Value;
         public DataAdapter(T value)
@@ -107,11 +172,12 @@ namespace Protoplasm.Utils
 
         public static DataAdapter<T> operator +(DataAdapter<T> a, DataAdapter<T> b)
         {
-            return Add(a.Value, b.Value);
+            return AddValue(a.Value, b.Value);
         }
+
         public static DataAdapter<T> operator -(DataAdapter<T> a, DataAdapter<T> b)
         {
-            return Subst(a.Value, b.Value);
+            return SubstValue(a, b);
         }
 
         public static bool operator ==(DataAdapter<T> a, DataAdapter<T> b)
@@ -153,5 +219,24 @@ namespace Protoplasm.Utils
         {
             return a.CompareTo(b) >= 0 ? a : b;
         }
+
+        public class DataAdapterCustomizationException : CustomizationException
+        {
+            public DataAdapterCustomizationException(Exception innerException)
+                : base(typeof(DataAdapter<T>), $"Ошибка кастомизации дата-адаптера {typeof(DataAdapter<T>).TypeName()}", innerException)
+            {
+            }
+
+            public DataAdapterCustomizationException(string message, Exception innerException)
+                : base(typeof(DataAdapter<T>), message, innerException)
+            {
+            }
+
+            public DataAdapterCustomizationException(string message)
+                : base(typeof(DataAdapter<T>), message)
+            {
+            }
+        }
+
     }
 }

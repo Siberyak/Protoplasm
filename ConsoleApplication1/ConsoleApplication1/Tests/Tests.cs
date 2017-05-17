@@ -248,6 +248,10 @@ namespace ConsoleApplication1.TestData
 
         private static void TestTestDataScheduller()
         {
+            SchedulerTester.Test();
+
+
+
             var calendar = new TestDataCalendar();
             var schedule = calendar.CreateSchedule(TimeSpan.FromMinutes(15));
             var scheduler = new TestDataScheduller(schedule);

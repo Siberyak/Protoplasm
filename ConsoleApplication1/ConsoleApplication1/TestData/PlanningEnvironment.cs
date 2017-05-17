@@ -7,7 +7,7 @@ namespace ConsoleApplication1.TestData
         where TTime : struct, IComparable<TTime>
         where TDuration : struct, IComparable<TDuration>
     {
-        public static Func<TTime?, TTime?, TDuration?> ToDuration => Calendars<TTime, TDuration>.ToDuration;
+        public static Func<TTime?, TTime?, TDuration?> ToDuration => Calendars<TTime, TDuration>.Duration;
 
         public static TTime Min(TTime a, TTime b)
         {

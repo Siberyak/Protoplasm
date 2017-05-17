@@ -11,13 +11,20 @@ namespace Protoplasm.Calendars
     }
 
     public static class Calendars<TTime, TDuration>
-        where TTime : struct, IComparable<TTime> 
+        where TTime : struct, IComparable<TTime>
         where TDuration : struct, IComparable<TDuration>
     {
         static Calendars()
         {
-            DataAdapter<TDuration>.Add = (a, b) => AddDuration(a, b);
-            DataAdapter<TDuration>.Subst = (a, b) => SubstDuration(a, b);
+            if (DataAdapter<TDuration>.Add == null)
+                DataAdapter<TDuration>.Add = Add;
+            else
+                AddDuration = DataAdapter<TDuration>.Add;
+
+            if (DataAdapter<TDuration>.Subst == null)
+                DataAdapter<TDuration>.Subst = Subst;
+            else
+                SubstDuration = DataAdapter<TDuration>.Subst;
         }
 
         public static Func<TTime?, TTime?, TDuration?> ToDuration;
@@ -72,38 +79,86 @@ namespace Protoplasm.Calendars
         }
 
         private static T? Max<T>(T? a, T? b)
-            where T : struct , IComparable<T>
+            where T : struct, IComparable<T>
         {
             return a.HasValue && b.HasValue
                 ? DataAdapter<T>.Max(a.Value, b.Value)
                 : a.HasValue ? a : b;
         }
 
+        public static TDuration? Duration(TTime? a, TTime? b)
+        {
+            if(ToDuration == null)
+                throw new CalendarsCustomizationException(new ArgumentNullException(nameof(ToDuration)));
+            return ToDuration(a, b);
+        }
+
+        public static TDuration Add(TDuration a, TDuration b)
+        {
+            if (AddDuration == null)
+                throw new CalendarsCustomizationException(new ArgumentNullException(nameof(AddDuration)));
+
+            return AddDuration(a, b);
+        }
 
         public static TDuration? Add(TDuration? a, TDuration? b)
         {
             return a.HasValue && b.HasValue
-                ? AddDuration(a.Value, b.Value)
+                ? Add(a.Value, b.Value)
                 : a.HasValue
-                    ? a
-                    : b;
+                    ? a : b;
         }
+
+        public class CalendarsCustomizationException : CustomizationException
+        {
+            public CalendarsCustomizationException(Exception innerException)
+                : base(typeof(Calendars<TTime, TDuration>), $"Ошибка кастомизации календаря {typeof(Calendars<TTime, TDuration>).TypeName()}", innerException)
+            {
+            }
+
+            public CalendarsCustomizationException(string message, Exception innerException)
+                : base(typeof(Calendars<TTime, TDuration>), message, innerException)
+            {
+            }
+
+            public CalendarsCustomizationException(string message)
+                : base(typeof(Calendars<TTime, TDuration>), message)
+            {
+            }
+        }
+
+        public static TDuration Subst(TDuration a, TDuration b)
+        {
+            if (SubstDuration == null)
+                throw new CalendarsCustomizationException(new ArgumentNullException(nameof(SubstDuration)));
+
+            return SubstDuration(a, b);
+        }
+
         public static TDuration? Subst(TDuration? a, TDuration? b)
         {
             return a.HasValue && b.HasValue
-                ? SubstDuration(a.Value, b.Value)
+                ? Subst(a.Value, b.Value)
                 : b.HasValue
-                    ? SubstDuration(default(TDuration), b.Value)
+                    ? Subst(default(TDuration), b.Value)
                     : a;
         }
 
+
+
         public static Point<TTime> OffsetPointToLeft(Point<TTime> point, TDuration offset)
         {
+            if (OffsetToLeft == null)
+                throw new CalendarsCustomizationException(new ArgumentNullException(nameof(OffsetToLeft)));
+
             var value = OffsetToLeft(point.PointValue, offset);
             return CreateOffsetedPoint(point, value);
         }
         public static Point<TTime> OffsetPointToRight(Point<TTime> point, TDuration offset)
         {
+            if (OffsetToRight == null)
+                throw new CalendarsCustomizationException(new ArgumentNullException(nameof(OffsetToRight)));
+
             var value = OffsetToRight(point.PointValue, offset);
             return CreateOffsetedPoint(point, value);
         }
@@ -120,7 +175,10 @@ namespace Protoplasm.Calendars
             private readonly Calendars<TTime, TDuration, TC>.MutableCalendar _available;
             private readonly Calendars<TTime, TDuration, TSch>.CalendarItems _allocated;
 
-            
+
         }
+
     }
+
+
 }
