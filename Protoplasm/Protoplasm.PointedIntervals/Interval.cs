@@ -1,4 +1,5 @@
 using System;
+using Protoplasm.Utils;
 
 namespace Protoplasm.PointedIntervals
 {
@@ -7,6 +8,9 @@ namespace Protoplasm.PointedIntervals
         public static readonly Interval<TBound> Undefined = new Interval<TBound>(Point<TBound>.Left(), Point<TBound>.Right());
         public readonly Point<TBound> Left;
         public readonly Point<TBound> Right;
+
+        public readonly ArithmeticAdapter<TBound> Min;
+        public readonly ArithmeticAdapter<TBound> Max;
 
         /// <summary>
         /// Обе границы не определены
@@ -39,6 +43,9 @@ namespace Protoplasm.PointedIntervals
 
             if (Left > Right)
                 throw new Exception("left > right");
+
+            Min = Left;
+            Max = Right;
         }
 
         public Interval<TBound> Intersect(Interval<TBound> interval)

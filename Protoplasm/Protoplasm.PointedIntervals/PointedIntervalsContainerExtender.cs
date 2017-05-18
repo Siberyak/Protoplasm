@@ -29,7 +29,7 @@ namespace Protoplasm.PointedIntervals
 
         class IntIntInterval : PointedInterval<int, int>
         {
-            public IntIntInterval(Point<int> left = null, Point<int> right = null, int data = 0) : base(left, right, data)
+            public IntIntInterval(Point<int> left = default(Point<int>), Point<int> right = default(Point<int>), int data = 0) : base(left, right, data)
             {
             }
         }

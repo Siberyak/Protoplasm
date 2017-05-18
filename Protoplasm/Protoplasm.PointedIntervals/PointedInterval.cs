@@ -53,7 +53,12 @@ namespace Protoplasm.PointedIntervals
         /// <param name="rightIncluded"></param>
         /// <param name="data"></param>
         protected internal PointedInterval(TBound? left, bool leftIncluded, TBound? right, bool rightIncluded, TData data)
-            : this(left.HasValue ? Point<TBound>.Left(left.Value, leftIncluded) : Point<TBound>.Left(), right.HasValue ? Point<TBound>.Right(right.Value, rightIncluded) : Point<TBound>.Right(), data)
+            : this
+            (
+                  left.HasValue ? Point<TBound>.Left(left.Value, leftIncluded) : Point<TBound>.Left(),
+                  right.HasValue ? Point<TBound>.Right(right.Value, rightIncluded) : Point<TBound>.Right(),
+                  data
+                  )
         { }
 
         protected internal PointedInterval(Point<TBound> left = null, Point<TBound> right = null, TData data = default(TData))
@@ -74,9 +79,9 @@ namespace Protoplasm.PointedIntervals
             // [[, ]], ((, )) 
             if (Left.Equals(point) || Right.Equals(point))
             {
-                if(selfAsSplitted)
+                if (selfAsSplitted)
                 {
-                    points = new[] {Left, Right};
+                    points = new[] { Left, Right };
                     return true;
                 }
 
@@ -91,26 +96,26 @@ namespace Protoplasm.PointedIntervals
             if (!equalsToLeft && !equalsToRight)
             {
                 var pair = point.Split();
-                points = new[] {Left, pair[0], pair[1], Right};
+                points = new[] { Left, pair[0], pair[1], Right };
             }
             // левая граница ([, [(
             // = [](*
             else if (equalsToLeft)
             {
-                points = new[] {Point<TBound>.Left(point), Point<TBound>.Right(point), Point<TBound>.Left(point, false), Right};
+                points = new[] { Point<TBound>.Left(point), Point<TBound>.Right(point), Point<TBound>.Left(point, false), Right };
 
             }
             // правая граница )], ])
             // = *)[]
             else
             {
-                points = new[] { Left, Point<TBound>.Right(point, false), Point<TBound>.Left(point), Point<TBound>.Right(point) } ;
+                points = new[] { Left, Point<TBound>.Right(point, false), Point<TBound>.Left(point), Point<TBound>.Right(point) };
             }
 
             return true;
         }
 
 
-        
+
     }
 }

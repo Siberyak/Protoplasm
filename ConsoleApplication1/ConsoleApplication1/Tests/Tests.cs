@@ -171,7 +171,7 @@ namespace ConsoleApplication1.TestData
             var tmpSch = adc.CreateSchedule(TimeSpan.FromMinutes(15));
             var scheduler = new Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
                 (
-                tmpSch, ProcessInstructionsRequest, ProcessAmountRequest, PrecessDurationByAmount
+                tmpSch, ProcessInstructionsRequest, ProcessAmountRequest, PrecessDurationByAmount, ProcessDataForAllocate
                 );
 
             var start = new Interval<DateTime>(left.Left(true));
@@ -244,6 +244,18 @@ namespace ConsoleApplication1.TestData
             var k = amount.Value/fullamount.Value;
             return TimeSpan.FromTicks(Convert.ToInt64(Math.Round(fullduration.Ticks * k)));
         }
+
+        private static PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData ProcessDataForAllocate(Interval<DateTime> interval, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData originaldata, Appointment reqiredamount)
+        {
+            if (!(originaldata is AmountedData))
+                throw new ArgumentException("", nameof(originaldata));
+
+            var data = (AmountedData)originaldata;
+
+            var amount = 10 - data.Appointments.Sum(x => x.Value);
+            return AmountedData.Appoint(reqiredamount.Appointee, (int) amount);
+        }
+
 
 
         private static void TestTestDataScheduller()
@@ -579,13 +591,17 @@ namespace ConsoleApplication1.TestData
             SubstAmount = Subst;
         }
 
-        public TestDataScheduller(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ISchedule schedule) : base(schedule, ResponseInstructions, ResponseAmount, ResponseDuration)
+        public TestDataScheduller(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ISchedule schedule) : base(schedule, ResponseInstructions, ResponseAmount, ResponseDuration, ResponseDataForAllocate)
         {}
 
         private static TimeSpan ResponseDuration(TimeSpan fullduration, TestAppointment fullamount, TestAppointment amount)
         {
             var k = amount.Hours / fullamount.Hours;
             return TimeSpan.FromTicks(Convert.ToInt64(Math.Round(fullduration.Ticks * k)));
+        }
+        private static PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData ResponseDataForAllocate(Interval<DateTime> interval, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData originaldata, TestAppointment reqiredamount)
+        {
+            throw new NotImplementedException();
         }
 
         static TestAppointment Add(TestAppointment a, TestAppointment b)

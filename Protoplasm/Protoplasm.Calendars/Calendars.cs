@@ -16,15 +16,15 @@ namespace Protoplasm.Calendars
     {
         static Calendars()
         {
-            if (DataAdapter<TDuration>.Add == null)
-                DataAdapter<TDuration>.Add = Add;
+            if (ArithmeticAdapter<TDuration>.Add == null)
+                ArithmeticAdapter<TDuration>.Add = Add;
             else
-                AddDuration = DataAdapter<TDuration>.Add;
+                AddDuration = ArithmeticAdapter<TDuration>.Add;
 
-            if (DataAdapter<TDuration>.Subst == null)
-                DataAdapter<TDuration>.Subst = Subst;
+            if (ArithmeticAdapter<TDuration>.Subst == null)
+                ArithmeticAdapter<TDuration>.Subst = Subst;
             else
-                SubstDuration = DataAdapter<TDuration>.Subst;
+                SubstDuration = ArithmeticAdapter<TDuration>.Subst;
         }
 
         public static Func<TTime?, TTime?, TDuration?> ToDuration;
@@ -36,11 +36,11 @@ namespace Protoplasm.Calendars
 
         public static TTime Min(TTime a, TTime b)
         {
-            return DataAdapter<TTime>.Min(a, b);
+            return ArithmeticAdapter<TTime>.Min(a, b);
         }
         public static TTime Max(TTime a, TTime b)
         {
-            return DataAdapter<TTime>.Max(a, b);
+            return ArithmeticAdapter<TTime>.Max(a, b);
         }
         public static TTime? Min(TTime? a, TTime? b)
         {
@@ -53,11 +53,11 @@ namespace Protoplasm.Calendars
 
         public static TDuration Min(TDuration a, TDuration b)
         {
-            return DataAdapter<TDuration>.Min(a, b);
+            return ArithmeticAdapter<TDuration>.Min(a, b);
         }
         public static TDuration Max(TDuration a, TDuration b)
         {
-            return DataAdapter<TDuration>.Max(a, b);
+            return ArithmeticAdapter<TDuration>.Max(a, b);
         }
 
         public static TDuration? Min(TDuration? a, TDuration? b)
@@ -74,7 +74,7 @@ namespace Protoplasm.Calendars
             where T : struct, IComparable<T>
         {
             return a.HasValue && b.HasValue
-                ? DataAdapter<T>.Min(a.Value, b.Value)
+                ? ArithmeticAdapter<T>.Min(a.Value, b.Value)
                 : a.HasValue ? a : b;
         }
 
@@ -82,7 +82,7 @@ namespace Protoplasm.Calendars
             where T : struct, IComparable<T>
         {
             return a.HasValue && b.HasValue
-                ? DataAdapter<T>.Max(a.Value, b.Value)
+                ? ArithmeticAdapter<T>.Max(a.Value, b.Value)
                 : a.HasValue ? a : b;
         }
 
@@ -180,5 +180,44 @@ namespace Protoplasm.Calendars
 
     }
 
+    public static class CalendarsExtender
+    {
+        public static Interval<TBound> Interval<TBound>(this Point<TBound> left, Point<TBound> right)
+            where TBound : struct, IComparable<TBound>
+        {
+            return new Interval<TBound>(left, right);
+        }
+
+        public static Point<TTime> OffsetToLeft<TTime, TDuration>(this Point<TTime> point, ArithmeticAdapter<TDuration> offset)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return offset == default(ArithmeticAdapter<TDuration>)
+                ? point
+                : Calendars<TTime, TDuration>.OffsetPointToLeft(point, offset.Value);
+        }
+
+        public static Point<TTime> OffsetToRight<TTime, TDuration>(this Point<TTime> point, ArithmeticAdapter<TDuration> offset)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return offset == default(ArithmeticAdapter<TDuration>) 
+                ? point 
+                : Calendars<TTime, TDuration>.OffsetPointToRight(point, offset.Value);
+        }
+
+        public static Point<TTime> OffsetToLeft<TTime, TDuration>(this Point<TTime> point, TDuration offset)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return Calendars<TTime, TDuration>.OffsetPointToLeft(point, offset);
+        }
+        public static Point<TTime> OffsetToRight<TTime, TDuration>(this Point<TTime> point, TDuration offset)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return Calendars<TTime, TDuration>.OffsetPointToRight(point, offset);
+        }
+    }
 
 }

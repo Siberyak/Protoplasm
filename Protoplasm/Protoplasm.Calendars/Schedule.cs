@@ -61,25 +61,25 @@ namespace Protoplasm.Calendars
             public void Include(Point<TTime> left, Point<TTime> right, TData data)
             {
                 _allocated.Include(left, right, data);
-                _available.Deallocate(left, right, data);
+                _available.Allocate(left, right, data);
             }
 
             public void Include(TTime? left, TTime? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
             {
                 _allocated.Include(left, right, data, leftIncluded, rightIncluded);
-                _available.Deallocate(left, right, data, leftIncluded, rightIncluded);
+                _available.Allocate(left, right, data, leftIncluded, rightIncluded);
             }
 
             public void Exclude(Point<TTime> left, Point<TTime> right, TData data)
             {
                 _allocated.Exclude(left, right, data);
-                _available.Allocate(left, right, data);
+                _available.Deallocate(left, right, data);
             }
 
             public void Exclude(TTime? left, TTime? right, TData data, bool leftIncluded = true, bool rightIncluded = true)
             {
                 _allocated.Exclude(left, right, data, leftIncluded, rightIncluded);
-                _available.Allocate(left, right, data, leftIncluded, rightIncluded);
+                _available.Deallocate(left, right, data, leftIncluded, rightIncluded);
             }
 
             public CalendarItem[] DefinedItems()

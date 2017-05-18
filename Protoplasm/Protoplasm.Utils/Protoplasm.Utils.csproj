@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArithmeticAdapter\ArithmeticAdapterInitializer.cs" />
+    <Compile Include="ArithmeticAdapter\ValueSemantic.cs" />
     <Compile Include="Collections\BindingListWrapper_convertable.cs" />
     <Compile Include="Collections\BindingListWrapper_simple.cs" />
     <Compile Include="Collections\DataList.cs" />
@@ -57,7 +59,7 @@
     <Compile Include="CommonEnumHelper.cs" />
     <Compile Include="ConfigExtender.cs" />
     <Compile Include="CustomizationException.cs" />
-    <Compile Include="DataAdapter.cs" />
+    <Compile Include="ArithmeticAdapter\ArithmeticAdapter.cs" />
     <Compile Include="EnumDisplayNameAttribute.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="EnumItem.cs" />

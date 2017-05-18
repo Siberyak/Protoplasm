@@ -55,7 +55,10 @@
     <Compile Include="IteratorInstruction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schedule.cs" />
+    <Compile Include="Scheduler.Iterator.cs" />
+    <Compile Include="Scheduler.Restrictions.cs" />
     <Compile Include="Scheduler.cs" />
+    <Compile Include="Scheduler.Delegates.cs" />
     <Compile Include="Scheduler.Tests.cs" />
     <Compile Include="SchedulerKind.cs" />
     <Compile Include="Tests\ByDayInfosAdapter.cs" />

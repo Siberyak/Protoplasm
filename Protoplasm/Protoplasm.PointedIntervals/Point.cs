@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Protoplasm.Utils;
 
 namespace Protoplasm.PointedIntervals
 {
@@ -217,9 +218,101 @@ namespace Protoplasm.PointedIntervals
             return _comparer.Compare(a, b) != 0;
         }
 
-        public static implicit operator TBound?(Point<TBound> point)
+        /// <summary>
+        /// Сдвиг вправо
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static Point<TBound> operator +(Point<TBound> point, TBound offset)
+        {
+            return point + (ArithmeticAdapter<TBound>)offset;
+        }
+
+        /// <summary>
+        /// Сдвиг влево
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static Point<TBound> operator -(Point<TBound> point, TBound offset)
+        {
+            return point - (ArithmeticAdapter<TBound>)offset;
+        }
+
+
+        /// <summary>
+        /// Сдвиг вправо
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static Point<TBound> operator +(Point<TBound> point, ArithmeticAdapter<TBound> offset)
+        {
+            if (point?.PointValue == null)
+                return point;
+
+            ArithmeticAdapter<TBound> value = point;
+            return PointByResult(point, value + offset);
+        }
+
+        /// <summary>
+        /// Сдвиг влево
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static Point<TBound> operator -(Point<TBound> point, ArithmeticAdapter<TBound> offset)
+        {
+            if (point?.PointValue == null)
+                return point;
+
+            ArithmeticAdapter<TBound> value = point;
+
+            return PointByResult(point, value - offset);
+        }
+
+        private static Point<TBound> PointByResult(Point<TBound> point, ArithmeticAdapter<TBound> result)
+        {
+            if (result.IsDefined)
+                return new Point<TBound>(result.Value, point.Direction, point.Included);
+            if (result.IsNegativeInfinity)
+                return Left();
+            if (result.IsPositiveInfinity)
+                return Right();
+
+            return null;
+        }
+
+
+        ///// <summary>
+        ///// Расстояние между тчками
+        ///// </summary>
+        ///// <param name="a"></param>
+        ///// <param name="b"></param>
+        ///// <returns></returns>
+        //public static TBound operator -(Point<TBound> a, Point<TBound> b)
+        //{
+        //    if (a?.PointValue.HasValue == true && b?.PointValue.HasValue == true)
+        //        return (((ArithmeticAdapter<TBound>) a.PointValue.Value) - b.PointValue.Value).Value;
+
+        //    throw new ArgumentException($"одна из точек (или обе) не определены. невозможно вычислить расстояние. a:'{a}', b:'{b}'");
+        //}
+
+        public static implicit operator TBound? (Point<TBound> point)
         {
             return point.PointValue;
+        }
+
+        public static implicit operator ArithmeticAdapter<TBound>(Point<TBound> point)
+        {
+            return point.PointValue ??
+                   (
+                       point.Direction == PointDirection.Left
+                           ? ArithmeticAdapter<TBound>.NegativeInfinity
+                           : ArithmeticAdapter<TBound>.PositiveInfinity
+                       )
+                ;
         }
 
 
@@ -236,8 +329,17 @@ namespace Protoplasm.PointedIntervals
             /// <param name="a">Первый сравниваемый объект.</param><param name="b">Второй сравниваемый объект.</param>
             public int Compare(Point<TBound> a, Point<TBound> b)
             {
-                TBound? aa = a.PointValue;
-                TBound? bb = b.PointValue;
+                if ((object)a == null && (object)b == null)
+                    return 0;
+
+                if ((object)a == null)
+                    return 1;
+
+                if ((object)b == null)
+                    return -1;
+
+                var aa = a.PointValue;
+                var bb = b.PointValue;
 
                 if (!aa.HasValue && !bb.HasValue)
                     return a.Direction == b.Direction ? 0 : ByDirection(a.Direction);
@@ -351,5 +453,10 @@ namespace Protoplasm.PointedIntervals
         }
 
         public bool IsUndefined => !PointValue.HasValue;
+
+        //public static implicit operator ArithmeticAdapter<TBound>(Point<TBound> point)
+        //{
+        //    return point.PointValue ?? default(ArithmeticAdapter<TBound>);
+        //}
     }
 }
