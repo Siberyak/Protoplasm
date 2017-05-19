@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class Competence
     {
@@ -123,50 +123,5 @@ namespace ConsoleApplication1.TestData
         }
     }
 
-    public abstract class MembershipItem : Entity
-    {
-        protected readonly Competences MembershipCompetences;
-        protected MembershipItem(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption)
-        {
-            var membership = memberOf.ToArray();
-            MemberOf = membership;
 
-            var competences = Competences.New();
-            foreach (var item in membership)
-            {
-                competences = competences.MemberOf(item);
-                item.AddMember(this);
-            }
-
-            MembershipCompetences = competences;
-        }
-
-  
-
-        protected IEnumerable<MembershipItem> MemberOf { get; }
-
-        public virtual bool MemberOfOrEqual(MembershipItem item)
-        {
-            return Equals(this, item) || MemberOf?.Any(x => x.MemberOfOrEqual(item)) == true;
-        }
-
-        public override string ToString()
-        {
-            return Caption ?? $"{base.ToString()}[{GetHashCode()}]";
-        }
-    }
-
-    public abstract class MembershipItemsContainer : MembershipItem
-    {
-        protected readonly List<MembershipItem> Members = new List<MembershipItem>();
-
-        protected MembershipItemsContainer(string caption, IEnumerable<MembershipItemsContainer> memberOf) : base(caption, memberOf)
-        {
-        }
-
-        public void AddMember(MembershipItem member)
-        {
-            Members.Add(member);
-        }
-    }
 }

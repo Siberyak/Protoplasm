@@ -8,11 +8,15 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ColorsMixer;
 using DevExpress.XtraBars;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Base;
+using DevExpress.XtraGrid.Views.Card;
+using DevExpress.XtraGrid.Views.Card.ViewInfo;
 using DevExpress.XtraGrid.Views.Layout.Events;
 using Factorio.Lua.Reader.Views;
+using Color = ColorsMixer.Color;
 
 namespace Factorio.Lua.Reader
 {
@@ -36,7 +40,34 @@ namespace Factorio.Lua.Reader
             _partsView.CustomCardCaptionImage += (sender, args) => args.Image = _partsView.RowData<Part>(args.RowHandle).Image;
             _partsView.FocusedRowChanged += PartsRowChanged;
 
+            _craftsView.CustomDrawCardCaption += CraftsCustomDrawCardCaption;
+            
             //_craftsView.Card
+        }
+
+
+        private void CraftsCustomDrawCardCaption(object sender, CardCaptionCustomDrawEventArgs e)
+        {
+            var cardInfo = e.CardInfo as CardInfo;
+            if(cardInfo == null)
+                return;
+            cardInfo.CaptionInfo.PaintAppearance.BackColor = System.Drawing.Color.Aqua;
+
+            var color = e.Appearance.BackColor;
+            var fromArgb = Color.FromArgb(128, 0, 255, 0);
+
+            var backColor1 = fromArgb.Mix(color);
+            var backColor2 = color.Mix(fromArgb);
+
+            color = color.ApplyAlfa(128);
+            var backColor3 = fromArgb.Mix(color);
+            var backColor4 = color.Mix(fromArgb);
+
+            e.Appearance.ForeColor = System.Drawing.Color.Aqua;
+
+            e.DefaultDraw();
+
+            e.Handled = true;
         }
 
         private void PartsRowChanged(object sender, FocusedRowChangedEventArgs e)

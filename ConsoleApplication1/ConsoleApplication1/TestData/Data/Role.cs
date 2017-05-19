@@ -1,3 +1,5 @@
+using MAS.Utils;
+
 namespace ConsoleApplication1.TestData
 {
     public class Role : MembershipItemsContainer

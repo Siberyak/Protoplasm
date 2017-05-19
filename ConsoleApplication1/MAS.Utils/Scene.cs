@@ -2,23 +2,25 @@ using System.Collections.Generic;
 using System.Linq;
 using MAS.Core.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
-    public class Scene : IScene
+    public abstract class Scene<TSatisfaction> : IScene
+        where TSatisfaction : class, ISatisfaction
     {
-        private Satisfaction _satisfaction;
+        protected TSatisfaction _satisfaction;
 
-        public Scene()
+        protected Scene()
         { }
 
-        private Scene(IScene original)
+        protected Scene(IScene original)
         {
             Original = original;
         }
 
         public IScene Original { get; }
 
-        public ISatisfaction Satisfaction => _satisfaction ?? (_satisfaction = new Satisfaction(((Scene)Original)._satisfaction?.Value ?? 0));
+        public ISatisfaction Satisfaction => _satisfaction ?? (_satisfaction = GetSatisfaction());
+        protected abstract TSatisfaction GetSatisfaction();
 
         private readonly List<INegotiator> _negotiators = new List<INegotiator>();
         public IEnumerable<INegotiator> Negotiators
@@ -50,14 +52,9 @@ namespace ConsoleApplication1.TestData
             return negotiator;
         }
 
-        public IScene Branch()
-        {
-            return new Scene(this);
-        }
+        public abstract IScene Branch();
 
-        public void MergeToOriginal()
-        {
-        }
+        public abstract void MergeToOriginal();
 
     }
 }

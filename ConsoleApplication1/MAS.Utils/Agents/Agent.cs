@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class Agent : IAgent
     {
@@ -23,7 +22,7 @@ namespace ConsoleApplication1.TestData
             throw new NotImplementedException();
         }
 
-        public virtual INegotiator this[IScene scene] => (scene as Scene)?.Negotiator(this);
+        public virtual INegotiator this[IScene scene] => scene?.Negotiator(this);
 
 
         public abstract IReadOnlyCollection<IRequirement> Requirements { get; }
@@ -36,12 +35,13 @@ namespace ConsoleApplication1.TestData
         public abstract IAbility ToScene(IAbility ability);
         public abstract void Initialize();
         public abstract IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos();
-        public INegotiator Negotiator(IScene scene)
+
+        INegotiator IAgent.Negotiator(IScene scene)
         {
-            return Negotiator((Scene) scene);
+            return Negotiator(scene);
         }
 
-        protected abstract INegotiator Negotiator(Scene scene);
+        protected abstract INegotiator Negotiator(IScene scene);
 
     }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class AgentsManager : IAgentsManager
     {

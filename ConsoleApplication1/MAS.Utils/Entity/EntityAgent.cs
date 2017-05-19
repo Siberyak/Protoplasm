@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class EntityAgent<T> : Agent, IEntityAgent<T>
         where T : Entity

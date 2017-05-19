@@ -3,15 +3,6 @@ using MAS.Core.Contracts;
 
 namespace ConsoleApplication1.TestData
 {
-    public class Satisfaction : Satisfaction<double>
-    {
-        public Satisfaction(double original) : base(original)
-        {
-        }
-
-        public override double Value => _original + Delta;
-    }
-
     public abstract class Satisfaction<T> : ISatisfaction<T>
         where T : IComparable<T>
     {

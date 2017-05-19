@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using MAS.Core.Compatibility.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public interface IAgentsManager
     {

@@ -13,7 +13,7 @@ namespace MAS.Core.Contracts
         ISatisfaction Satisfaction { get; }
 
         IEnumerable<INegotiator> Negotiators { get; }
-        
 
+        INegotiator Negotiator(IAgent agent);
     }
 }

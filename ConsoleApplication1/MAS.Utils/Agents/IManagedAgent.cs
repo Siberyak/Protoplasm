@@ -1,6 +1,6 @@
 using MAS.Core.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public interface IManagedAgent : IAgent
     {

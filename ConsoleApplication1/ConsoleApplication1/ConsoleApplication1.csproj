@@ -66,47 +66,35 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestData\Abilities\ScheduleAbility.cs" />
-    <Compile Include="TestData\Agents\AgentsManager.cs" />
-    <Compile Include="TestData\Agents\IAgentsManager.cs" />
-    <Compile Include="TestData\Agents\IManagedAgent.cs" />
     <Compile Include="TestData\Data\Negotiator.cs" />
+    <Compile Include="TestData\Membership\MembershipItem.cs" />
+    <Compile Include="TestData\Membership\MembershipItemsContainer.cs" />
     <Compile Include="TestData\AvailabilityCalendar\IAvailabilityCalendar.cs" />
     <Compile Include="TestData\AvailabilityCalendar\IAvailabilityData.cs" />
     <Compile Include="TestData\AvailabilityCalendar\AvailabilityCalendar.cs" />
     <Compile Include="TestData\Agents\DepartmentAgent.cs" />
     <Compile Include="TestData\Agents\EmployeeAgent.cs" />
-    <Compile Include="TestData\Data\Agent.cs" />
-    <Compile Include="TestData\Data\EntityAgent.cs" />
-    <Compile Include="TestData\Data\IEntityAgent.cs" />
-    <Compile Include="TestData\Data\ManagedAgent.cs" />
-    <Compile Include="TestData\Data\ManagedEntityAgent.cs" />
     <Compile Include="TestData\Messaging\MessagingTests.cs" />
     <Compile Include="TestData\AvailabilityCalendar\AvailabilityCalendarAdapter.cs" />
+    <Compile Include="TestData\Satisfaction.cs" />
+    <Compile Include="TestData\Scene.cs" />
     <Compile Include="Tests\CompetencesTests.cs" />
     <Compile Include="TestData\Requirements\BoundaryRequirement.cs" />
     <Compile Include="TestData\Data\Calendar.cs" />
     <Compile Include="TestData\Abilities\CalendarAbility.cs" />
-    <Compile Include="TestData\Competences\Competence.cs" />
-    <Compile Include="TestData\Competences\Competences.cs" />
-    <Compile Include="TestData\Abilities\CompetencesAbility.cs" />
-    <Compile Include="TestData\Competences\CompetencesExtender.cs" />
-    <Compile Include="TestData\Requirements\CompetencesRequirement.cs" />
+    <Compile Include="TestData\Membership\MemberOfCompetencesExtender.cs" />
     <Compile Include="TestData\Data\Department.cs" />
     <Compile Include="TestData\Data\Employee.cs" />
     <Compile Include="TestData\Data\Interval.cs" />
-    <Compile Include="TestData\Competences\MemberOfCompetence.cs" />
+    <Compile Include="TestData\Membership\MemberOfCompetence.cs" />
     <Compile Include="TestData\PlanningEnvironment.cs" />
-    <Compile Include="TestData\Requirements\Requirement.cs" />
     <Compile Include="TestData\Agents\ResourcesManager.cs" />
-    <Compile Include="TestData\Data\Entity.cs" />
     <Compile Include="TestData\Data\Role.cs" />
     <Compile Include="TestData\Agents\WorkItemAgent.cs" />
     <Compile Include="TestData\Agents\WorkItemsManager.cs" />
-    <Compile Include="TestData\Abilities\Ability.cs" />
     <Compile Include="TestData\Data\WorkItem.cs" />
     <Compile Include="Tests\ISatisfaction.cs" />
     <Compile Include="Tests\Satisfaction.cs" />
-    <Compile Include="Tests\Scene.cs" />
     <Compile Include="Tests\Tests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +118,10 @@
     <ProjectReference Include="..\MAS.Core\MAS.Core.csproj">
       <Project>{0cfb6a8e-af1c-483f-99de-44d6b867ec71}</Project>
       <Name>MAS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MAS.Utils\MAS.Utils.csproj">
+      <Project>{01a06b29-de50-449a-a651-2f9a58efe985}</Project>
+      <Name>MAS.Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

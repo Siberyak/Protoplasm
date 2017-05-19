@@ -7,6 +7,7 @@ using Akka.Actor;
 using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Contracts;
+using MAS.Utils;
 using Protoplasm.Calendars;
 using Protoplasm.Calendars.Tests;
 using Protoplasm.PointedIntervals;
@@ -497,7 +498,7 @@ namespace ConsoleApplication1.TestData
         public PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData Exclude(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData availabilityData)
         {
             var testdata = availabilityData as TestData ?? new TestData(null);
-            if (Appointee == null && Equals(Appointee, testdata.Appointee))
+            if (Appointee == null || Equals(Appointee, testdata.Appointee))
                 return new TestData(null);
 
             throw new NotSupportedException();

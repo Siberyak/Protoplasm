@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{72DE7DD2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protoplasm.Utils.UnitTests", "Protoplasm.Utils.UnitTests\Protoplasm.Utils.UnitTests.csproj", "{DF6F1B2A-1E2C-4502-A3DB-E07CE9C74CF9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAS.Utils", "MAS.Utils\MAS.Utils.csproj", "{01A06B29-DE50-449A-A651-2F9A58EFE985}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{DF6F1B2A-1E2C-4502-A3DB-E07CE9C74CF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF6F1B2A-1E2C-4502-A3DB-E07CE9C74CF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF6F1B2A-1E2C-4502-A3DB-E07CE9C74CF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01A06B29-DE50-449A-A651-2F9A58EFE985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01A06B29-DE50-449A-A651-2F9A58EFE985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01A06B29-DE50-449A-A651-2F9A58EFE985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01A06B29-DE50-449A-A651-2F9A58EFE985}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,5 +68,6 @@ Global
 		{C1BD47E7-1B00-45DE-BE1B-F4C4F0F76EA8} = {6D8D77A3-B788-4B55-85DB-BEE3D684C323}
 		{72DE7DD2-EDD2-432E-A491-91905EB526B8} = {6D8D77A3-B788-4B55-85DB-BEE3D684C323}
 		{DF6F1B2A-1E2C-4502-A3DB-E07CE9C74CF9} = {72DE7DD2-EDD2-432E-A491-91905EB526B8}
+		{01A06B29-DE50-449A-A651-2F9A58EFE985} = {3BDDFE4F-8098-493D-883B-6092F3634818}
 	EndGlobalSection
 EndGlobal

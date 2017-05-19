@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using MAS.Utils;
 
 namespace ConsoleApplication1.TestData
 {
-    public static class CompetencesExtender
+    public static class MemberOfCompetencesExtender
     {
         public static Competences MemberOf(this Competences competences, out IEnumerable<Competence> result, params MembershipItem[] memberOf)
         {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using MAS.Core;
 using MAS.Core.Contracts;
+using MAS.Utils;
 
 namespace ConsoleApplication1.TestData
 {
@@ -14,7 +15,7 @@ namespace ConsoleApplication1.TestData
                 
             }
 
-            protected override INegotiator Negotiator(Scene scene)
+            protected override INegotiator Negotiator(IScene scene)
             {
                 throw new System.NotImplementedException();
             }

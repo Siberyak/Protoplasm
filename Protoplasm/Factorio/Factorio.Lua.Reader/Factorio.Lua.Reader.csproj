@@ -256,6 +256,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ColorsMixer\ColorsMixer.csproj">
+      <Project>{28d83d59-84bf-4bb6-8f58-cb1858b61f91}</Project>
+      <Name>ColorsMixer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Protoplasm.ComponentModel\Protoplasm.ComponentModel.csproj">
       <Project>{40e24e3b-7e11-404a-978d-e909a44b118b}</Project>
       <Name>Protoplasm.ComponentModel</Name>

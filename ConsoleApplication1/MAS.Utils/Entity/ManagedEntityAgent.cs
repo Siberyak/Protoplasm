@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
-using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 using Protoplasm.Utils;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class ManagedEntityAgent<TEntity> : EntityAgent<TEntity>, IManagedAgent
         where TEntity : Entity

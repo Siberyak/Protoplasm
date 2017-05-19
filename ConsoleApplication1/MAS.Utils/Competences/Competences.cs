@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public class Competences : IReadOnlyCollection<Competence>
     {

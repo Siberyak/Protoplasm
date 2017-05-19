@@ -1,10 +1,9 @@
 using System;
-using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class Requirement : IRequirement
     {

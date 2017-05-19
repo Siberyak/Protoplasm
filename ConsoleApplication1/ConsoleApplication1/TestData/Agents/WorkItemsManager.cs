@@ -4,6 +4,7 @@ using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
+using MAS.Utils;
 using Protoplasm.PointedIntervals;
 using Protoplasm.Utils;
 

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using MAS.Core.Compatibility.Contracts;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class ManagedAgent : Agent, IManagedAgent
     {
-        public ManagedAgent(IAgentsManager manager)
+        protected ManagedAgent(IAgentsManager manager)
         {
             Manager = manager;
         }
