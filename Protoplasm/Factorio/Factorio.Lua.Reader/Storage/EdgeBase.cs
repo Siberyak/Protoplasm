@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Factorio.Lua.Reader.Graph;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {

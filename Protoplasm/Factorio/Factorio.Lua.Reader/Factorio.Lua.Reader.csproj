@@ -256,6 +256,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Collections\Protoplasm.Collections.csproj">
+      <Project>{430db1b1-28d5-4693-a1c0-9867441eebde}</Project>
+      <Name>Protoplasm.Collections</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ColorsMixer\ColorsMixer.csproj">
       <Project>{28d83d59-84bf-4bb6-8f58-cb1858b61f91}</Project>
       <Name>ColorsMixer</Name>
@@ -263,6 +267,10 @@
     <ProjectReference Include="..\..\Protoplasm.ComponentModel\Protoplasm.ComponentModel.csproj">
       <Project>{40e24e3b-7e11-404a-978d-e909a44b118b}</Project>
       <Name>Protoplasm.ComponentModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Protoplasm.Graph\Protoplasm.Graph.csproj">
+      <Project>{3a5438b3-f555-4405-a6e1-5464dad5c02c}</Project>
+      <Name>Protoplasm.Graph</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Protoplasm.Utils\Protoplasm.Utils.csproj">
       <Project>{19baf319-a0ba-4c50-b580-32647171c73b}</Project>

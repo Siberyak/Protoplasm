@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using DevExpress.XtraExport;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {

@@ -7,7 +7,7 @@ using System.Resources;
 using Microsoft.SqlServer.Server;
 using Protoplasm.PointedIntervals;
 using Protoplasm.Utils;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Protoplasm.Calendars
 {

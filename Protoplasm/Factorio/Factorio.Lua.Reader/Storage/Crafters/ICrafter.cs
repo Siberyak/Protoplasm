@@ -1,4 +1,4 @@
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {

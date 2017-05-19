@@ -5,7 +5,7 @@ using System.Linq;
 using Protoplasm.ComponentModel;
 using Protoplasm.Collections;
 
-namespace Protoplasm.Utils.Graph
+namespace Protoplasm.Graph
 {
     public class DataNode<TNodeData> : CustomTypeDescriptorBase, IDataNode<TNodeData>, IPropertyDataProvider
     {

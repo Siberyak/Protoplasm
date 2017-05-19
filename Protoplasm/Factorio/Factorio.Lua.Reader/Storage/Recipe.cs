@@ -6,7 +6,7 @@ using System.Windows.Forms.VisualStyles;
 using Factorio.Lua.Reader.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {

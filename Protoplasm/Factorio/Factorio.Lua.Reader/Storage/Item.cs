@@ -2,7 +2,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {

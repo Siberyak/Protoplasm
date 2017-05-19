@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Factorio.Lua.Reader", "Fact
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorsMixer", "ColorsMixer\ColorsMixer.csproj", "{28D83D59-84BF-4BB6-8F58-CB1858B61F91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protoplasm.Collections", "Collections\Protoplasm.Collections.csproj", "{430DB1B1-28D5-4693-A1C0-9867441EEBDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protoplasm.Graph", "Protoplasm.Graph\Protoplasm.Graph.csproj", "{3A5438B3-F555-4405-A6E1-5464DAD5C02C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{28D83D59-84BF-4BB6-8F58-CB1858B61F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28D83D59-84BF-4BB6-8F58-CB1858B61F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28D83D59-84BF-4BB6-8F58-CB1858B61F91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{430DB1B1-28D5-4693-A1C0-9867441EEBDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430DB1B1-28D5-4693-A1C0-9867441EEBDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430DB1B1-28D5-4693-A1C0-9867441EEBDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430DB1B1-28D5-4693-A1C0-9867441EEBDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A5438B3-F555-4405-A6E1-5464DAD5C02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A5438B3-F555-4405-A6E1-5464DAD5C02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A5438B3-F555-4405-A6E1-5464DAD5C02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A5438B3-F555-4405-A6E1-5464DAD5C02C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

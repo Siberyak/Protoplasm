@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Protoplasm.Utils.Collections;
+using Protoplasm.Collections;
 
 namespace Factorio.Lua.Reader
 {

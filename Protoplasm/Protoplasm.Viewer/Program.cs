@@ -4,7 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
+using Protoplasm.Graph;
 using Protoplasm.ViewsAndActions;
 
 namespace Protoplasm.Viewer

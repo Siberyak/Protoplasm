@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Linq;
-using DevExpress.XtraLayout.Converter;
-using Protoplasm.Utils.Collections;
+
+using Protoplasm.Collections;
 
 namespace Factorio.Lua.Reader
 {

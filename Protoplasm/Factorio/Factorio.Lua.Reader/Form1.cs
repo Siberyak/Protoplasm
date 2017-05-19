@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using DevExpress.Utils.Menu;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraTreeList;
-using Protoplasm.Utils.Graph;
+using Protoplasm.Graph;
 
 namespace Factorio.Lua.Reader
 {
