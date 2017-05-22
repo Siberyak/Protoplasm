@@ -7,38 +7,41 @@ namespace MAS.Utils
     public abstract class Scene<TSatisfaction> : IScene
         where TSatisfaction : class, ISatisfaction
     {
-        protected TSatisfaction _satisfaction;
+        protected virtual TSatisfaction Satisfaction { get; set; }
 
         protected Scene()
         { }
 
-        protected Scene(IScene original)
+        protected Scene(Scene<TSatisfaction> original)
         {
             Original = original;
         }
 
-        public IScene Original { get; }
+        protected Scene<TSatisfaction> Original;
 
-        public ISatisfaction Satisfaction => _satisfaction ?? (_satisfaction = GetSatisfaction());
+        IScene IScene.Original => Original;
+
+        ISatisfaction IScene.Satisfaction => Satisfaction ?? (Satisfaction = GetSatisfaction());
         protected abstract TSatisfaction GetSatisfaction();
 
-        private readonly List<INegotiator> _negotiators = new List<INegotiator>();
-        public IEnumerable<INegotiator> Negotiators
+        protected readonly List<INegotiator> Negotiators = new List<INegotiator>();
+
+        IEnumerable<INegotiator> IScene.Negotiators
         {
             get
             {
-                lock (_negotiators)
+                lock (Negotiators)
                 {
-                    return _negotiators.ToArray();
+                    return Negotiators.ToArray();
                 }
             }
         }
 
         public INegotiator Negotiator(IAgent agent)
         {
-            lock (_negotiators)
+            lock (Negotiators)
             {
-                var negotiator = _negotiators.FirstOrDefault(x => x.Agent == agent)
+                var negotiator = Negotiators.FirstOrDefault(x => x.Agent == agent)
                                  ?? CreateNegotiator(agent);
 
                 return negotiator;
@@ -48,7 +51,7 @@ namespace MAS.Utils
         private INegotiator CreateNegotiator(IAgent agent)
         {
             var negotiator = agent.Negotiator(this);
-            _negotiators.Add(negotiator);
+            Negotiators.Add(negotiator);
             return negotiator;
         }
 
@@ -56,5 +59,32 @@ namespace MAS.Utils
 
         public abstract void MergeToOriginal();
 
+        private void MergeToOriginal1()
+        {
+            if (Original == null)
+                return;
+
+            lock (Original)
+            {
+                lock (Original.Negotiators)
+                {
+                    foreach (var negotiator in Negotiators.ToArray())
+                    {
+                        Original.ReplaceNegotiator(negotiator);
+                    }
+                }
+            }
+        }
+
+        private void ReplaceNegotiator(INegotiator negotiator)
+        {
+            lock (Negotiators)
+            {
+                var index = Negotiators.FindIndex(x => x.Agent == negotiator.Agent);
+                Negotiators[index] = negotiator;
+                //((IFlatableSatisfaction) negotiator.Satisfaction)?.Flat();
+            }
+
+        }
     }
 }

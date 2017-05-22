@@ -31,11 +31,6 @@ namespace MAS.Utils
             return base.Compatible(requirements, scene);
         }
 
-        public override bool Compatible(IAbilitiesHolder abilities, IScene scene)
-        {
-            return base.Compatible(abilities, scene);
-        }
-
         bool IRequirementsHolder.Compatible(IAbilitiesHolder abilities, IScene scene)
         {
             return Compatible(abilities, scene);
@@ -53,7 +48,7 @@ namespace MAS.Utils
 
         public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
         {
-            return Manager[this];
+            return Manager;
         }
     }
 }

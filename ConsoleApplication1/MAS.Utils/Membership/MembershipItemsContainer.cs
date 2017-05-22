@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public abstract class MembershipItemsContainer : MembershipItem
     {

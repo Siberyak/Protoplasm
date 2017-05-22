@@ -37,8 +37,8 @@ namespace Protoplasm.Calendars
                 schedule,
                 TimeSpanTimeSpanBoolCalendarAdapter.OnRequestInstructions,
                 TimeSpanTimeSpanBoolCalendarAdapter.OnRequestAmount,
-                TimeSpanTimeSpanBoolCalendarAdapter.OnRequestBurationByAmount,
-                TimeSpanTimeSpanBoolCalendarAdapter.OnRequestDataForAllocate
+                TimeSpanTimeSpanBoolCalendarAdapter.OnRequestBurationByAmount
+                //, TimeSpanTimeSpanBoolCalendarAdapter.OnRequestDataForAllocate
                 );
 
             scheduler.FindAllocation
@@ -104,9 +104,9 @@ namespace Protoplasm.Calendars
                 return false;
             }
 
-            public static IteratorInstruction OnRequestInstructions(bool? data, double requiredamount)
+            public static AllocationInstruction OnRequestInstructions(bool? data, double requiredamount)
             {
-                return data == false ? IteratorInstruction.Accept : IteratorInstruction.Reject;
+                return data == false ? AllocationInstruction.Accept : AllocationInstruction.Reject;
             }
 
             public static double OnRequestAmount(TimeSpan duration, bool? data, double requiredamount)
@@ -469,25 +469,25 @@ namespace Protoplasm.Calendars
             return new C().CreateSchedule(1);
         }
 
-        public IteratorInstruction ProcessRequestInstructions(TestData data, TestDataAmount requiredamount)
+        public AllocationInstruction ProcessRequestInstructions(TestData data, TestDataAmount requiredamount)
         {
             if (data.Skipped)
-                return IteratorInstruction.Skip;
+                return AllocationInstruction.Skip;
 
             var emptySlots = data.Slots.Count(x => x == null);
             var appointeeSlots = data.Slots.Count(x => x == requiredamount.Appointee);
 
             if (emptySlots == 0)
             {
-                return requiredamount.AllowBreaks ? IteratorInstruction.Reject : IteratorInstruction.Skip;
+                return requiredamount.AllowBreaks ? AllocationInstruction.Reject : AllocationInstruction.Skip;
             }
 
             if (emptySlots != data.Slots.Count && !requiredamount.AllowCombine)
             {
-                return IteratorInstruction.Reject;
+                return AllocationInstruction.Reject;
             }
 
-            return IteratorInstruction.Accept;
+            return AllocationInstruction.Accept;
         }
 
         public TestDataAmount ProcessRequestAmount(double duration, TestData data, TestDataAmount requiredamount)
@@ -521,7 +521,7 @@ namespace Protoplasm.Calendars
         { }
 
         public Sch(SchConfig config)
-            : base(config.Schedule, config.ProcessRequestInstructions, config.ProcessRequestAmount, config.ProcessRequestDurationByAmount, config.ProcessRequestDataForAllocate)
+            : base(config.Schedule, config.ProcessRequestInstructions, config.ProcessRequestAmount, config.ProcessRequestDurationByAmount/*, config.ProcessRequestDataForAllocate*/)
         {
         }
 

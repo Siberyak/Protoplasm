@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using MAS.Utils;
 
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public static class MemberOfCompetencesExtender
     {

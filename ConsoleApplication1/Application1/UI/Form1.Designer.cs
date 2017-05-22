@@ -1,4 +1,4 @@
-﻿namespace Application1
+﻿namespace Application1.UI
 {
     partial class Form1
     {

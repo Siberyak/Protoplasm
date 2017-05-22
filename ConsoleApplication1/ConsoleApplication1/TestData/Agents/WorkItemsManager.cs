@@ -39,6 +39,16 @@ namespace ConsoleApplication1.TestData
                 agent.Initialize();
                 return agent;
             }
+
+            protected override IEnumerable<IAbilitiesHolder> GetAbilitiesHolders()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<IRequirementsHolder> GetRequirementsHolders()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

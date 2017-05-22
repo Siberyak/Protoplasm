@@ -3,10 +3,13 @@ using System.Diagnostics;
 
 namespace Protoplasm.Utils
 {
-    public class ArithmeticAdapterInitializer
+    public static class ArithmeticAdapterInitializer
     {
         internal static readonly object Locker = new object();
-        internal static bool DataAdapterSelfTested;
+#if SELFTEST
+    internal static bool DataAdapterSelfTested;
+#endif
+
         internal static bool DataAdapterDefaultsInited;
 
         public static void Test()
@@ -270,7 +273,6 @@ namespace Protoplasm.Utils
                DataAdapterSelfTested = true;
             }
 #endif
-
         }
 
         public static void InitDefaults()
@@ -311,6 +313,17 @@ namespace Protoplasm.Utils
 #endif
                 DataAdapterDefaultsInited = true;
             }
+        }
+
+        public static T Max<T>(this T a, T b)
+            where T : IComparable<T>
+        {
+            return ((ArithmeticAdapter<T>)a).Max(b).Value;
+        }
+        public static T Min<T>(this T a, T b)
+            where T : IComparable<T>
+        {
+            return ((ArithmeticAdapter<T>)a).Min(b).Value;
         }
     }
 }

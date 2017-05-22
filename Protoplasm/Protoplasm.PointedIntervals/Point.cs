@@ -139,14 +139,14 @@ namespace Protoplasm.PointedIntervals
 
         public Point<TBound> AsRight(bool? included = null)
         {
-            return Direction == PointDirection.Right && included == Included
+            return Direction == PointDirection.Right && (included == Included || IsUndefined)
                 ? this
                 : Right(PointValue, included ?? !Included);
         }
 
         public Point<TBound> AsLeft(bool? included = null)
         {
-            return Direction == PointDirection.Left && included == Included
+            return Direction == PointDirection.Left && (included == Included || IsUndefined)
                 ? this
                 : Left(PointValue, included ?? !Included);
         }

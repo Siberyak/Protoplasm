@@ -44,8 +44,8 @@ namespace Protoplasm.Calendars
                     public INode<IteratorInterval> Node => _node.Alive ? _node : (_node = _getNode(_node));
 
                     public IteratorInterval Interval => Node.Value;
-                    public IteratorIntervalData IntervalData => Interval.Data;
-                    public IteratorInstruction Instruction => IntervalData.Instruction;
+                    public IntervalInfo IntervalData => Interval.Data;
+                    public AllocationInstruction Instruction => IntervalData.Instruction;
 
                     private TDuration? _duration;
                     public ArithmeticAdapter<TDuration> Duration => _duration ?? (_duration = ToDuration(Interval)).Value;
@@ -92,15 +92,13 @@ namespace Protoplasm.Calendars
                 private readonly RequestInstructionsDelegate _requestInstructions;
                 private readonly RequestAmountDelegate _requestAmount;
                 private readonly RequestDurationByAmountDelegate _requestDurationByAmount;
-                private readonly RequestDataForAllocateDelegate _requestDataForAllocateDelegate;
-                //private INode<IteratorInterval> _finishNode;
+                //private readonly RequestDataForAllocateDelegate _requestDataForAllocateDelegate;
 
-                //                private INode<IteratorInterval> _rootNode;
                 private NodeAdapter Root;
                 private ArithmeticAdapter<TAmount> Amount;
                 private Point<TDuration> Duration;
                 private Point<TDuration> TotalDuration;
-                private PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData> Items;
+                private PointedIntervalsContainer<IteratorInterval, TTime, IntervalInfo> Items;
 
                 public TAmount RequiredAmount => _restrictions.RequiredAmount;
                 private TDuration ScheduleMinDuration => _schedule.MinDuration;
@@ -117,8 +115,6 @@ namespace Protoplasm.Calendars
                 private ArithmeticAdapter<TDuration> MinTotalDurationΔ => MinTotalDuration - TotalDuration;
                 private ArithmeticAdapter<TDuration> MaxTotalDurationΔ => MaxTotalDuration - TotalDuration;
 
-                //INode<IteratorInterval> _firstNode => _getNextNode(_rootNode);
-
                 private NodeAdapter _first;
                 private NodeAdapter First => _first ?? (_first = GetNodeAdapter(_getNextNode(Root.Node), x => _getNextNode(Root.Node)));
 
@@ -129,8 +125,16 @@ namespace Protoplasm.Calendars
                     set { _current = value; }
                 }
 
-                public Iterator(ISchedule schedule, Restrictions restrictions, SchedulerKind kind, RequestInstructionsDelegate requestInstructions, RequestAmountDelegate requestAmount,
-                    RequestDurationByAmountDelegate requestDurationByAmount, RequestDataForAllocateDelegate requestDataForAllocateDelegate)
+                public Iterator
+                    (
+                    ISchedule schedule, 
+                    Restrictions restrictions, 
+                    SchedulerKind kind, 
+                    RequestInstructionsDelegate requestInstructions, 
+                    RequestAmountDelegate requestAmount,
+                    RequestDurationByAmountDelegate requestDurationByAmount
+                    //, RequestDataForAllocateDelegate requestDataForAllocateDelegate
+                    )
                 {
                     _schedule = schedule;
                     _restrictions = restrictions;
@@ -138,12 +142,17 @@ namespace Protoplasm.Calendars
                     _requestInstructions = requestInstructions;
                     _requestAmount = requestAmount;
                     _requestDurationByAmount = requestDurationByAmount;
-                    _requestDataForAllocateDelegate = requestDataForAllocateDelegate;
+                    //_requestDataForAllocateDelegate = requestDataForAllocateDelegate;
                 }
 
                 NodeAdapter GetNodeAdapter(INode<IteratorInterval> node, Func<INode<IteratorInterval>, INode<IteratorInterval>> getRootNode)
                 {
                     return new NodeAdapter(_restrictions, node, _requestAmount, _requestDurationByAmount, _getNextNode, _getPrevNode, getRootNode);
+                }
+
+                public ArithmeticAdapter<TAmount> RequestAmount(IteratorInterval interval)
+                {
+                    return _requestAmount(interval.Duration, interval.Data.OriginalData, _restrictions.RequiredAmount);
                 }
 
                 public void Init()
@@ -169,7 +178,7 @@ namespace Protoplasm.Calendars
                     TotalDuration = default(TDuration).Right();
 
 
-                    Items = new PointedIntervalsContainer<IteratorInterval, TTime, IteratorIntervalData>(
+                    Items = new PointedIntervalsContainer<IteratorInterval, TTime, IntervalInfo>(
                         (left, right, dt) => new IteratorInterval(left, right, dt),
                         (a, b) => b,
                         (a, b) => null
@@ -178,28 +187,37 @@ namespace Protoplasm.Calendars
 
                     var items = _schedule.Available.Get(_restrictions.MinStart, _restrictions.MaxFinish);
 
-                    foreach (var item in items)
-                    {
-                        var instructions = _requestInstructions(((ICalendarItem) item).Data, _restrictions.RequiredAmount);
+                    var instructedItems = items
+                        .Select(item => new {item, instruction = _requestInstructions(((ICalendarItem) item).Data, _restrictions.RequiredAmount)})
+                        .SkipWhile(x => x.instruction != AllocationInstruction.Accept)
+                        .ToArray();
 
-                        var minDurationAmount = instructions == IteratorInstruction.Accept
+                    foreach (var x in instructedItems)
+                    {
+                        var item = x.item;
+                        var instruction = x.instruction;
+
+                        var minDurationAmount = instruction == AllocationInstruction.Accept
                             ? _requestAmount(ScheduleMinDuration, item.Data, RequiredAmount)
-                            : default(TAmount);
+                            : ArithmeticAdapter<TAmount>.Zero;
 
                         Items.Include
                             (
                                 item.Left,
                                 item.Right,
-                                new IteratorIntervalData(item.Data, instructions, minDurationAmount)
+                                new IntervalInfo(item.Data, instruction, minDurationAmount)
                             );
                     }
-
-                    var fn = Items.FindNode(x => x.Contains(point));
+                    
+                    var fn = Items.FirstNode.Next;//Items.FindNode(x => x.Contains(point));
                     Root = GetNodeAdapter(_getPrevNode(fn), x => Items.FindNode(y => y.Contains(x.Value.Left)));
                 }
 
                 public IteratorInterval[] Process()
-                { 
+                {
+                    if (Items.Count() < 2)
+                        return new IteratorInterval[0];
+
                     var skipped = false;
                     var accepted = false;
 
@@ -215,7 +233,7 @@ namespace Protoplasm.Calendars
 
                         switch (Current.Instruction)
                         {
-                            case IteratorInstruction.Skip:
+                            case AllocationInstruction.Skip:
                                 if (skipped)
                                     ObstructByRejected();
                                 else
@@ -231,14 +249,14 @@ namespace Protoplasm.Calendars
 
                                 skipped = true;
                                 break;
-                            case IteratorInstruction.Reject:
+                            case AllocationInstruction.Reject:
                                 accepted = false;
                                 skipped = true;
 
                                 ObstructByRejected();
 
                                 break;
-                            case IteratorInstruction.Accept:
+                            case AllocationInstruction.Accept:
 
                                 skipped = false;
                                 accepted = true;
@@ -275,6 +293,7 @@ namespace Protoplasm.Calendars
 
                                     //нашли
                                     Terminate(resultDurationΔ);
+                                    ConsoleWriteLine("\t[terminated]", ConsoleColor.Green);
                                     break;
                                 }
 
@@ -295,7 +314,7 @@ namespace Protoplasm.Calendars
                         
                     }
 
-                    var result = Items.Where(x => x.Data?.Instruction == IteratorInstruction.Accept)
+                    var result = Items.Where(x => x.Data?.Instruction == AllocationInstruction.Accept)
                         .ToArray();
 
                     ConsoleWriteLine($"-= Completed, [{result.Length}] items for allocate =-");
@@ -322,15 +341,15 @@ namespace Protoplasm.Calendars
                     Items.Exclude(new IteratorInterval(left.Interval(right)));
                 }
 
-                private ConsoleColor GetConsoleColor(IteratorInstruction instruction)
+                private ConsoleColor GetConsoleColor(AllocationInstruction instruction)
                 {
                     switch (instruction)
                     {
-                        case IteratorInstruction.Skip:
+                        case AllocationInstruction.Skip:
                             return ConsoleColor.Yellow;
-                        case IteratorInstruction.Reject:
+                        case AllocationInstruction.Reject:
                             return ConsoleColor.Red;
-                        case IteratorInstruction.Accept:
+                        case AllocationInstruction.Accept:
                             return ConsoleColor.Green;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(instruction), instruction, null);
@@ -426,9 +445,9 @@ namespace Protoplasm.Calendars
 
                     var totalDelta = _restrictions.MaxTotalDuration.IsUndefined ? zero : TotalDuration - _restrictions.MaxTotalDuration;
 
-                    var instruction = IteratorInstruction.Accept;
+                    var instruction = AllocationInstruction.Accept;
 
-                    while (delta > zero || totalDelta > zero || instruction != IteratorInstruction.Accept)
+                    while (delta > zero || totalDelta > zero || instruction != AllocationInstruction.Accept)
                     {
                         obstructed = true;
                         // если длительность не меньше, чем какая-нить из дельт...
@@ -439,7 +458,7 @@ namespace Protoplasm.Calendars
 
                         totalDelta -= obstructDuration;
 
-                        if (instruction == IteratorInstruction.Accept)
+                        if (instruction == AllocationInstruction.Accept)
                             delta -= obstructDuration;
 
                         instruction = First.Instruction;
@@ -453,8 +472,8 @@ namespace Protoplasm.Calendars
                 {
                     var zero = default(TDuration);
 
-                    IteratorInstruction instruction = IteratorInstruction.Accept;
-                    while (intervalDuration > zero || instruction != IteratorInstruction.Accept)
+                    AllocationInstruction instruction = AllocationInstruction.Accept;
+                    while (intervalDuration > zero || instruction != AllocationInstruction.Accept)
                     {
                         var obstructDuration = intervalDuration.Min(First.Duration);
 
@@ -470,7 +489,7 @@ namespace Protoplasm.Calendars
                 {
                     switch (First.Instruction)
                     {
-                        case IteratorInstruction.Skip:
+                        case AllocationInstruction.Skip:
                         {
                             TotalDuration -= First.Duration;
 
@@ -480,9 +499,9 @@ namespace Protoplasm.Calendars
                             Obstruct(First);
                             break;
                         }
-                        case IteratorInstruction.Reject:
+                        case AllocationInstruction.Reject:
                             throw new NotSupportedException("не должно такого быть, от слова 'никогда'");
-                        case IteratorInstruction.Accept:
+                        case AllocationInstruction.Accept:
                         {
                             // если остаток длительносит меньше минимальной длительности
                             if (First.Duration - obstructDuration < ScheduleMinDuration)
@@ -514,9 +533,43 @@ namespace Protoplasm.Calendars
                     return obstructDuration;
                 }
             }
-
-            internal class IteratorInterval : PointedInterval<TTime, IteratorIntervalData>
+            public interface IAllocation
             {
+                Point<TTime> Left { get; }
+                Point<TTime> Right { get; }
+
+                ArithmeticAdapter<TDuration> Duration { get; }
+                AllocationInstruction Instruction { get; }
+                ArithmeticAdapter<TAmount> Amount { get; }
+                TData CalendarData { get; }
+
+            }
+
+            public class Allocation : IAllocation
+            {
+                public Point<TTime> Left { get; }
+                public Point<TTime> Right { get; }
+                public ArithmeticAdapter<TDuration> Duration { get; }
+                public AllocationInstruction Instruction { get; }
+                public ArithmeticAdapter<TAmount> Amount { get; }
+                public TData CalendarData { get; }
+
+                internal Allocation(IteratorInterval interval, Iterator iterator)
+                {
+                    Left = interval.Left;
+                    Right = interval.Right;
+                    Duration = interval.Duration;
+                    Instruction = interval.Data.Instruction;
+                    Amount = iterator.RequestAmount(interval);
+                    CalendarData = interval.Data.OriginalData;
+                }
+            }
+
+            internal class IteratorInterval : PointedInterval<TTime, IntervalInfo>
+            {
+
+                public IAllocation GetAllocation(Iterator iterator) => new Allocation(this, iterator);
+
                 private TDuration? _duration;
                 public TDuration Duration => _duration ?? (_duration = ToDuration(Left, Right)).Value;
 
@@ -525,31 +578,31 @@ namespace Protoplasm.Calendars
                     return Left.IsUndefined || Right.IsUndefined ? null : $", Duration: {Duration}";
                 }
 
-                protected internal IteratorInterval(Interval<TTime> interval, IteratorIntervalData data = null) : this(interval.Left, interval.Right, data ?? new IteratorIntervalData(default(TData), default(IteratorInstruction)))
+                protected internal IteratorInterval(Interval<TTime> interval, IntervalInfo data = null) : this(interval.Left, interval.Right, data ?? new IntervalInfo(default(TData), default(AllocationInstruction), ArithmeticAdapter<TAmount>.Zero))
                 {
                 }
 
-                protected internal IteratorInterval(Point<TTime> left = null, Point<TTime> right = null, IteratorIntervalData data = null) : base(left, right, data)
+                protected internal IteratorInterval(Point<TTime> left = null, Point<TTime> right = null, IntervalInfo data = null) : base(left, right, data)
                 {
                 }
             }
 
-            internal class IteratorIntervalData
+            internal class IntervalInfo
             {
                 public override string ToString()
                 {
-                    return Instruction == IteratorInstruction.Accept ? $"{Instruction}, Data:[{OriginalData}], MinDurationAmount:[{MinDurationAmount}]" : $"{Instruction}";
+                    return Instruction == AllocationInstruction.Accept ? $"{Instruction}, Data:[{OriginalData}], MinDurationAmount:[{MinDurationAmount}]" : $"{Instruction}";
                 }
 
                 public readonly TData OriginalData;
-                public readonly IteratorInstruction Instruction;
+                public readonly AllocationInstruction Instruction;
                 public readonly ArithmeticAdapter<TAmount> MinDurationAmount;
 
-                public IteratorIntervalData(TData originalData, IteratorInstruction instruction, TAmount minDurationAmount = default(TAmount))
+                public IntervalInfo(TData originalData, AllocationInstruction instruction, ArithmeticAdapter<TAmount> minDurationAmount)
                 {
                     OriginalData = originalData;
                     Instruction = instruction;
-                    MinDurationAmount = minDurationAmount;
+                    MinDurationAmount = minDurationAmount ;
                 }
             }
 

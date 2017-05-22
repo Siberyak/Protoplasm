@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Net.Http;
 using System.Resources;
 using Microsoft.SqlServer.Server;
@@ -37,19 +38,16 @@ namespace Protoplasm.Calendars
             private readonly RequestInstructionsDelegate _requestInstructions;
             private readonly RequestAmountDelegate _requestAmount;
             private readonly RequestDurationByAmountDelegate _requestDurationByAmount;
-            private readonly RequestDataForAllocateDelegate _requestDataForAllocateDelegate;
+            //private readonly RequestDataForAllocateDelegate _requestDataForAllocateDelegate;
 
             public static TDuration ToDuration(Interval<TTime> interval)
             {
-                return ToDuration(interval.Left, interval.Right);
+                return Calendars<TTime, TDuration>.Duration(interval);
             }
 
             public static TDuration ToDuration(Point<TTime> left, Point<TTime> right)
             {
-                var duration = Calendars<TTime, TDuration>.Duration(left, right);
-                if (!duration.HasValue)
-                    throw new NotSupportedException("не удалось вычислить длительность");
-                return duration.Value;
+                return Calendars<TTime, TDuration>.Duration(left, right);
             }
 
             //public static TAmount Amount(TDuration duration, TData data, TAmount RequiredAmount)
@@ -57,16 +55,23 @@ namespace Protoplasm.Calendars
             //    return CalculateAmount(duration, data, RequiredAmount);
             //}
 
-            public Scheduler(ISchedule schedule, RequestInstructionsDelegate requestInstructions, RequestAmountDelegate requestAmount, RequestDurationByAmountDelegate requestDurationByAmount, RequestDataForAllocateDelegate requestDataForAllocateDelegate)
+            public Scheduler
+                (
+                ISchedule schedule, 
+                RequestInstructionsDelegate requestInstructions, 
+                RequestAmountDelegate requestAmount, 
+                RequestDurationByAmountDelegate requestDurationByAmount
+                //, RequestDataForAllocateDelegate requestDataForAllocateDelegate
+                )
             {
                 _schedule = schedule;
                 _requestInstructions = requestInstructions;
                 _requestAmount = requestAmount;
                 _requestDurationByAmount = requestDurationByAmount;
-                _requestDataForAllocateDelegate = requestDataForAllocateDelegate;
+                //_requestDataForAllocateDelegate = requestDataForAllocateDelegate;
             }
 
-            public void FindAllocation(Interval<TTime> start, Interval<TTime> finish, Interval<TDuration> totalDuration, Interval<TDuration> duration, TAmount amount, SchedulerKind kind)
+            public IEnumerable<IAllocation> FindAllocation(Interval<TTime> start, Interval<TTime> finish, Interval<TDuration> totalDuration, Interval<TDuration> duration, TAmount amount, SchedulerKind kind)
             {
                 start = start ?? new Interval<TTime>();
                 finish = finish ?? new Interval<TTime>();
@@ -219,8 +224,8 @@ namespace Protoplasm.Calendars
                     kind,
                     _requestInstructions,
                     _requestAmount,
-                    _requestDurationByAmount,
-                    _requestDataForAllocateDelegate
+                    _requestDurationByAmount
+                    //, _requestDataForAllocateDelegate
                     );
 
                 iterator.Init();
@@ -229,13 +234,18 @@ namespace Protoplasm.Calendars
 
                 ConsoleWriteLine($"<><><><>");
 
-                foreach (var interval in items)
+                ConsoleWriteLine("вариант размещения:");
+
+                var result = items.Select(x => x.GetAllocation(iterator)).ToArray();
+
+                foreach (IAllocation allocation in result)
                 {
-                    var data = _requestDataForAllocateDelegate(interval, interval.Data.OriginalData, amount);
-                    ConsoleWriteLine($"allocate: {interval}, data={data}");
-                    _schedule.Include(interval.Left, interval.Right, data);
+                    ConsoleWriteLine($"\t{allocation.Left.Interval(allocation.Right)}, duration: [{allocation.Duration}], amount=[{allocation.Amount.Value}], instuction: [{allocation.Instruction}]");
                 }
+
                 ConsoleWriteLine($"<><><><>");
+
+                return result;
             }
 
             private Interval<TDuration> PreProcessDuration(Interval<TDuration> duration, Interval<TDuration> totalDuration)

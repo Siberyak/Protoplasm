@@ -2,7 +2,7 @@ using System;
 
 namespace Protoplasm.Calendars
 {
-    public enum IteratorInstruction
+    public enum AllocationInstruction
     {
         Skip,
         Reject,

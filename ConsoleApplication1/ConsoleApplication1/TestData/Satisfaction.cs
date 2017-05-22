@@ -1,3 +1,6 @@
+﻿using MAS.Core.Contracts;
+using MAS.Utils;
+
 namespace ConsoleApplication1.TestData
 {
     public class Satisfaction : Satisfaction<double>
@@ -6,6 +9,11 @@ namespace ConsoleApplication1.TestData
         {
         }
 
-        public override double Value => _original + Delta;
+        public override double Value => _original + Δ;
+
+        public override ISatisfaction Snapshot()
+        {
+            return new Satisfaction(_original) { Δ = Δ };
+        }
     }
 }

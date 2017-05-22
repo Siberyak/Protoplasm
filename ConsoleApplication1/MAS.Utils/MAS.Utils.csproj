@@ -54,9 +54,16 @@
     <Compile Include="Entity\EntityAgent.cs" />
     <Compile Include="Entity\IEntityAgent.cs" />
     <Compile Include="Entity\ManagedEntityAgent.cs" />
+    <Compile Include="Entity\DataRequest.cs" />
+    <Compile Include="ISatisfaction%28T%29.cs" />
+    <Compile Include="Membership\MemberOfCompetence.cs" />
+    <Compile Include="Membership\MemberOfCompetencesExtender.cs" />
+    <Compile Include="Membership\MembershipItem.cs" />
+    <Compile Include="Membership\MembershipItemsContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requirements\CompetencesRequirement.cs" />
     <Compile Include="Requirements\Requirement.cs" />
+    <Compile Include="Satisfaction%28T%29.cs" />
     <Compile Include="Scene.cs" />
   </ItemGroup>
   <ItemGroup>

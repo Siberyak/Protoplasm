@@ -9,6 +9,7 @@ namespace MAS.Core.Contracts
 
         ISatisfaction Satisfaction { get; }
         IAgent Agent { get; }
-        IScene Variate(INegotiator abilities);
+        bool IsSatisfied { get; }
+        IScene Variate(INegotiator respondent);
     }
 }

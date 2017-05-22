@@ -93,6 +93,19 @@ namespace Protoplasm.Calendars
             return ToDuration(a, b);
         }
 
+        public static TDuration Duration(Interval<TTime> interval)
+        {
+            return Duration(interval.Left, interval.Right);
+        }
+
+        public static TDuration Duration(Point<TTime> left, Point<TTime> right)
+        {
+            var duration = Duration((TTime?)left, right);
+            if (!duration.HasValue)
+                throw new NotSupportedException("не удалось вычислить длительность");
+            return duration.Value;
+        }
+
         public static TDuration Add(TDuration a, TDuration b)
         {
             if (AddDuration == null)
@@ -145,6 +158,54 @@ namespace Protoplasm.Calendars
         }
 
 
+        public static Interval<TTime> ChangeLeft(Interval<TTime> original, Point<TTime> left, bool keepIntervalDuration)
+        {
+            left = left.AsLeft();
+
+            keepIntervalDuration = keepIntervalDuration && !left.IsUndefined;
+            original = original ?? Interval<TTime>.Undefined;
+            Point<TTime> right;
+
+            if (original.IsUndefined || original.Right.IsUndefined || original.Right < left)
+            {
+                right = Point<TTime>.Right();
+            }
+            else if (keepIntervalDuration)
+            {
+                var duration = Duration(original);
+                var point = left.OffsetToRight(duration);
+                right = point.AsRight(original.Right.Included);
+            }
+            else
+                right = original.Right;
+
+            var interval = left.Interval(right);
+            return interval;
+        }
+
+        public static Interval<TTime> ChangeRight(Interval<TTime> original, Point<TTime> right, bool keepIntervalDuration)
+        {
+            right = right.AsRight();
+            keepIntervalDuration = keepIntervalDuration && !right.IsUndefined;
+            original = original ?? Interval<TTime>.Undefined;
+            Point<TTime> left;
+
+            if (original.IsUndefined || original.Left.IsUndefined || original.Left > right)
+            {
+                left = Point<TTime>.Left();
+            }
+            else if (keepIntervalDuration)
+            {
+                var duration = Duration(original);
+                var point = right.OffsetToLeft(duration);
+                left = point.AsLeft(original.Left.Included);
+            }
+            else
+                left = original.Left;
+
+            var interval = left.Interval(right);
+            return interval;
+        }
 
         public static Point<TTime> OffsetPointToLeft(Point<TTime> point, TDuration offset)
         {
@@ -182,12 +243,6 @@ namespace Protoplasm.Calendars
 
     public static class CalendarsExtender
     {
-        public static Interval<TBound> Interval<TBound>(this Point<TBound> left, Point<TBound> right)
-            where TBound : struct, IComparable<TBound>
-        {
-            return new Interval<TBound>(left, right);
-        }
-
         public static Point<TTime> OffsetToLeft<TTime, TDuration>(this Point<TTime> point, ArithmeticAdapter<TDuration> offset)
             where TTime : struct, IComparable<TTime>
             where TDuration : struct, IComparable<TDuration>
@@ -218,6 +273,35 @@ namespace Protoplasm.Calendars
         {
             return Calendars<TTime, TDuration>.OffsetPointToRight(point, offset);
         }
+
+        public static Interval<TTime> ChangeLeft<TTime, TDuration>(this Interval<TTime> original, TTime value, bool keepIntervalDuration, bool included)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return original.ChangeLeft<TTime, TDuration>(value.Left(included), keepIntervalDuration);
+        }
+
+        public static Interval<TTime> ChangeLeft<TTime, TDuration>(this Interval<TTime> original, Point<TTime> left, bool keepIntervalDuration)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return Calendars<TTime, TDuration>.ChangeLeft(original, left, keepIntervalDuration);
+        }
+
+        public static Interval<TTime> ChangeRight<TTime, TDuration>(this Interval<TTime> original, TTime value, bool keepIntervalDuration, bool included)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return original.ChangeRight<TTime, TDuration>(value.Right(included), keepIntervalDuration);
+        }
+
+        public static Interval<TTime> ChangeRight<TTime, TDuration>(this Interval<TTime> original, Point<TTime> right, bool keepIntervalDuration)
+            where TTime : struct, IComparable<TTime>
+            where TDuration : struct, IComparable<TDuration>
+        {
+            return Calendars<TTime, TDuration>.ChangeRight(original, right, keepIntervalDuration);
+        }
+
     }
 
 }

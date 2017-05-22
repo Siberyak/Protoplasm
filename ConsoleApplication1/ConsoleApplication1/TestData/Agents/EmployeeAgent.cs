@@ -17,6 +17,7 @@ namespace ConsoleApplication1.TestData
             }
 
 
+
             public override void Initialize()
             {
                 
@@ -34,7 +35,7 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            public override IScene Variate(INegotiator abilities)
+            public override IScene Variate(INegotiator respondent)
             {
                 throw new System.NotImplementedException();
             }

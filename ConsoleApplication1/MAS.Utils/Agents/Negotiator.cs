@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAS.Core.Compatibility.Contracts;
@@ -13,10 +14,21 @@ namespace MAS.Utils
         {
             Scene = scene;
             Agent = agent;
-            Satisfaction = Agent[scene.Original]?.Satisfaction ?? CreateSatisfaction();
+            Satisfaction = CreateSatisfaction(Agent[scene.Original]?.Satisfaction);
         }
 
-        protected abstract TSatisfaction CreateSatisfaction();
+        protected TSatisfaction Satisfaction;
+
+        protected TData RequestFromAgent<TData>(IScene scene)
+        {
+            TData result;
+            if(!Agent.Ask(new DataRequest(Scene), out result))
+                throw new Exception();
+
+            return result;
+        }
+
+        protected abstract TSatisfaction CreateSatisfaction(ISatisfaction original);
 
         public IEnumerable<int> Variate(IRequirementsHolder requirements)
         {
@@ -25,6 +37,8 @@ namespace MAS.Utils
 
         private IAbilitiesHolder _abilities => Agent;
         private IRequirementsHolder _requirements => Agent;
+
+        public abstract bool IsSatisfied { get; }
 
         public INegotiator this[IScene scene] => Agent[scene];
 
@@ -63,25 +77,26 @@ namespace MAS.Utils
             return _requirements.ToScene(requirement);
         }
 
-        public bool Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
+        public virtual bool Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool Tell<TMessage>(TMessage message)
+        public virtual bool Tell<TMessage>(TMessage message)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool Request<TData>(out TData data)
+        public virtual bool Request<TData>(out TData data)
         {
-            throw new System.NotImplementedException();
+            var question = new DataRequest(Scene);
+            return Agent.Ask(question, out data);
         }
 
         public IScene Scene { get; }
-        public ISatisfaction Satisfaction { get; }
+        ISatisfaction INegotiator.Satisfaction => Satisfaction;
         IAgent INegotiator.Agent => Agent;
         protected T Agent { get; }
-        public abstract IScene Variate(INegotiator abilities);
+        public abstract IScene Variate(INegotiator respondent);
     }
 }

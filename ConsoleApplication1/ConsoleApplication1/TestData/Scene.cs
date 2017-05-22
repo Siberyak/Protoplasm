@@ -15,7 +15,7 @@ namespace ConsoleApplication1.TestData
 
         protected override Satisfaction GetSatisfaction()
         {
-            var original= ((Scene) Original)?._satisfaction;
+            var original= ((Scene) Original)?.Satisfaction;
             return new Satisfaction(original?.Value ?? 0);
         }
 

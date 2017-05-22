@@ -7,8 +7,17 @@ namespace MAS.Utils
 {
     public abstract class Agent : IAgent
     {
+
         public virtual bool Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
         {
+            var request = question as IDataRequest;
+            if (request != null)
+            {
+                answer = default(TAnswer);
+                var byNegotiator = request.Scene.Original?.Negotiator(this).Request(out answer);
+                return byNegotiator == true || Request(out answer);
+            }
+            
             throw new NotImplementedException();
         }
 

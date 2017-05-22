@@ -101,4 +101,13 @@ namespace Protoplasm.PointedIntervals
             return interval > point;
         }
     }
+
+    public static class IntervalExtender
+    {
+        public static Interval<TBound> Instance<TBound>(this Interval<TBound> interval) 
+            where TBound : struct, IComparable<TBound>
+        {
+            return interval ?? Interval<TBound>.Undefined;
+        } 
+    }
 }

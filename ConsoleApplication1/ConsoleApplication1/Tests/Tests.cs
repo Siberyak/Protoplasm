@@ -155,7 +155,9 @@ namespace ConsoleApplication1.TestData
             var branch1 = root.Branch();
             IScene resultScene;
 
-            wi1.TrySatisfy(branch1, out resultScene);
+            throw new NotImplementedException();
+
+            //wi1.TrySatisfy(branch1, out resultScene);
 
             Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
                 .AddAmount = (a, b) => new Appointment(a.Appointee, a.Value+b.Value);
@@ -172,7 +174,8 @@ namespace ConsoleApplication1.TestData
             var tmpSch = adc.CreateSchedule(TimeSpan.FromMinutes(15));
             var scheduler = new Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.Scheduler<Appointment>
                 (
-                tmpSch, ProcessInstructionsRequest, ProcessAmountRequest, PrecessDurationByAmount, ProcessDataForAllocate
+                tmpSch, ProcessInstructionsRequest, ProcessAmountRequest, PrecessDurationByAmount
+                //, ProcessDataForAllocate
                 );
 
             var start = new Interval<DateTime>(left.Left(true));
@@ -352,19 +355,19 @@ namespace ConsoleApplication1.TestData
             return null;
         }
 
-        private static IteratorInstruction ProcessInstructionsRequest(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
+        private static AllocationInstruction ProcessInstructionsRequest(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, Appointment requiredamount)
         {
             if (!(data is AmountedData))
-                return IteratorInstruction.Skip;
+                return AllocationInstruction.Skip;
             
             var amountedData = ((AmountedData)data);
             if(amountedData.Appointments.Any(x => x.Appointee != requiredamount.Appointee))
-                return IteratorInstruction.Reject;
+                return AllocationInstruction.Reject;
             
             if(amountedData.Available <= 0)
-                return IteratorInstruction.Skip;
+                return AllocationInstruction.Skip;
 
-            return IteratorInstruction.Accept;
+            return AllocationInstruction.Accept;
         }
     }
 
@@ -592,7 +595,9 @@ namespace ConsoleApplication1.TestData
             SubstAmount = Subst;
         }
 
-        public TestDataScheduller(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ISchedule schedule) : base(schedule, ResponseInstructions, ResponseAmount, ResponseDuration, ResponseDataForAllocate)
+        public TestDataScheduller(Calendars<DateTime, TimeSpan, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData>.ISchedule schedule) : base(schedule, ResponseInstructions, ResponseAmount, ResponseDuration
+            //, ResponseDataForAllocate
+            )
         {}
 
         private static TimeSpan ResponseDuration(TimeSpan fullduration, TestAppointment fullamount, TestAppointment amount)
@@ -639,23 +644,23 @@ namespace ConsoleApplication1.TestData
             return new TestAppointment(a.Appointee, a.Hours - b.Hours);
         }
 
-        private static IteratorInstruction ResponseInstructions(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
+        private static AllocationInstruction ResponseInstructions(PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
         {
             var testData = data as TestData;
             if(testData == null || requiredamount?.Appointee == null)
                 throw new NotSupportedException();
 
             if (testData.Appointee == "-= ! =-")
-                return IteratorInstruction.Skip;
+                return AllocationInstruction.Skip;
 
             return testData.Appointee == null 
-                ? IteratorInstruction.Accept 
-                : IteratorInstruction.Reject;
+                ? AllocationInstruction.Accept 
+                : AllocationInstruction.Reject;
         }
 
         private static TestAppointment ResponseAmount(TimeSpan duration, PlanningEnvironment<DateTime, TimeSpan>.IAvailabilityData data, TestAppointment requiredamount)
         {
-            if(ResponseInstructions(data, requiredamount) != IteratorInstruction.Accept)
+            if(ResponseInstructions(data, requiredamount) != AllocationInstruction.Accept)
                 throw new NotSupportedException();
 
             return new TestAppointment(requiredamount.Appointee, duration.TotalHours);

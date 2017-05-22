@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A13D3C28-FBE7-447B-969C-69ECE05A2366}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Application1</RootNamespace>
     <AssemblyName>Application1</AssemblyName>
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevExpress.BonusSkins.v17.1" />
     <Reference Include="DevExpress.Data.v17.1" />
@@ -40,6 +43,7 @@
     <Reference Include="DevExpress.XtraEditors.v17.1" />
     <Reference Include="DevExpress.Printing.v17.1.Core" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,15 +55,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Data\Abilities and Requirements\Boundary.cs" />
+    <Compile Include="Data\Abilities and Requirements\BoundaryRequirement.cs" />
+    <Compile Include="Data\Abilities and Requirements\ScheduleAbility.cs" />
+    <Compile Include="Data\WorkCalendar\WorkCalendar.cs" />
+    <Compile Include="Data\WorkCalendar\WorkCalendarAdapter.cs" />
+    <Compile Include="Data\WorkCalendar\WorkItemAmount.cs" />
+    <Compile Include="Data\WorkCalendar\WorkItemSlot.cs" />
+    <Compile Include="Data\WorkCalendar\WorkItemSlotCollection.cs" />
+    <Compile Include="Data\Agents\WorkItemAgent.cs" />
+    <Compile Include="Data\Agents\WorkItemNegotiator.cs" />
+    <Compile Include="Data\Entities\WorkItem.cs" />
+    <Compile Include="Data\Managers\WorkItemsManager.cs" />
+    <Compile Include="Data\Negotiator.cs" />
+    <Compile Include="Data\Entities\Resource.cs" />
+    <Compile Include="Data\Agents\ResourceAgent.cs" />
+    <Compile Include="Data\Agents\ResourceAgentNegotiator.cs" />
+    <Compile Include="Data\Entities\ResourcesGroup.cs" />
+    <Compile Include="Data\Managers\ResourcesManager.cs" />
+    <Compile Include="Data\Satisfaction.cs" />
+    <Compile Include="Data\Scene.cs" />
+    <Compile Include="Data\WorkCalendar\WorkSchedule.cs" />
+    <Compile Include="Data\WorkCalendar\WorkScheduler.cs" />
+    <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="UI\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="UI\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -80,6 +106,28 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Protoplasm\Protoplasm.Calendars\Protoplasm.Calendars.csproj">
+      <Project>{c1bd47e7-1b00-45de-be1b-f4c4f0f76ea8}</Project>
+      <Name>Protoplasm.Calendars</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Protoplasm\Protoplasm.PointedIntervals\Protoplasm.PointedIntervals.csproj">
+      <Project>{a00eebad-4f1b-470c-afde-0aaa6ea851d5}</Project>
+      <Name>Protoplasm.PointedIntervals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Protoplasm\Protoplasm.Utils\Protoplasm.Utils.csproj">
+      <Project>{19baf319-a0ba-4c50-b580-32647171c73b}</Project>
+      <Name>Protoplasm.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MAS.Core\MAS.Core.csproj">
+      <Project>{0cfb6a8e-af1c-483f-99de-44d6b867ec71}</Project>
+      <Name>MAS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MAS.Utils\MAS.Utils.csproj">
+      <Project>{01a06b29-de50-449a-a651-2f9a58efe985}</Project>
+      <Name>MAS.Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

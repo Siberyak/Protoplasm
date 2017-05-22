@@ -1,6 +1,4 @@
-using MAS.Utils;
-
-namespace ConsoleApplication1.TestData
+namespace MAS.Utils
 {
     public class MemberOfCompetence : Competence
     {

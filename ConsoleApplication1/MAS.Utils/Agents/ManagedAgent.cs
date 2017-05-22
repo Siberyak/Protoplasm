@@ -14,7 +14,7 @@ namespace MAS.Utils
 
         public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
         {
-            return Manager[this];
+            return Manager;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace MAS.Utils
 
         public virtual IAbility ToScene()
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 }

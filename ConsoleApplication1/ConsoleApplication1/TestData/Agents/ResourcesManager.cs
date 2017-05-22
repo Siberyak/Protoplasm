@@ -1,6 +1,8 @@
 using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using MAS.Core;
+using MAS.Core.Compatibility.Contracts;
 using MAS.Utils;
 using Protoplasm.Calendars;
 
@@ -24,7 +26,17 @@ namespace ConsoleApplication1.TestData
             {
                 agent.Initialize();
                 return agent;
-            } 
+            }
+
+            protected override IEnumerable<IAbilitiesHolder> GetAbilitiesHolders()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<IRequirementsHolder> GetRequirementsHolders()
+            {
+                throw new NotImplementedException();
+            }
 
             public DepartmentAgent CreateDepartment(string caption, params Department[] memberOf)
             {

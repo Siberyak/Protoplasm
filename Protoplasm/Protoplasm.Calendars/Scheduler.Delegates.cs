@@ -9,13 +9,13 @@ namespace Protoplasm.Calendars
             where TAmount : IComparable<TAmount>
         {
 
-            public delegate IteratorInstruction RequestInstructionsDelegate(TData data, TAmount requiredAmount);
+            public delegate AllocationInstruction RequestInstructionsDelegate(TData data, TAmount requiredAmount);
 
             public delegate TAmount RequestAmountDelegate(TDuration duration, TData data, TAmount requiredAmount);
 
             public delegate TDuration RequestDurationByAmountDelegate(TDuration fullDuration, TAmount fullAmount, TAmount amount);
 
-            public delegate TData RequestDataForAllocateDelegate(Interval<TTime> interval, TData originalData, TAmount reqiredAmount);
+            public delegate TData RequestDataForAllocateDelegate(Interval<TTime> interval, TData originalData, TAmount amount);
         }
     }
 }

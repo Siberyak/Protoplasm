@@ -10,9 +10,11 @@ namespace ConsoleApplication1.TestData
         {
         }
 
-        protected override Satisfaction CreateSatisfaction()
+        protected override Satisfaction CreateSatisfaction(ISatisfaction original)
         {
             return new Satisfaction(0);
         }
+
+        public override bool IsSatisfied => Satisfaction.Value > 0;
     }
 }

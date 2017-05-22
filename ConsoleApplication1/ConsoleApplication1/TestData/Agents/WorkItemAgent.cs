@@ -17,6 +17,7 @@ namespace ConsoleApplication1.TestData
             }
 
 
+
             public override void Initialize()
             {
                 
@@ -30,13 +31,15 @@ namespace ConsoleApplication1.TestData
 
         class WorkItemNegotiator : Negotiator<WorkItemAgent>
         {
+            public override bool IsSatisfied => Satisfaction.Value > 0;
+
             public WorkItemNegotiator(IScene scene, WorkItemAgent agent) : base(scene, agent)
             {
             }
 
-            public override IScene Variate(INegotiator abilities)
+            public override IScene Variate(INegotiator respondent)
             {
-                return VariateByEmployee(abilities as EmployeeAgentNegotiator);
+                return VariateByEmployee(respondent as EmployeeAgentNegotiator);
             }
 
             private IScene VariateByEmployee(EmployeeAgentNegotiator negotiator)
