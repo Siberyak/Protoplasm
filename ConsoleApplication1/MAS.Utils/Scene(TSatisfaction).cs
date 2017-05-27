@@ -21,8 +21,8 @@ namespace MAS.Utils
 
         IScene IScene.Original => Original;
 
-        ISatisfaction IScene.Satisfaction => Satisfaction ?? (Satisfaction = GetSatisfaction());
-        protected abstract TSatisfaction GetSatisfaction();
+        ISatisfaction IScene.Satisfaction => Satisfaction;// ?? (Satisfaction = GetSatisfaction());
+        //protected abstract TSatisfaction GetSatisfaction();
 
         protected readonly List<INegotiator> Negotiators = new List<INegotiator>();
 
@@ -51,15 +51,18 @@ namespace MAS.Utils
         private INegotiator CreateNegotiator(IAgent agent)
         {
             var negotiator = agent.Negotiator(this);
-            Negotiators.Add(negotiator);
+            lock (Negotiators)
+            {
+                Negotiators.Add(negotiator);
+            }
             return negotiator;
         }
 
         public abstract IScene Branch();
 
-        public abstract void MergeToOriginal();
+        //public abstract void MergeToOriginal();
 
-        private void MergeToOriginal1()
+        public virtual void MergeToOriginal()
         {
             if (Original == null)
                 return;
@@ -68,9 +71,12 @@ namespace MAS.Utils
             {
                 lock (Original.Negotiators)
                 {
-                    foreach (var negotiator in Negotiators.ToArray())
+                    lock (Negotiators)
                     {
-                        Original.ReplaceNegotiator(negotiator);
+                        foreach (var negotiator in Negotiators.ToArray())
+                        {
+                            Original.ReplaceNegotiator(negotiator);
+                        }
                     }
                 }
             }
@@ -80,8 +86,8 @@ namespace MAS.Utils
         {
             lock (Negotiators)
             {
-                var index = Negotiators.FindIndex(x => x.Agent == negotiator.Agent);
-                Negotiators[index] = negotiator;
+                var original = Negotiators.First(x => x.Agent == negotiator.Agent);
+                negotiator.MergeToOriginal(original);
                 //((IFlatableSatisfaction) negotiator.Satisfaction)?.Flat();
             }
 

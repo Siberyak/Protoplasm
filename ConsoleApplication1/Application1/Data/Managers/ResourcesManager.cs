@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MAS.Core;
 using MAS.Core.Compatibility.Contracts;
@@ -25,6 +26,15 @@ namespace Application1.Data
         protected override IEnumerable<IRequirementsHolder> GetRequirementsHolders()
         {
             return Enumerable.Empty<IRequirementsHolder>();
+        }
+
+        public void Show(Scene scene)
+        {
+            foreach (var agent in Agents)
+            {
+                var negotiator = scene.Negotiator(agent);
+                Console.WriteLine($"{negotiator.Satisfaction, -20}| {agent, -40}");
+            }
         }
     }
 }

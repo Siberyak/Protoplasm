@@ -1,4 +1,4 @@
-﻿#define CONS
+﻿#define CONS1
 
 using System;
 using System.Data;
@@ -224,7 +224,7 @@ namespace Protoplasm.Calendars
                     ConsoleWriteLine($"-= Process =-  ***********************************************");
 
 
-                    while (Current.OriginalData != null)
+                    while (Current.Interval.IsDefined)
                     {
                         ConsoleWriteLine($"========================");
                         ConsoleWriteLine($"-> {Current.Interval}");
@@ -330,12 +330,12 @@ namespace Protoplasm.Calendars
                     if (_kind == SchedulerKind.LeftToRight)
                     {
                         left = Current.Interval.Left.OffsetToRight(obstructDuration);
-                        right = _restrictions.MaxStart.Max(_restrictions.MaxFinish);
+                        right = _restrictions.MaxStart.Max(_restrictions.MaxFinish).OffsetToRight(MinDuration);
                     }
                     else
                     {
                         right = Current.Interval.Right.OffsetToLeft(obstructDuration);
-                        left = _restrictions.MinStart.Min(_restrictions.MinFinish);
+                        left = _restrictions.MinStart.Min(_restrictions.MinFinish).OffsetToLeft(MinDuration);
                     }
 
                     Items.Exclude(new IteratorInterval(left.Interval(right)));

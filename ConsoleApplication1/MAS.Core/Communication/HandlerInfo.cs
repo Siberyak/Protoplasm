@@ -35,11 +35,11 @@ namespace MAS.Core
             return true;
         }
 
-        protected virtual bool Allowed<TResp, TOut>(TResp respondent) { throw new NotImplementedException(); }
+        protected virtual bool Allowed<TResp, TOut>(TResp respondent) { return false; }
 
-        protected virtual bool Allowed<TResp, TIn>(TResp respondent, TIn input) { throw new NotImplementedException(); }
+        protected virtual bool Allowed<TResp, TIn>(TResp respondent, TIn input) { return false; }
 
-        protected virtual bool Allowed<TResp, TIn, TOut>(TResp respondent, TIn input) { throw new NotImplementedException(); }
+        protected virtual bool Allowed<TResp, TIn, TOut>(TResp respondent, TIn input) { return false; }
 
         protected virtual TOut Process<TResp, TOut>(TResp respondent) { throw new NotImplementedException(); }
 

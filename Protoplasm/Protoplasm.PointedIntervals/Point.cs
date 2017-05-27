@@ -32,6 +32,11 @@ namespace Protoplasm.PointedIntervals
             return PointValue.Equals(other.PointValue) && Direction == other.Direction && Included == other.Included;
         }
 
+        internal bool IsLeftIncluded => Direction == PointDirection.Left && Included;
+        internal bool IsRightIncluded => Direction == PointDirection.Right && Included;
+        internal bool IsLeftNotIncluded => Direction == PointDirection.Left && !Included;
+        internal bool IsRightNotIncluded => Direction == PointDirection.Right && !Included;
+
         /// <summary>
         /// Определяет, равен ли заданный объект текущему объекту.
         /// </summary>
@@ -341,15 +346,18 @@ namespace Protoplasm.PointedIntervals
                 var aa = a.PointValue;
                 var bb = b.PointValue;
 
-                if (!aa.HasValue && !bb.HasValue)
+                var aaHasValue = aa.HasValue;
+                var bbHasValue = bb.HasValue;
+
+                if (!aaHasValue && !bbHasValue)
                     return a.Direction == b.Direction ? 0 : ByDirection(a.Direction);
 
-                if (!aa.HasValue)
+                if (!aaHasValue)
                 {
                     return ByDirection(a.Direction);
                 }
 
-                if (!bb.HasValue)
+                if (!bbHasValue)
                 {
                     return -1 * ByDirection(b.Direction);
                 }
@@ -362,6 +370,29 @@ namespace Protoplasm.PointedIntervals
 
                 //string str = Brackets[a.Direction][a.Included] + Brackets[b.Direction][b.Included];
                 //return OnEqualsValues[str];
+
+
+                if (a.IsLeftNotIncluded && b.IsLeftNotIncluded) return 0; // ( == (
+                if (a.IsLeftNotIncluded && b.IsRightNotIncluded) return 1; // ( > )
+                if (a.IsLeftNotIncluded && b.IsLeftIncluded) return 1; // ( > [
+                if (a.IsLeftNotIncluded && b.IsRightIncluded) return 1; // ( > ]
+
+                if (a.IsRightNotIncluded && b.IsRightNotIncluded) return 0; // ) == )
+                if (a.IsRightNotIncluded && b.IsLeftNotIncluded) return -1; // ) < (
+                if (a.IsRightNotIncluded && b.IsLeftIncluded) return -1; // ) < [
+                if (a.IsRightNotIncluded && b.IsRightIncluded) return -1; // ) < ]
+
+                if (a.IsLeftIncluded && b.IsLeftIncluded) return 0; // [ == [
+                if (a.IsLeftIncluded && b.IsRightIncluded) return 0; // [ == ]
+                if (a.IsLeftIncluded && b.IsLeftNotIncluded) return -1; // [ < (
+                if (a.IsLeftIncluded && b.IsRightNotIncluded) return 1; // [ > )
+
+                if (a.IsRightIncluded && b.IsRightIncluded) return 0; // ] == ]
+                if (a.IsRightIncluded && b.IsLeftIncluded) return 0; // ] == [
+                if (a.IsRightIncluded && b.IsLeftNotIncluded) return -1; // ] < (
+                if (a.IsRightIncluded && b.IsRightNotIncluded) return 1; // ] > )
+
+                throw new NotImplementedException();
 
                 string str = $"{GetBrackets(a)}{GetBrackets(b)}";
                 return IsEqualsValues(str);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MAS.Core;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 
@@ -14,31 +15,35 @@ namespace MAS.Utils
         {
             Scene = scene;
             Agent = agent;
-            Satisfaction = CreateSatisfaction(Agent[scene.Original]?.Satisfaction);
+            ISatisfaction originalSatisfaction = null;
+            if (Scene.Original != null)
+            {
+                originalSatisfaction = Scene.Original.Negotiator(Agent).Satisfaction;
+            }
+
+            //if (Agent[scene.Original]?.Request(out originalSatisfaction) != true)
+            //    originalSatisfaction = null;
+
+            Satisfaction = CreateSatisfaction(originalSatisfaction);
         }
 
         protected TSatisfaction Satisfaction;
 
-        protected TData RequestFromAgent<TData>(IScene scene)
-        {
-            TData result;
-            if(!Agent.Ask(new DataRequest(Scene), out result))
-                throw new Exception();
+        //protected TData RequestFromAgent<TData>(IScene scene)
+        //{
+        //    TData result;
+        //    if(!Agent.Ask(new DataRequest(Scene), out result))
+        //        throw new Exception();
 
-            return result;
-        }
+        //    return result;
+        //}
 
         protected abstract TSatisfaction CreateSatisfaction(ISatisfaction original);
-
-        public IEnumerable<int> Variate(IRequirementsHolder requirements)
-        {
-            return Enumerable.Empty<int>();
-        }
 
         private IAbilitiesHolder _abilities => Agent;
         private IRequirementsHolder _requirements => Agent;
 
-        public abstract bool IsSatisfied { get; }
+        public abstract NegotiatorState State { get; }
 
         public INegotiator this[IScene scene] => Agent[scene];
 
@@ -77,9 +82,15 @@ namespace MAS.Utils
             return _requirements.ToScene(requirement);
         }
 
-        public virtual bool Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
+        bool IRespondent.Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
         {
-            throw new System.NotImplementedException();
+            return Ask(question, out answer);
+        }
+
+        protected virtual bool Ask<TQuestion, TAnswer>(TQuestion question, out TAnswer answer)
+        {
+            answer = default(TAnswer);
+            return false;
         }
 
         public virtual bool Tell<TMessage>(TMessage message)
@@ -87,16 +98,44 @@ namespace MAS.Utils
             throw new System.NotImplementedException();
         }
 
-        public virtual bool Request<TData>(out TData data)
+        bool IRespondent.Request<TData>(out TData data)
         {
-            var question = new DataRequest(Scene);
-            return Agent.Ask(question, out data);
+            //if (typeof (TData) == typeof (ISatisfaction))
+            //{
+            //    data = (TData)(object)Satisfaction;
+            //    return true;
+            //}
+
+            //if (Request(out data))
+            //    return true;
+
+            //var question = new DataRequest(Scene);
+            //return Agent.Ask(question, out data);
+
+            return Request(out data);
+        }
+
+        protected virtual bool Request<TData>(out TData data)
+        {
+            data = default(TData);
+            return false;
         }
 
         public IScene Scene { get; }
         ISatisfaction INegotiator.Satisfaction => Satisfaction;
         IAgent INegotiator.Agent => Agent;
         protected T Agent { get; }
-        public abstract IScene Variate(INegotiator respondent);
+
+        //public abstract IScene Variate(INegotiator respondent);
+        public abstract IEnumerable<IScene> Variants(INegotiator respondent);
+
+        void INegotiator.MergeToOriginal(INegotiator original)
+        {
+            var negotiator = (Negotiator<T, TSatisfaction>) original;
+            negotiator.Satisfaction = Satisfaction;
+            MergeToOriginal(original);
+        }
+
+        protected abstract void MergeToOriginal(INegotiator original);
     }
 }

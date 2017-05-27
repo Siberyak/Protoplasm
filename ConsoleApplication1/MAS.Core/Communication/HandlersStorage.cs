@@ -21,10 +21,23 @@ namespace MAS.Core
             return infos;
         }
 
+        private bool FindHandlerInfos<T>(out List<HandlerInfo> infos)
+        {
+            var type = typeof(T);
+            if (_handlers.TryGetValue(type, out infos))
+                return true;
+
+            if (!type.IsInterface)
+                return false;
+
+            type = _handlers.Keys.FirstOrDefault(x => type.IsAssignableFrom(x));
+            return type != null && _handlers.TryGetValue(type, out infos);
+        }
+
         public bool Tell<TMessage>(TRespondent source, TMessage message)
         {
             List<HandlerInfo> infos;
-            return _handlers.TryGetValue(typeof(TMessage), out infos)
+            return FindHandlerInfos<TMessage>(out infos)
                    && infos.Any(x => x.TryProcessTold(source, message));
         }
 
@@ -33,7 +46,7 @@ namespace MAS.Core
             answer = default(TAnswer);
 
             List<HandlerInfo> infos;
-            if (!_handlers.TryGetValue(typeof(TQuestion), out infos))
+            if (!FindHandlerInfos<TQuestion>(out infos))
                 return false;
 
             foreach (var x in infos)
@@ -45,12 +58,13 @@ namespace MAS.Core
             return false;
         }
 
+
         public bool Request<TData>(TRespondent source, out TData data)
         {
             data = default(TData);
 
             List<HandlerInfo> infos;
-            if (!_handlers.TryGetValue(typeof(TData), out infos))
+            if (!FindHandlerInfos<TData>(out infos))
                 return false;
 
             foreach (var x in infos)

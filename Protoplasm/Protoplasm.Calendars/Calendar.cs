@@ -70,24 +70,30 @@ namespace Protoplasm.Calendars
 
             public virtual IEnumerable<CalendarItem> Get(Point<TTime> left, Point<TTime> right)
             {
-                Define(left, right);
+                lock (_calendarItems)
+                {
+                    Define(left, right);
 
-                var calendarItems = _calendarItems.Get(left, right);
-                return calendarItems;
+                    var calendarItems = _calendarItems.Get(left, right);
+                    return calendarItems;
+                }
             }
 
 
             public INode<ICalendarItem> Find(Point<TTime> point)
             {
-                var node = _calendarItems.Find(point);
+                lock (_calendarItems)
+                {
+                    var node = _calendarItems.Find(point);
 
-                if (!NodeIsUndefined(node) || CalendarAdapter == null)
-                    return node;
+                    if (!NodeIsUndefined(node) || CalendarAdapter == null)
+                        return node;
                 
-                Define(point.AsLeft(true), point.AsRight(true));
-                node = _calendarItems.Find(point);
+                    Define(point.AsLeft(true), point.AsRight(true));
+                    node = _calendarItems.Find(point);
 
-                return node;
+                    return node;
+                }
             }
 
             protected static bool NodeIsUndefined(INode<ICalendarItem> node)
@@ -136,7 +142,10 @@ namespace Protoplasm.Calendars
 
             public CalendarItem[] DefinedItems()
             {
-                return _calendarItems.DefinedItems();
+                lock (_calendarItems)
+                {
+                    return _calendarItems.DefinedItems();
+                }
             }
 
             public override string ToString()

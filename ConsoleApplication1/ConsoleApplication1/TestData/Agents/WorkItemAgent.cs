@@ -37,9 +37,19 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            public override IScene Variate(INegotiator respondent)
+            public override IEnumerable<IScene> Variants(INegotiator respondent)
             {
-                return VariateByEmployee(respondent as EmployeeAgentNegotiator);
+                throw new System.NotImplementedException();
+            }
+
+            //public override IScene Variate(INegotiator respondent)
+            //{
+            //    return VariateByEmployee(respondent as EmployeeAgentNegotiator);
+            //}
+
+            protected override void MergeToOriginal(INegotiator original)
+            {
+                throw new System.NotImplementedException();
             }
 
             private IScene VariateByEmployee(EmployeeAgentNegotiator negotiator)

@@ -20,15 +20,11 @@ namespace Factorio.Lua.Reader
         private static void Main(string[] args)
         {
 
-            var str = "__ENTITY__electrolyser-2__";
+            var flag = false;
+            if (flag)
+                FactorioProgram.Load();
 
-            var ism = Storage._entityRegex.IsMatch(str);
-            var matchCollection = Storage._entityRegex.Matches(str);
-            var match = Storage._entityRegex.Match(str);
 
-            var g1 = match.Groups[0];
-            var g2 = match.Groups[1];
-            //Load();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

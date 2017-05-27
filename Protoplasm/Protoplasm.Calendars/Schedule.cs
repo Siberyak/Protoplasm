@@ -38,7 +38,7 @@ namespace Protoplasm.Calendars
                 var items = original._allocated.DefinedItems();
                 foreach (var item in items)
                 {
-                    _allocated.Include(item.Left, item.Right, item.Data);
+                    Include(item.Left, item.Right, item.Data);
                 }
             }
 

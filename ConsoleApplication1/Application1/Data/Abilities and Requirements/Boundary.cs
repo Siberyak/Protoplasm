@@ -20,6 +20,14 @@ namespace Application1.Data
             Duration = duration.Instance();
         }
 
+        public bool IsCorrect
+        {
+            get
+            {
+                return Start.Left < Finish.Right;
+            }
+        }
+
         public override string ToString()
         {
             var start = Start.IsUndefined ? null : $"S: {Start}";
@@ -80,5 +88,14 @@ namespace Application1.Data
             return new Boundary(Start, Finish, interval, Duration);
         }
 
+        public Boundary Restrict(Boundary restriction)
+        {
+            var start = restriction.Start.Intersect(Start);
+            var finish = restriction.Finish.Intersect(Finish);
+            var totalDuration = restriction.TotalDuration.Intersect(TotalDuration);
+            var duration = restriction.Duration.Intersect(Duration);
+
+            return new Boundary(start, finish, totalDuration, duration);
+        }
     }
 }

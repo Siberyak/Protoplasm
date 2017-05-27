@@ -9,7 +9,16 @@ namespace MAS.Core.Contracts
 
         ISatisfaction Satisfaction { get; }
         IAgent Agent { get; }
-        bool IsSatisfied { get; }
-        IScene Variate(INegotiator respondent);
+        NegotiatorState State { get; }
+
+        void MergeToOriginal(INegotiator original);
+        IEnumerable<IScene> Variants(INegotiator respondent);
+    }
+
+    public enum NegotiatorState
+    {
+        Ready,
+        NotReady,
+        Satisfied,
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
 using Protoplasm.Utils;
@@ -8,9 +9,11 @@ namespace MAS.Utils
     public abstract class ManagedEntityAgent<TEntity> : EntityAgent<TEntity>, IManagedAgent
         where TEntity : Entity
     {
-        public IAgentsManager Manager { get; }
+        IAgentsManager IManagedAgent.Manager => Manager;
 
-        public ManagedEntityAgent(IAgentsManager manager, TEntity entity) : base(entity)
+        protected IAgentsManager Manager { get; }
+
+        protected ManagedEntityAgent(IAgentsManager manager, TEntity entity) : base(entity)
         {
             Manager = manager;
         }
@@ -48,7 +51,7 @@ namespace MAS.Utils
 
         public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
         {
-            return Manager;
+            return Manager.Where(x => x.AbilitiesHolder == this || x.RequiremenetsHolder == this);
         }
     }
 }

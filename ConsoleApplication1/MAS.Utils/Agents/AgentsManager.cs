@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using MAS.Core;
 using MAS.Core.Compatibility;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
+using Protoplasm.Utils;
 
 namespace MAS.Utils
 {
@@ -165,6 +169,21 @@ namespace MAS.Utils
 
         public bool TrySatisfyRequirements(IScene scene, out IScene result, VariantKind kind)
         {
+
+            var current = scene;
+
+            var holders = GetRequirementsHolders();
+            foreach (var holder in holders)
+            {
+                var success = holder.TrySatisfy(scene, out result, kind);
+                if (success)
+                    current = result;
+            }
+
+            result = current;
+            return current != scene;
+
+
             return GetRequirementsHolders()
                 .TrySatisfy(scene, out result, kind);
         }
@@ -175,10 +194,86 @@ namespace MAS.Utils
                 .SelectMany(resourceAgent => resourceAgent.SatisfactionVariants(scene));
         }
 
+        public IScene SAbilities(IScene scene, VariantKind kind)
+        {
+            var scenes = SatisfyAbilities(scene);
+            var result = Best(scenes, kind);
+            return result;
+        }
+
+        private IScene Best(IEnumerable<IScene> scenes, VariantKind kind)
+        {
+            ConsoleExtender.WriteLine("-= checking variants =-");
+            ConsoleExtender.WriteLine("");
+            ConsoleExtender.WriteLine($"kind: {kind}");
+
+            ConsoleExtender.WriteLine("");
+            var timeHolder = ConsoleExtender.Holder.Get("");
+            ConsoleExtender.WriteLine("");
+            var variantsHolder = ConsoleExtender.Holder.Get("");
+            var bestHolder = ConsoleExtender.Holder.Get("");
+            var currentHolder = ConsoleExtender.Holder.Get("");
+
+            var stopwatch = Stopwatch.StartNew();
+
+            var cnt = 0;
+            IScene best = null;
+            foreach (var scene in scenes)
+            {
+                var elapsed = stopwatch.Elapsed;
+                timeHolder.SetValue($"time left: {elapsed.ToString(@"hh\:mm\:ss")}        ");
+
+                var persec = Math.Round(cnt++ / elapsed.TotalSeconds, 1);
+                variantsHolder.SetValue($"checked variants: {cnt}, performance: {persec} per sec.         ");
+                currentHolder.SetValue($"\t current: {scene}        ");
+                if (best == null || scene.Satisfaction.CompareTo(best.Satisfaction) > 0)
+                {
+                    best = scene;
+                    bestHolder.SetValue($"\t    best: {best}       ");
+
+                    if (kind == VariantKind.First)
+                        break;
+                }
+            }
+            ConsoleExtender.WriteLine("-= done =-");
+            return best;
+        }
+
+        public IEnumerable<IScene> SatisfyAbilities(IScene scene)
+        {
+
+            var holders = GetAbilitiesHolders().Parallel();
+
+            var variants = holders.SelectMany(holder => holder.SatisfactionVariants(scene, false).Parallel()).Parallel();
+            foreach (var first in variants)
+            {
+                var any = false;
+                foreach (var second in SatisfyAbilities(first).Parallel())
+                {
+                    any = true;
+                    yield return second;
+                }
+
+                if (!any)
+                    yield return first;
+            }
+        }
+
+
         public bool TrySatisfyAbilities(IScene scene, out IScene result, VariantKind kind)
         {
-            return GetAbilitiesHolders()
-                .TrySatisfy(scene, out result, kind);
+            var current = scene;
+
+            var holders = GetAbilitiesHolders();
+            foreach (var holder in holders)
+            {
+                var success = holder.TrySatisfy(scene, out result, kind);
+                if (success)
+                    current = result;
+            }
+
+            result = current;
+            return current != scene;
         }
 
         public IEnumerable<IScene> AbilitiesSatisfactionVariants(IScene scene)

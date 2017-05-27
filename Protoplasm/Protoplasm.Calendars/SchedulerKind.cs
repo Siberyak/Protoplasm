@@ -2,7 +2,7 @@ namespace Protoplasm.Calendars
 {
     public enum SchedulerKind
     {
-        LeftToRight,
+        LeftToRight = 0,
         RightToLeft
     }
 }

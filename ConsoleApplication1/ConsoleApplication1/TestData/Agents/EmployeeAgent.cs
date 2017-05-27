@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using MAS.Core;
 using MAS.Core.Compatibility.Contracts;
@@ -35,7 +36,16 @@ namespace ConsoleApplication1.TestData
             {
             }
 
-            public override IScene Variate(INegotiator respondent)
+            //public override IScene Variate(INegotiator respondent)
+            //{
+            //    throw new System.NotImplementedException();
+            //}
+            public override IEnumerable<IScene> Variants(INegotiator respondent)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            protected override void MergeToOriginal(INegotiator original)
             {
                 throw new System.NotImplementedException();
             }

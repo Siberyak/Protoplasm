@@ -8,7 +8,7 @@ using Protoplasm.Calendars;
 
 namespace Application1.Data
 {
-    [DisplayName("Resource-Агент")]
+    [DisplayName("R-Агент")]
     public class ResourceAgent : ManagedEntityAgent<Resource>, IAbilitiesHolder
     {
         static readonly HandlersStorage<ResourceAgent> Handlers = new HandlersStorage<ResourceAgent>();

@@ -34,7 +34,7 @@ namespace MAS.Utils
 
         public override string ToString()
         {
-            return $"{Value} = {_original} + Δ:[{Δ}]";
+            return $"{Value,3} = {_original,2} + Δ:[{Δ}]";
         }
 
         void IFlatableSatisfaction.Flat()

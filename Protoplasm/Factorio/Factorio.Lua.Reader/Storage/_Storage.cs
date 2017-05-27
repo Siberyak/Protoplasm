@@ -111,11 +111,6 @@ namespace Factorio.Lua.Reader
         private static Storage Load()
         {
 
-            var flag = false;
-            if (flag)
-                FactorioProgram.Load();
-
-
             _typesAttributes = typeof(Base).Assembly.GetTypes()
                 .Select(x => new { Type = x, Attribute = x.Attribute<JsonObjectAttribute>() })
                 .Where(x => typeof(Base).IsAssignableFrom(x.Type) && x.Attribute != null && !String.IsNullOrEmpty(x.Attribute.Id))

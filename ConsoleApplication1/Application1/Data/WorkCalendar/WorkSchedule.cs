@@ -16,20 +16,26 @@ namespace Application1.Data
 
         public WorkSchedule Clone()
         {
-            return new WorkSchedule(_schedule.Clone());
+            lock (this)
+            {
+                return new WorkSchedule(_schedule.Clone());
+            }
         }
 
 
         public WorkScheduler Scheduler()
         {
-            return new WorkScheduler
-                (
-                _schedule,
-                WorkItemAmount.ResponseInstruction,
-                WorkItemAmount.ResponseAmount,
-                WorkItemAmount.ResponseDurationByAmount,
-                WorkItemAmount.ResponseDataForAllocate
-                );
+            lock (this)
+            {
+                return new WorkScheduler
+                    (
+                    _schedule,
+                    WorkItemAmount.ResponseInstruction,
+                    WorkItemAmount.ResponseAmount,
+                    WorkItemAmount.ResponseDurationByAmount,
+                    WorkItemAmount.ResponseDataForAllocate
+                    );
+            }
         }
 
         private void Allocate(Calendars<DateTime, TimeSpan, WorkItemSlotCollection>.Scheduler<WorkItemAmount>.IAllocation allocation)
@@ -43,9 +49,12 @@ namespace Application1.Data
 
         public void Allocate(IEnumerable<Calendars<DateTime, TimeSpan, WorkItemSlotCollection>.Scheduler<WorkItemAmount>.IAllocation> allocations)
         {
-            foreach (var allocation in allocations)
+            lock (this)
             {
-                Allocate(allocation);
+                foreach (var allocation in allocations)
+                {
+                    Allocate(allocation);
+                }
             }
         }
     }

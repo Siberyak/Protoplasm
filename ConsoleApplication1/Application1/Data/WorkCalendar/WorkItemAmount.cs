@@ -1,13 +1,26 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using DevExpress.Utils.Filtering;
 using Protoplasm.Calendars;
 using Protoplasm.PointedIntervals;
 using Protoplasm.Utils;
 
 namespace Application1.Data
 {
+    public struct AllocationRequirement
+    {
+        public Boundary Boundary { get; private set; }
+        public WorkItemAmount Amount { get; private set; }
+        public SchedulerKind Kind { get; private set; }
+
+        public AllocationRequirement(Boundary boundary, WorkItemAmount amount, SchedulerKind kind)
+        {
+            Boundary = boundary;
+            Amount = amount;
+            Kind = kind;
+        }
+    }
+
     public struct WorkItemAmount : IComparable<WorkItemAmount>
     {
         public enum MesureUnit
