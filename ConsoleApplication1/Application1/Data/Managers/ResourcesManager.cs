@@ -11,10 +11,27 @@ namespace Application1.Data
 {
     public class ResourcesManager : AgentsManager
     {
-        public ResourceAgent CreateResource(string caption, IReadOnlyCollection<Competence> competences, params ResourcesGroup[] memberOf)
+        public ResourceAgent Get(Resource resource)
         {
-            var department = new Resource(caption, competences, memberOf);
-            var agent = new ResourceAgent(this, department);
+            if (resource == null)
+                return null;
+
+            return Agents.OfType<ResourceAgent>().FirstOrDefault(x => x.Entity == resource)
+                   ?? CreateResourceAgent(resource);
+        }
+
+        public Resource CreateResource(string caption, IReadOnlyCollection<Competence> competences, bool createAgent = false)
+        {
+            var memberOf = new ResourcesGroup[0];
+            var resource = new Resource(caption, competences, memberOf);
+            if (createAgent)
+                CreateResourceAgent(resource);
+            return resource;
+        }
+
+        private ResourceAgent CreateResourceAgent(Resource resource)
+        {
+            var agent = new ResourceAgent(this, resource);
             return Initialize(agent);
         }
 

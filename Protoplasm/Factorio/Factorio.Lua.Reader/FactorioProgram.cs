@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,10 @@ namespace Factorio.Lua.Reader
 
             var flag = false;
             if (flag)
-                FactorioProgram.Load();
+            {
+                Load();
+                return;
+            }
 
 
 
@@ -42,11 +46,25 @@ namespace Factorio.Lua.Reader
             //Whiteprint
             //Black
             //"Dark Side"
-            UserLookAndFeel.Default.SetSkinStyle("Visual Studio 2013 Blue");
+            //UserLookAndFeel.Default.SetSkinStyle("Visual Studio 2013 Blue");
 
+            var skin = SkinManager.Default.GetSkin(SkinProductId.Docking, UserLookAndFeel.Default);
+            var tmp = skin.Elements.OfType<DictionaryEntry>().Select(x => x.Key).ToArray();
+
+            if(tmp.Length == 0)
+            { }
 
             //Application.Run(new Form1());
-            Application.Run(new RibbonForm2());
+
+            var storageExist = false;
+            ViewsExtender.ShowProgress(() => storageExist = Storage.Current != null);
+
+            if (!storageExist)
+            {
+                return;
+            }
+            else
+                Application.Run(new RibbonForm2());
         }
 
         public static void Load()

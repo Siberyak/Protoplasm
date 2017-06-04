@@ -81,26 +81,19 @@ namespace Factorio.Lua.Reader
             if(Recipe == null)
                 return;
 
+            var parts = Recipe.Parts;
+
+
             LayoutControl.BeginInit();
 
             LayoutControl.AddLabel(Recipe.LocalizedName, Recipe.ImageIndex32());
-            LayoutControl.AddSeparator();
 
-            LayoutControl.AddLabel($"{Recipe._EnergyRequired}", ImagesHelper.GetIndex32(Recipe.ClockIcon, k => ImagesHelper.LoadImage(Recipe.Storage, k)));
 
-            var parts = Recipe.Parts;
-            foreach (var edge in parts.Where(x => x.Direction == Direction.Input))
-            {
-                var text = $" x {edge.Amount}   {edge.Part.LocalizedName}";
-                var imageIndex = ImagesHelper.GetIndex32(edge.Part._Icon, k => ImagesHelper.LoadImage(Recipe.Storage, k));
-                var item = LayoutControl.AddLabel(text, imageIndex);
-                item.Click += InputLabelClick;
-            }
 
             LayoutControl.AddSeparator();
 
             var outs = parts.Where(x => x.Direction == Direction.Output).ToArray();
-            if (outs.Length > 1)
+            if (outs.Length > 0)
             {
                 foreach (var edge in outs)
                 {
@@ -112,6 +105,20 @@ namespace Factorio.Lua.Reader
 
                 LayoutControl.AddSeparator();
             }
+
+            LayoutControl.AddLabel($"{Recipe._EnergyRequired}", ImagesHelper.GetIndex32(Recipe.ClockIcon, k => ImagesHelper.LoadImage(Recipe.Storage, k)));
+
+            foreach (var edge in parts.Where(x => x.Direction == Direction.Input))
+            {
+                var text = $" x {edge.Amount}   {edge.Part.LocalizedName}";
+                var imageIndex = ImagesHelper.GetIndex32(edge.Part._Icon, k => ImagesHelper.LoadImage(Recipe.Storage, k));
+                var item = LayoutControl.AddLabel(text, imageIndex);
+                item.Click += InputLabelClick;
+            }
+
+            LayoutControl.AddSeparator();
+
+            
 
             var crafters = Recipe.RecipeCategory.References.OfType<RecipeCategoryCrafterEdge>().Select(x => x.Crafter).ToArray();
             if(crafters.Length > 0)

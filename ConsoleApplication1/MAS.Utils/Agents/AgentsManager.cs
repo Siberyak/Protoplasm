@@ -34,7 +34,7 @@ namespace MAS.Utils
             CollectCompatibilites(agent);
         }
 
-        private void CollectCompatibilites(IAgent agent)
+        protected virtual void CollectCompatibilites(IAgent agent)
         {
             foreach (var manager in AbilitiesManagers)
             {
@@ -47,20 +47,14 @@ namespace MAS.Utils
             }
         }
 
-        public void RegisterCompatibility(IAbilitiesHolder abilities)
+        public virtual IEnumerable<IHoldersCompatibilityInfo> RegisterCompatibility(IAbilitiesHolder abilities)
         {
-            foreach (var requirements in GetRequirementsHolders())
-            {
-                Compatible(abilities, requirements);
-            }
+            return GetRequirementsHolders().Select(requirements => Compatible(abilities, requirements)).ToArray();
         }
 
-        public void RegisterCompatibility(IRequirementsHolder requirements)
+        public virtual IEnumerable<IHoldersCompatibilityInfo> RegisterCompatibility(IRequirementsHolder requirements)
         {
-            foreach (var abilities in GetAbilitiesHolders())
-            {
-                Compatible(abilities, requirements);
-            }
+            return GetAbilitiesHolders().Select(abilities => Compatible(abilities, requirements)).ToArray();
         }
 
         public IEnumerable<IAgent> Agents => _agents.ToArray();
@@ -78,7 +72,7 @@ namespace MAS.Utils
             return _compatibilities.FirstOrDefault(x => x.RequiremenetsHolder == requirements && x.AbilitiesHolder == abilities);
         }
 
-        private IHoldersCompatibilityInfo Generate(IRequirementsHolder requirements, IAbilitiesHolder abilities)
+        protected IHoldersCompatibilityInfo Generate(IRequirementsHolder requirements, IAbilitiesHolder abilities)
         {
             lock (_compatibilities)
             {
@@ -96,7 +90,7 @@ namespace MAS.Utils
                        ?? abilitiesAgentsManager?.Add(requirements, abilities, null) 
                        ?? requirements.Compatibility(abilities);
                 
-                // ничего не нашли
+                // добавляем
                 _compatibilities.Add(info);
 
                 // освежаем, если надо

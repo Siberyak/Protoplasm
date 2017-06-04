@@ -18,6 +18,7 @@ namespace Application1.Data
 
         private readonly CompetencesAbility _competencesAbility;
         private readonly ScheduleAbility _scheduleAbility;
+        private readonly ResourceAbility _resourceAbility;
         public WorkSchedule Schedule => _scheduleAbility.Schedule;
 
         public IReadOnlyCollection<Competence> Competences => _competencesAbility.Competences;
@@ -27,11 +28,12 @@ namespace Application1.Data
         {
             _competencesAbility = new CompetencesAbility(competences.Union(MembershipCompetences).ToArray());
             _scheduleAbility = new ScheduleAbility(WorkCalendar);
+            _resourceAbility = new ResourceAbility(this);
         }
 
         protected override IReadOnlyCollection<Ability> GenerateAbilities()
         {
-            return new Ability[] { _competencesAbility, _scheduleAbility };
+            return new Ability[] { _competencesAbility, _scheduleAbility, _resourceAbility };
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Factorio.Lua.Reader
             return dialogResult == DialogResult.OK && processResult(form, control);
         }
 
-        private static void ShowProgress(Action action)
+        public static void ShowProgress(Action action)
         {
             SplashScreenManager.ShowDefaultWaitForm();
             action();

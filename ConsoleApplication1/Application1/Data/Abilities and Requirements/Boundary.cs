@@ -40,6 +40,23 @@ namespace Application1.Data
 
         public static readonly Boundary Empty = default(Boundary);
 
+        public Boundary SetStart(Interval<DateTime> interval)
+        {
+            return new Boundary(interval, Finish, TotalDuration, Duration);
+        }
+        public Boundary SetFinish(Interval<DateTime> interval)
+        {
+            return new Boundary(Start, interval, TotalDuration, Duration);
+        }
+        public Boundary SetTotalDuration(Interval<TimeSpan> interval)
+        {
+            return new Boundary(Start, Finish, interval, Duration);
+        }
+        public Boundary SetDuration(Interval<TimeSpan> interval)
+        {
+            return new Boundary(Start, Finish, TotalDuration, interval);
+        }
+
         public Boundary StartAfter(DateTime value, bool keepIntervalDuration = true, bool included = true)
         {
             var interval = Start.ChangeLeft<DateTime, TimeSpan>(value, keepIntervalDuration, included);

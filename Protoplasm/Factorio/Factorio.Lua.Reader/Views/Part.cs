@@ -1,6 +1,6 @@
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
-
 using Protoplasm.Collections;
 
 namespace Factorio.Lua.Reader
@@ -11,11 +11,12 @@ namespace Factorio.Lua.Reader
         private readonly PredicatedList<CraftInfo> _list;
         private double _available;
         private double _required;
+        private bool _enabled;
 
         public Part(IRecipePart part, IBindingList<CraftInfo> crafts)
         {
             _part = part;
-            _list = new PredicatedList<CraftInfo>(crafts, x => x._recipe.AllParts.Contains(part) && x.Speed.HasValue);
+            _list = new PredicatedList<CraftInfo>(crafts, x => x.Enabled && x.Recipe.AllParts.Contains(part) && x.Enabled);
             _list.BeforeRemoveItem += BeforeRemove;
             _list.ListChanged += ListChanged;
             _image = _part?.Image32();
@@ -28,11 +29,30 @@ namespace Factorio.Lua.Reader
                 (
                     x => new
                     {
-                        x,
-                        Outs = x._recipe.References.OfType<RecipePartEdge>().Where(y => y.Direction == Direction.Output && y.Part == _part).ToArray(),
-                        Ins = x._recipe.References.OfType<RecipePartEdge>().Where(y => y.Direction == Direction.Input && y.Part == _part).ToArray()
+                        CraftInfo = x,
+                        Outs = x.Recipe.References.OfType<RecipePartEdge>().Where(y => y.Direction == Direction.Output && y.Part == _part).ToArray(),
+                        Ins = x.Recipe.References.OfType<RecipePartEdge>().Where(y => y.Direction == Direction.Input && y.Part == _part).ToArray()
                     }
-                ).ToArray();
+                )
+                .Where(x => x.CraftInfo.CraftTime.HasValue)
+                .Select(x => new {x.CraftInfo, x.Ins, x.Outs, Count = 60.0 / x.CraftInfo.CraftTime.Value })
+                .ToArray();
+
+            Enabled = tmp.Any(x => x.Ins.Length != 0 || x.Outs.Length != 0);
+            Required = tmp.Sum(x => x.CraftInfo.Count * x.Count * x.Ins.Sum(y => y.Amount));
+            Available = tmp.Sum(x => x.CraftInfo.Count * x.Count * x.Outs.Sum(y => y.Amount));
+        }
+
+        [Browsable(false)]
+        public bool Enabled
+        {
+            get { return _enabled; }
+            private set
+            {
+                if (value == _enabled) return;
+                _enabled = value;
+                OnPropertyChanged();
+            }
         }
 
         private void BeforeRemove(object sender, BeforeRemoveEventArgs e)
@@ -45,10 +65,7 @@ namespace Factorio.Lua.Reader
             Recalc();
         }
 
-        public string LocalizedName
-        {
-            get { return _part.LocalizedName; }
-        }
+        public string Name => _part.LocalizedName;
 
         public double Available
         {

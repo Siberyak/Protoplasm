@@ -3772,10 +3772,10 @@ namespace Factorio.Lua.Reader
     {
 
         [JsonProperty("excluded")]
-        public string _Excluded { get; set; }
+        public object _Excluded { get; set; }
 
         [JsonProperty("included")]
-        public string _Included { get; set; }
+        public object _Included { get; set; }
 
         [JsonProperty("last_hour_only")]
         public bool _LastHourOnly { get; set; }

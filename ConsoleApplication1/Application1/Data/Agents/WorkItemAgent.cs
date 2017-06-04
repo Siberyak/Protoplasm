@@ -18,8 +18,8 @@ namespace Application1.Data
 
         static WorkItemAgent()
         {
-            Handlers.Requested(agent => agent.Boundary);
-            Handlers.Requested(agent => agent.RequiredAmount);
+            //Handlers.Requested(agent => agent.Boundary);
+            //Handlers.Requested(agent => agent.RequiredAmount);
             Handlers.Asked<DependenciesRequest, NegotiatorState>((agent, request) => agent.DependenciesState(request.Scene));
             Handlers.Asked<DependenciesRequest, Boundary[]>((agent, request) => agent.DependenciesBoundaries(request.Scene));
         }
@@ -35,8 +35,8 @@ namespace Application1.Data
         }
 
 
-        public Boundary Boundary => Entity.Boundary;
-        public WorkItemAmount RequiredAmount => Entity.RequiredAmount;
+        //public Boundary Boundary => Entity.Boundary;
+        //public WorkItemAmount RequiredAmount => Entity.RequiredAmount;
         public SchedulerKind Kind { get; set; }
 
         public int Priority => Entity.Priority;
@@ -49,7 +49,7 @@ namespace Application1.Data
 
         public override void Initialize()
         {
-
+            Entity.Lock();
         }
 
         protected override INegotiator Negotiator(IScene scene)

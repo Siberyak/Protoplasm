@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MAS.Core.Compatibility.Contracts;
 using MAS.Core.Contracts;
+using Protoplasm.Utils;
 
 namespace MAS.Utils
 {
@@ -19,6 +20,11 @@ namespace MAS.Utils
             //}
             
             throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType().DisplayName()}";
         }
 
         public virtual bool Tell<TMessage>(TMessage message)

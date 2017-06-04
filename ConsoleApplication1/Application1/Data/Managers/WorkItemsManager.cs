@@ -15,13 +15,27 @@ namespace Application1.Data
     {
         private readonly List<WorkItemsDependencyCollection> _dependencies = new List<WorkItemsDependencyCollection>();
 
-        public WorkItemAgent CreateWorkItemAgent(string caption, int priority, IReadOnlyCollection<Competence> competences)
+        public WorkItemAgent Get(WorkItem workItem)
         {
-            var workItem = new WorkItem(caption, priority, competences);
+            if (workItem == null)
+                return null;
+
+            return Agents.OfType<WorkItemAgent>().FirstOrDefault(x => x.Entity == workItem)
+                   ?? CreateWorkItemAgent(workItem);
+
+        }
+
+        public WorkItem CreateWorkItem(string caption, int priority)
+        {
+            var workItem = new WorkItem(caption, priority);
+            return workItem;
+        }
+
+        private WorkItemAgent CreateWorkItemAgent(WorkItem workItem)
+        {
             var agent = new WorkItemAgent(this, workItem);
             return Initialize(agent);
         }
-
 
 
         protected override IEnumerable<IAbilitiesHolder> GetAbilitiesHolders()

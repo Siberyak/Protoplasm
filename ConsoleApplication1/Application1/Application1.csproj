@@ -91,7 +91,15 @@
   <ItemGroup>
     <Compile Include="Data\Abilities and Requirements\Boundary.cs" />
     <Compile Include="Data\Abilities and Requirements\BoundaryRequirement.cs" />
+    <Compile Include="Data\Abilities and Requirements\ResourceAbility.cs" />
+    <Compile Include="Data\Abilities and Requirements\ResourceRequirement.cs" />
     <Compile Include="Data\Abilities and Requirements\ScheduleAbility.cs" />
+    <Compile Include="Data\Entities\ResourceRequirementInfo.cs" />
+    <Compile Include="Data\Entities\WorkItemBoundaryInfo.cs" />
+    <Compile Include="Data\Entities\WorkItemsDependency.cs" />
+    <Compile Include="Data\Entities\WorkItemsDependencyCollection.cs" />
+    <Compile Include="Data\Entities\WorkItemsDependencyInjector.cs" />
+    <Compile Include="Data\Entities\WorkItemsInterval.cs" />
     <Compile Include="Data\WorkCalendar\WorkCalendar.cs" />
     <Compile Include="Data\WorkCalendar\WorkCalendarAdapter.cs" />
     <Compile Include="Data\WorkCalendar\WorkItemAmount.cs" />

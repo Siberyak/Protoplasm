@@ -13,10 +13,14 @@ namespace Application1
         public ResourcesManager ResourcesManager { get; } = new ResourcesManager();
         public WorkItemsManager WorkItemsManager { get; } = new WorkItemsManager();
 
+        ComplexedResourcesManager ComplexedResourcesManager { get; } = new ComplexedResourcesManager();
+
         public Env()
         {
-            WorkItemsManager.AddAbilitiesManager(ResourcesManager);
-            ResourcesManager.AddRequirementsManager(WorkItemsManager);
+            WorkItemsManager.AddAbilitiesManager(ComplexedResourcesManager);
+            ComplexedResourcesManager.AddRequirementsManager(WorkItemsManager);
+
+            ComplexedResourcesManager.AddAbilitiesManager(ResourcesManager);
         }
 
         delegate bool TrySatisfyDelegate(IScene scene, out IScene result, VariantKind kind);

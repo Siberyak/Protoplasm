@@ -182,7 +182,7 @@ namespace Factorio.Lua.Reader
         public string _Order { get; set; }
         private void Populate(JToken token, bool input)
         {
-            object amount = null;
+            double amount = 0;
             string name = null;
 
             if (token.Type == JTokenType.Object)
@@ -190,7 +190,8 @@ namespace Factorio.Lua.Reader
                 dynamic source = token;
 
                 name = source.name;
-                amount = source.amount;
+
+                amount = source.amount ?? (source.amount_max + source.amount_min)/2;
             }
             else if (token.Type == JTokenType.Array)
             {
@@ -201,7 +202,7 @@ namespace Factorio.Lua.Reader
             Populate(name, amount, input);
         }
 
-        private void Populate(string name, object amount, bool input)
+        private void Populate(string name, double amount, bool input)
         {
             var item = Storage.FindNode<IRecipePart>(x => x.Name == name);
 

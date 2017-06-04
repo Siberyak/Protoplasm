@@ -1,11 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using Factorio.Lua.Reader.Annotations;
+using Protoplasm.Collections;
 
 namespace Factorio.Lua.Reader
 {
-    public abstract class BaseCalcInfo : INotifyPropertyChanged
+    public abstract class BaseCalcInfo : INotifyPropertyChanged, IBindingListItem
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -16,8 +18,14 @@ namespace Factorio.Lua.Reader
         }
 
         [Browsable(false)]
-        public Image Image => _image;
+        public virtual Image Image => _image;
 
         protected Image _image;
+
+        public event EventHandler Deleted;
+        public void OnDeleted()
+        {
+            Deleted?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

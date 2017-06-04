@@ -232,7 +232,7 @@ namespace Protoplasm.Utils
 
             return flags.ToArray();
         }
-
         #endregion
     }
+
 }

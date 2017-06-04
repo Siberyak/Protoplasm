@@ -7,7 +7,7 @@ namespace Factorio.Lua.Reader
         }
 
         public Direction Direction { get; set; }
-        public object Amount { get; set; }
+        public double Amount { get; set; }
 
         public Recipe Recipe => (Recipe) _from;
         public IRecipePart Part => (IRecipePart) _to;

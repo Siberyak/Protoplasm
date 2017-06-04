@@ -1,23 +1,68 @@
+using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Factorio.Lua.Reader
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class CraftInfo : BaseCalcInfo
     {
         private Storage _storage => Storage.Current;
 
         ICrafter _crafter;
+
+        [JsonProperty("count")]
         private int _count = 1;
-        internal Recipe _recipe;
+
+        internal Recipe Recipe;
+
+        [JsonProperty("mode")]
+        private ViewMode _mode = ViewMode.Crafter;
+
+        [JsonProperty("enabled")]
+        private bool _enabled;
+
+        private Recipe _requestRecipe;
+
+        [JsonProperty("location")]
+        private Point _location;
+
+        [JsonConstructor]
+        public CraftInfo()
+        {
+        }
+
+        [JsonProperty("recipe")]
+        string RecipeID
+        {
+            get { return Recipe.Name; }
+            set { SetRecipe(_storage.Recipies.First(x => x.Name == value)); }
+        }
+
+        [JsonProperty("crafter")]
+        string CrafterID
+        {
+            get { return Crafter?.Name; }
+            set { Crafter = _storage.Nodes.OfType<ICrafter>().FirstOrDefault(x => x.Name == value); }
+        }
 
         public CraftInfo(Recipe recipe)
         {
-            _recipe = recipe;
-            _image = _recipe.Image32();
+            SetRecipe(recipe);
         }
 
-        public string Name => _recipe.LocalizedName;
+        private void SetRecipe(Recipe recipe)
+        {
+            Recipe = recipe;
+            _image = Recipe.Image32();
+        }
+
+        [Browsable(true)]
+        public override Image Image => base.Image;
+
+        public string Name => Recipe.LocalizedName;
 
 
         public int Count
@@ -39,13 +84,81 @@ namespace Factorio.Lua.Reader
             {
                 if (Equals(value, _crafter)) return;
                 _crafter = value;
+
+                OnPropertyChanged();
+
+                if (_crafter == null)
+                    Enabled = false;
+
+            }
+        }
+        [Browsable(false)]
+        public double RecipeTime => Recipe._EnergyRequired;
+
+        [Browsable(false)]
+        public double? Speed => Crafter?._CraftingSpeed;
+
+        [Browsable(false)]
+        public double? CraftTime => Recipe._EnergyRequired/Speed;
+
+        [Browsable(false)]
+        public ViewMode Mode
+        {
+            get { return _mode; }
+            set
+            {
+                if (value == _mode) return;
+                _mode = value;
                 OnPropertyChanged();
             }
         }
-        public double RecipeTime => _recipe._EnergyRequired;
 
-        public double? Speed => Crafter?._CraftingSpeed;
+        [Browsable(false)]
+        public bool Enabled
+        {
+            get { return _enabled && Crafter != null; }
+            set
+            {
+                if (value == _enabled) return;
+                _enabled = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public double? CraftTime => _recipe._EnergyRequired/Speed;
+        [Browsable(false)]
+        public Recipe RequestRecipe
+        {
+            get { return _requestRecipe; }
+            set
+            {
+                if (Equals(value, _requestRecipe)) return;
+                _requestRecipe = value;
+                if(_requestRecipe != null)
+                    OnPropertyChanged();
+            }
+        }
+
+        public Point Location
+        {
+            get { return _location; }
+            set
+            {
+                if (value.Equals(_location)) return;
+                _location = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [Flags]
+        public enum ViewMode
+        {
+            None = 0,
+            Recipe = 1,
+            Crafter = 2, 
+            Count = 4,
+            PerMinute = 8
+        }
+
+
     }
 }

@@ -234,7 +234,7 @@ namespace Factorio.Lua.Reader
 
         public Color Transform(Color color)
         {
-            var a = Convert.ToByte(Math.Round(color.A * A));
+            var a = Convert.ToByte(Math.Round(color.A * (1-A)));
             var r = Convert.ToByte(Math.Round(color.R * R));
             var g = Convert.ToByte(Math.Round(color.G * G));
             var b = Convert.ToByte(Math.Round(color.B * B));

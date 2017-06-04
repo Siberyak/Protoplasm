@@ -27,20 +27,22 @@ namespace Application1.Data
         {
             get
             {
-                var boundary = Agent.Boundary;
-                Boundary[] restrictions;
-                Agent.Ask(new DependenciesRequest(Scene), out restrictions);
+                //var boundary = Agent.Boundary;
+                //Boundary[] restrictions;
+                //Agent.Ask(new DependenciesRequest(Scene), out restrictions);
 
-                foreach (var restriction in restrictions)
-                {
-                    boundary = boundary.Restrict(restriction);
-                }
+                //foreach (var restriction in restrictions)
+                //{
+                //    boundary = boundary.Restrict(restriction);
+                //}
 
 
 
-                return boundary.IsCorrect
-                    ? new[]{new AllocationRequirement(boundary, Agent.RequiredAmount, Agent.Kind)}
-                    : new AllocationRequirement[0];
+                return 
+                    //boundary.IsCorrect
+                    //? new[]{new AllocationRequirement(boundary, Agent.RequiredAmount, Agent.Kind)}
+                    //: 
+                    new AllocationRequirement[0];
             }
         }
 

@@ -1,278 +1,179 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
+using MAS.Core.Compatibility;
+using MAS.Core.Compatibility.Contracts;
+using MAS.Core.Contracts;
 using MAS.Utils;
-using Protoplasm.Calendars;
-using Protoplasm.PointedIntervals;
 
 namespace Application1.Data
 {
     public class WorkItem : Entity
     {
-        private readonly BoundaryRequirement _boundaryRequirement;
-        private readonly CompetencesRequirement _competencesRequirement;
+        private readonly List<WorkItemBoundaryInfo> _boundaryInfos;
+        private readonly List<ResourceRequirementInfo> _resourceRequirementInfos;
 
-        public WorkItem(string caption, int priority, IReadOnlyCollection<Competence> competences) : base(caption)
+        public WorkItem(string caption, int priority) : base(caption)
         {
+            _boundaryInfos = new List<WorkItemBoundaryInfo>();
+            _resourceRequirementInfos = new List<ResourceRequirementInfo>();
+
             Priority = priority;
-            _competencesRequirement = new CompetencesRequirement(competences);
+        }
+        public int Priority { get; }
 
-            var boundary = Boundary.Empty;
+        private bool _locked;
 
-            boundary = boundary
-                .StartAfter(DateTime.Today)
-                .FinishBefore(DateTime.Today.AddHours(24))
-                .NotLonger(TimeSpan.FromHours(16))
-                ;
-
-            _boundaryRequirement = new BoundaryRequirement(boundary);
+        public void Lock()
+        {
+            _locked = true;
         }
 
-        public Boundary Boundary => _boundaryRequirement.Boundary;
-        public WorkItemAmount RequiredAmount => new WorkItemAmount(this, 8, TimeSpan.FromHours(1), false, false);
+        public void Add(WorkItemBoundaryInfo item)
+        {
+            if(_locked)
+                throw new Exception("Locked!");
+            _boundaryInfos.Add(item);
+        }
 
-        public int Priority { get; }
+        public void AddRange(IEnumerable<WorkItemBoundaryInfo> collection)
+        {
+            if (_locked)
+                throw new Exception("Locked!");
+            _boundaryInfos.AddRange(collection);
+        }
+
+        public void Add(ResourceRequirementInfo item)
+        {
+            if (_locked)
+                throw new Exception("Locked!");
+            _resourceRequirementInfos.Add(item);
+        }
+
+        public void AddRange(IEnumerable<ResourceRequirementInfo> collection)
+        {
+            if (_locked)
+                throw new Exception("Locked!");
+            _resourceRequirementInfos.AddRange(collection);
+        }
+
+        //public Boundary Boundary => _boundaryRequirement.Boundary;
+        //public WorkItemAmount RequiredAmount => new WorkItemAmount(this, 8, TimeSpan.FromHours(1), false, false);
+
+
+        
 
         protected override IReadOnlyCollection<Requirement> GenerateRequirements()
         {
+            var requirements = new List<Requirement>();
+            foreach (var boundaryInfo in _boundaryInfos)
+            {
+                foreach (var requirementInfo in _resourceRequirementInfos)
+                {
+                    requirements.Add(new WorkItemRequirementsPart(boundaryInfo, requirementInfo));
+                }
+            }
+
+            return requirements.ToArray();
+
             return new Requirement[]
             {
-                _boundaryRequirement,
-                _competencesRequirement,
+                //_boundaryRequirement,
+                //_competencesRequirement,
             };
         }
     }
 
-    public class WorkItemsDependencyInjector
+    class WorkItemRequirementsPart : Requirement
     {
-        List<WorkItemsDependencyCollection> _collection;
+        private WorkItemBoundaryInfo _boundaryInfo;
+        private ResourceRequirementInfo _requirementInfo;
 
-        public WorkItemsDependencyInjector(List<WorkItemsDependencyCollection> collection)
+        public WorkItemRequirementsPart(WorkItemBoundaryInfo boundaryInfo, ResourceRequirementInfo requirementInfo)
         {
-            _collection = collection;
-        }
-
-        private WorkItem _primary;
-        private WorkItemsInterval _primaryInterval;
-        private WorkItem _secondary;
-        private WorkItemsInterval _secondaryInterval;
-        private Interval<TimeSpan> _dealy = new Interval<TimeSpan>();
-
-        public WorkItemsDependencyInjector Reset()
-        {
-            _primary = null;
-            _secondary = null;
-            _dealy = new Interval<TimeSpan>();
-            return this;
+            _boundaryInfo = boundaryInfo;
+            _requirementInfo = requirementInfo;
         }
 
-        public WorkItemsDependencyInjector Primary(WorkItem workItem, WorkItemsInterval interval)
+        public override CompatibilityType Compatible(IAbility ability)
         {
-            _primary = workItem;
-            _primaryInterval = interval;
-            return this;
-        }
-        public WorkItemsDependencyInjector Secondary(WorkItem workItem, WorkItemsInterval interval)
-        {
-            _secondary = workItem;
-            _secondaryInterval = interval;
-            return this;
-        }
-        public WorkItemsDependencyInjector MinDelay(TimeSpan? value)
-        {
-            return this;
-        }
-        public WorkItemsDependencyInjector MaxDelay(TimeSpan? value)
-        {
-            return this;
+            throw new NotImplementedException();
         }
 
-        public bool Inject()
+        public override bool Compatible(IAbility ability, IScene scene)
         {
-            lock (_collection)
+            throw new NotImplementedException();
+        }
+
+        public IRequirementsHolder AsRequirementsHolder(IAgentsManager manager)
+        {
+            var boundary = Boundary.Empty;
+            boundary = boundary
+                .SetStart(_boundaryInfo.Start)
+                .SetFinish(_boundaryInfo.Finish)
+                .SetTotalDuration(_requirementInfo.TotalDuration)
+                .SetDuration(_requirementInfo.Duration);
+
+            var requirements = new []
             {
-                if (Validate() != ValidationResult.Valid)
-                    return false;
+                new BoundaryRequirement(boundary),
+                _requirementInfo.Resource != null
+                    ? (IRequirement)new ResourceRequirement(_requirementInfo.Resource)
+                    : new CompetencesRequirement(_requirementInfo.Competences)
+            };
 
-                var dep = _collection.FirstOrDefault(x => x.Primary == _primary && x.Secondary == _secondary);
-                if (dep == null)
-                    _collection.Add(dep = new WorkItemsDependencyCollection(_primary, _secondary));
+            return new WorkItemPartAgent(manager, requirements);
+        }
 
-                dep.Add(_secondaryInterval, _dealy, _primaryInterval);
+        [DisplayName(@"WIPart-Агент")]
+        class WorkItemPartAgent : ManagedAgent
+        {
+            public WorkItemPartAgent(IAgentsManager manager, IReadOnlyCollection<IRequirement> requirements) : base(manager)
+            {
+                Requirements = requirements;
+            }
 
-                return true;
+            public override IReadOnlyCollection<IRequirement> Requirements { get; }
+            public override IHoldersCompatibilityInfo Compatible(IAbilitiesHolder abilities)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool Compatible(IAbilitiesHolder abilities, IScene scene)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override IRequirement ToScene(IRequirement requirement)
+            {
+                return requirement;
+            }
+
+            public override IReadOnlyCollection<IAbility> Abilities { get; } = new IAbility[0];
+            public override IHoldersCompatibilityInfo Compatible(IRequirementsHolder requirements)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool Compatible(IRequirementsHolder requirements, IScene scene)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override IAbility ToScene(IAbility ability)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Initialize()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override INegotiator Negotiator(IScene scene)
+            {
+                throw new NotImplementedException();
             }
         }
-
-        public ValidationResult Validate()
-        {
-            lock (_collection)
-            {
-                var result = ValidationResult.Valid;
-                if (_dealy.IsUndefined)
-                    result |= ValidationResult.DelayNotSet;
-                if (_primary == null)
-                    result |= ValidationResult.PrimaryNotSet;
-                if (_secondary == null)
-                    result |= ValidationResult.SecondaryNotSet;
-                if (_secondary == _primary)
-                    result |= ValidationResult.PrimaryEqualsSecondary;
-
-                if (result == ValidationResult.Valid)
-                {
-                    var dep = _collection.FirstOrDefault(x => x.Primary == _primary && x.Secondary == _secondary);
-                    if (dep?.Contains(_secondaryInterval, _primaryInterval) == true)
-                        result |= ValidationResult.Exists;
-                }
-
-                return result;
-            }
-        }
-
-        [Flags]
-        public enum ValidationResult
-        {
-            Valid = 0,
-            PrimaryNotSet = 1,
-            PrimaryEqualsSecondary = 2,
-            SecondaryNotSet = 4,
-            DelayNotSet = 8,
-            Exists = 16
-        }
-
-    }
-
-
-
-    public class WorkItemsDependencyCollection
-    {
-        private static readonly Func<WorkItemsDependency, WorkItemsInterval, WorkItemsInterval, bool> Predicate =
-            (x, primaryInterval, secondaryInterval) =>
-                x.PrimaryInterval == primaryInterval
-                && x.SecondaryInterval == secondaryInterval;
-
-        private readonly List<WorkItemsDependency> _dependencies;
-
-        public WorkItem Primary { get; set; }
-        public WorkItem Secondary { get; set; }
-
-        public WorkItemsDependencyCollection(WorkItem primary, WorkItem secondary)
-        {
-            Primary = primary;
-            Secondary = secondary;
-            _dependencies = new List<WorkItemsDependency>();
-        }
-
-        public void Add(WorkItemsInterval secondaryInterval, Interval<TimeSpan> delay, WorkItemsInterval primaryInterval)
-        {
-            lock (_dependencies)
-            {
-                _dependencies.RemoveAll(x => Predicate(x, primaryInterval, secondaryInterval));
-                _dependencies.Add(new WorkItemsDependency(primaryInterval, secondaryInterval, delay));
-            }
-        }
-
-        public bool Contains(WorkItemsInterval secondaryInterval, WorkItemsInterval primaryInterval)
-        {
-            lock (_dependencies)
-            {
-                return _dependencies.Any(x => Predicate(x, primaryInterval, secondaryInterval));
-            }
-        }
-
-
-        private static Point<DateTime> ByInterval(WorkItemsInterval kind, Interval<DateTime> interval)
-        {
-            return kind == WorkItemsInterval.Start ? interval.Left : interval.Right;
-        }
-
-        public Boundary[] BySecondary(Interval<DateTime> interval)
-        {
-            lock (_dependencies)
-            {
-
-                var result = new List<Boundary>();
-                foreach (var dependency in _dependencies)
-                {
-                    var boundary = new Boundary();
-
-                    var primaryInterval = dependency.PrimaryInterval;
-                    var secondaryInterval = dependency.SecondaryInterval;
-                    var delay = dependency.Delay;
-
-                    var point = ByInterval(primaryInterval, interval);
-
-                    switch (secondaryInterval)
-                    {
-                        case WorkItemsInterval.Start:
-                            {
-                                if (delay.Min.IsDefined)
-                                {
-                                    var left = point.OffsetToRight(delay.Min);
-                                    boundary = boundary.StartAfter(left.Value(), false);
-                                }
-
-                                if (delay.Max.IsDefined)
-                                {
-                                    var right = point.OffsetToRight(delay.Max);
-                                    boundary = boundary.StartBefore(right.Value(), false);
-                                }
-
-                            }
-                            break;
-                        case WorkItemsInterval.Finish:
-                            {
-                                if (delay.Min.IsDefined)
-                                {
-                                    var left = point.OffsetToRight(delay.Min);
-                                    boundary = boundary.FinishAfter(left.Value(), false);
-                                }
-                                if (delay.Max.IsDefined)
-                                {
-                                    var right = point.OffsetToRight(delay.Max);
-                                    boundary = boundary.FinishBefore(right.Value(), false);
-                                }
-                            }
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                    result.Add(boundary);
-                }
-
-                return result.ToArray();
-            }
-        }
-
-        public Boundary[] ByPrimary(Interval<DateTime> interval)
-        {
-            return new Boundary[0];
-        }
-    }
-
-    public class WorkItemsDependency
-    {
-        public WorkItemsDependency(WorkItemsInterval primaryInterval, WorkItemsInterval secondaryInterval, Interval<TimeSpan> delay)
-        {
-            PrimaryInterval = primaryInterval;
-            SecondaryInterval = secondaryInterval;
-            Delay = delay;
-        }
-
-        public WorkItemsInterval PrimaryInterval { get; set; }
-        public WorkItemsInterval SecondaryInterval { get; set; }
-        public Interval<TimeSpan> Delay { get; set; }
-
-        public override string ToString()
-        {
-            return $"prim.{PrimaryInterval} -> {Delay} -> sec.{SecondaryInterval}";
-        }
-    }
-
-    public enum WorkItemsInterval
-    {
-        Start,
-        Finish,
     }
 }

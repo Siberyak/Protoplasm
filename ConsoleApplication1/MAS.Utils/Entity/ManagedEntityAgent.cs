@@ -44,11 +44,6 @@ namespace MAS.Utils
             return Compatible(requirements, scene);
         }
 
-        public override string ToString()
-        {
-            return $"{GetType().DisplayName()}: [{Entity}]";
-        }
-
         public override IEnumerable<IHoldersCompatibilityInfo> CompatibilityInfos()
         {
             return Manager.Where(x => x.AbilitiesHolder == this || x.RequiremenetsHolder == this);

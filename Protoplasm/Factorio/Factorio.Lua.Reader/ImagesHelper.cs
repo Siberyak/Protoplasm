@@ -10,49 +10,137 @@ namespace Factorio.Lua.Reader
 {
     public static class ImagesHelper
     {
-        public static readonly ImageCollection Images32 = new ImageCollection() { ImageSize = new Size(32, 32) };
-        public static readonly ImageCollection Images64 = new ImageCollection() { ImageSize = new Size(64, 64) };
+        public class Helper
+        {
+            public ImageCollection Images { get; }
 
-        private static readonly Dictionary<object, int> _indexes32 = new Dictionary<object, int>();
-        private static readonly Dictionary<object, int> _indexes64 = new Dictionary<object, int>();
+            readonly Dictionary<object, int> _indexes = new Dictionary<object, int>();
+
+            public Helper(int width, int? height = null)
+            {
+                Images = new ImageCollection {ImageSize = new Size(width, height ?? width) };
+            }
+
+            public int? GetIndex<TData, T>(TData data, T key, ImageLoaderDelegate<TData> loader)
+            {
+                return GetIndex(key, k => loader(data), _indexes, Images);
+            }
+
+            public int GetIndex(string key)
+            {
+                return GetIndex(key, k => LoadImage(Storage.Current, k)) ?? -1;
+            }
+
+            public int? GetIndex<T>(T key, ImageLoaderDelegate<T> loader)
+            {
+                return GetIndex(key, loader, _indexes, Images);
+            }
+
+            private static int? GetIndex<T>(T key, ImageLoaderDelegate<T> loader, Dictionary<object, int> indexes, ImageCollection images)
+            {
+                if (key == null)
+                    return null;
+
+                lock (indexes)
+                {
+                    if (indexes.ContainsKey(key))
+                        return indexes[key];
+
+                    var image = loader?.Invoke(key);
+                    if (image == null)
+                        return null;
+
+                    var index = images.Images.Add(image);
+                    indexes.Add(key, index);
+                    return index;
+                }
+            }
+        }
 
         public delegate Image ImageLoaderDelegate<T>(T key);
 
+        #region 16x16
+
+        public static Helper x16 = new Helper(16);
+
+
+        public static ImageCollection Images16
+        {
+            get { return x16.Images; }
+        }
+
+        public static int? GetIndex16<TData, T>(TData data, T key, ImageLoaderDelegate<TData> loader)
+        {
+            return x16.GetIndex(data, key, loader);
+        }
+
+        public static int GetIndex16(string key)
+        {
+            return x16.GetIndex(key);
+        }
+
+        public static int? GetIndex16<T>(T key, ImageLoaderDelegate<T> loader)
+        {
+            return x16.GetIndex(key, loader);
+        }
+
+        #endregion
+
+        #region 32x32
+
+        public static readonly Helper x32 = new Helper(32);
+
+        public static ImageCollection Images32
+        {
+            get { return x32.Images; }
+        }
+
         public static int? GetIndex32<TData, T>(TData data, T key, ImageLoaderDelegate<TData> loader)
         {
-            return GetIndex(key, k => loader(data), _indexes32, Images32);
+            return x32.GetIndex(data, key, loader);
+        }
+
+        public static int GetIndex32(string key)
+        {
+            return x32.GetIndex(key);
         }
 
         public static int? GetIndex32<T>(T key, ImageLoaderDelegate<T> loader)
         {
-            return GetIndex(key, loader, _indexes32, Images32);
+            return x32.GetIndex(key, loader);
+        }
+
+        #endregion
+
+        #region 64x54
+
+        public static readonly Helper x64 = new Helper(64);
+
+        public static ImageCollection Images64
+        {
+            get { return x64.Images; }
+        }
+
+        public static int? GetIndex64<TData, T>(TData data, T key, ImageLoaderDelegate<TData> loader)
+        {
+            return x64.GetIndex(data, key, loader);
+        }
+
+        public static int GetIndex64(string key)
+        {
+            return x64.GetIndex(key);
         }
 
         public static int? GetIndex64<T>(T key, ImageLoaderDelegate<T> loader)
         {
-            return GetIndex(key, loader, _indexes64, Images64);
+            return x64.GetIndex(key, loader);
         }
 
-        private static int? GetIndex<T>(T key, ImageLoaderDelegate<T> loader, Dictionary<object, int> indexes, ImageCollection images)
-        {
-            if (key == null)
-                return null;
+        #endregion
 
-            lock (indexes)
-            {
-                if (indexes.ContainsKey(key))
-                    return indexes[key];
 
-                var image = loader?.Invoke(key);
-                if (image == null)
-                    return null;
-
-                var index = images.Images.Add(image);
-                indexes.Add(key, index);
-                return index;
-            }
-        }
-
+        
+        
         public static Bitmap LoadImage(Storage storage, string key)
         {
             var parts = key.Split('/');
