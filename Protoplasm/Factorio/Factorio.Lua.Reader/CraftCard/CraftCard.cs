@@ -21,7 +21,7 @@ namespace Factorio.Lua.Reader
         protected override void OnClick(EventArgs e)
         {
 
-            if (CraftInfo?.Crafter != null)
+            if (CraftInfo?.Crafter != null && (ModifierKeys == Keys.Control || ModifierKeys == Keys.ControlKey))
             {
                 CraftInfo.Enabled = !CraftInfo.Enabled;
             }

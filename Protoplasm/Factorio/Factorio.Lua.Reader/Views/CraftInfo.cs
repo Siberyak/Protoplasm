@@ -3,12 +3,46 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using Newtonsoft.Json;
+using Protoplasm.Collections;
 
 namespace Factorio.Lua.Reader
 {
     [JsonObject(MemberSerialization.OptIn)]
+    public class CraftChain
+    {
+        private Calculation _calculation;
+
+        PredicatedList<CraftInfo>  _crafts;
+
+        [JsonConstructor]
+        public CraftChain()
+        {
+        }
+
+        public CraftChain(Calculation calculation)
+        {
+            Calculation = calculation;
+        }
+
+        [JsonProperty("calculation")]
+        private Calculation Calculation
+        {
+            get { return _calculation; }
+            set
+            {
+                _calculation = value;
+                _crafts = new PredicatedList<CraftInfo>(_calculation.Crafts, x => x.Chain == this);
+            }
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
     public class CraftInfo : BaseCalcInfo
     {
+
+        [JsonProperty("chain")]
+        public CraftChain Chain;
+
         private Storage _storage => Storage.Current;
 
         ICrafter _crafter;

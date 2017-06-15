@@ -95,6 +95,8 @@ namespace Factorio.Lua.Reader
         {
             SuspendLayout();
 
+            var old = Bounds;
+
             var location = Location;
             location.Offset(offset);
             Location = location;
@@ -104,8 +106,29 @@ namespace Factorio.Lua.Reader
             LocationOffset = locationOffset;
 
             ResumeLayout();
-            Refresh();
-            FindForm()?.Refresh();
+
+            Parent.Refresh();
+            //Parent.Invalidate(old);
+            //Parent.DrawToBitmap(bitmap, Bounds);
+        }
+
+        void IRelatableControl.BringToFront()
+        {
+            BringToFront();
+            foreach (var relatableControl in RelatableControls)
+            {
+                relatableControl.BringToFront();
+            }
+        }
+
+        void IRelatableControl.SendToBack()
+        {
+            foreach (var relatableControl in RelatableControls)
+            {
+                relatableControl.SendToBack();
+            }
+
+            SendToBack();
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -113,6 +136,7 @@ namespace Factorio.Lua.Reader
             if (AllowMoving && e.Button == MouseButtons.Right)
             {
                 MovingStartLocation = e.Location;
+                ((IRelatableControl)this).BringToFront();
             }
 
             base.OnMouseDown(e);

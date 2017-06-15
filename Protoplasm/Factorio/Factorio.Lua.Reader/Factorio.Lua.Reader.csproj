@@ -136,6 +136,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CraftCard\_IRelatableControl.cs" />
+    <Compile Include="DragDropLib.cs" />
+    <Compile Include="DragDropSample.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="RibbonForm2.cs">
       <SubType>Form</SubType>

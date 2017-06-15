@@ -54,7 +54,7 @@ namespace Factorio.Lua.Reader
             if(tmp.Length == 0)
             { }
 
-            //Application.Run(new Form1());
+            //Application.Run(new DragDropSample());
 
             var storageExist = false;
             ViewsExtender.ShowProgress(() => storageExist = Storage.Current != null);

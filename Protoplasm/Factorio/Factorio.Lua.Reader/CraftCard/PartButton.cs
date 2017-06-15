@@ -61,17 +61,7 @@ namespace Factorio.Lua.Reader
                 .Distinct()
                 .ToArray();
 
-            _anchor = new LabelButton
-            {
-                Size = new Size(10, 10),
-                Top = edge.Direction == Direction.Input ? Top - 15 : Bottom + 5,
-                Left = Left + Width/2 - 5,
-                Text = "",
-                Visible = false,
-                Angle = edge.Direction == Direction.Input ? -90 : 90
-            };
-
-            AddRelatedControl(_anchor);
+            //AddAnchor();
 
 
             if (infos.Length == 0)
@@ -89,6 +79,21 @@ namespace Factorio.Lua.Reader
                 item.Click += ContextMenuStripItemClick;
                 ContextMenuStrip.Items.Add(item);
             }
+        }
+
+        private void AddAnchor()
+        {
+            _anchor = new LabelButton
+            {
+                Size = new Size(10, 10),
+                Top = _edge.Direction == Direction.Input ? Top - 15 : Bottom + 5,
+                Left = Left + Width/2 - 5,
+                Text = "",
+                Visible = false,
+                Angle = _edge.Direction == Direction.Input ? -90 : 90
+            };
+
+            AddRelatedControl(_anchor);
         }
 
         private void ContextMenuStripItemClick(object sender, EventArgs e)
@@ -109,7 +114,7 @@ namespace Factorio.Lua.Reader
 
         protected override void OnClick(EventArgs e)
         {
-            _anchor.Visible = !_anchor.Visible;
+            //_anchor.Visible = !_anchor.Visible;
             base.OnClick(e);
         }
 

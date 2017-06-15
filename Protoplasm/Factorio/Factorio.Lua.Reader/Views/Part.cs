@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -62,6 +63,20 @@ namespace Factorio.Lua.Reader
 
         private void ListChanged(object sender, ListChangedEventArgs e)
         {
+            if (e.ListChangedType == ListChangedType.ItemChanged)
+            {
+                var craftInfo = ((IList<CraftInfo>)sender)[e.NewIndex];
+                switch (e.PropertyDescriptor?.Name)
+                {
+                    case nameof(craftInfo.Crafter):
+                    case nameof(craftInfo.Count):
+                    case nameof(craftInfo.Enabled):
+                        break;
+                    default:
+                        return;
+                }
+            }
+
             Recalc();
         }
 
